@@ -22,11 +22,20 @@ entries:
       title: Active Learning
       url: /active_learning
     - output: web,pdf
+      title: FastMNIST
+      url: /fast_mnist
+    - output: web,pdf
       title: Repeated-MNIST Dataset
       url: /repeated_mnist
     - output: web,pdf
       title: Example Experiment
       url: /example_experiment
+    - output: web,pdf
+      title: Black Box Model Training
+      url: /black_box_training
+    - output: web,pdf
+      title: Some Models
+      url: /A1_some_models
     output: web
     title: batchbald_redux
   output: web

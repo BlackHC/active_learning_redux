@@ -306,7 +306,7 @@ description: "Computing joint entropies exactly or by using importance sampling"
                                                 <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
-            
+
         <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">output_entropies_B</span>
@@ -777,7 +777,7 @@ description: "Computing joint entropies exactly or by using importance sampling"
                 <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
-            
+
         <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">output_entropies_B</span>
@@ -1019,37 +1019,37 @@ description: "Computing joint entropies exactly or by using importance sampling"
     <span class="n">probs_max_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
     <span class="n">N</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">M</span><span class="p">:</span> <span class="nb">int</span>
-        
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">max_N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_N</span> <span class="o">=</span> <span class="n">max_N</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">inner</span> <span class="o">=</span> <span class="n">ExactJointEntropy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">max_N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    
+
 
     <span class="k">def</span> <span class="nf">add_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;DynamicJointEntropy&#39;</span><span class="p">:</span>
         <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">add_N</span> <span class="o">=</span> <span class="n">probs_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        
+
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="n">add_N</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">C</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="o">+</span><span class="n">add_N</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs_N_K_C</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+=</span> <span class="n">add_N</span>       
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+=</span> <span class="n">add_N</span>
+
         <span class="n">num_exact_samples</span> <span class="o">=</span> <span class="n">C</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span>
         <span class="k">if</span> <span class="n">num_exact_samples</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">inner</span> <span class="o">=</span> <span class="n">SampledJointEntropy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probs_max_N_K_C</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">)</span>
-            
+
         <span class="k">return</span> <span class="bp">self</span>
-    
+
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    
+
     <span class="k">def</span> <span class="nf">compute_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                       <span class="n">probs_B_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
                       <span class="n">output_entropies_B</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>

@@ -19,21 +19,32 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "BayesianModule": "03_consistent_mc_dropout.ipynb",
          "ConsistentMCDropout": "03_consistent_mc_dropout.ipynb",
          "ConsistentMCDropout2d": "03_consistent_mc_dropout.ipynb",
+         "SamplerModel": "03_consistent_mc_dropout.ipynb",
          "ActiveLearningData": "04_active_learning.ipynb",
          "get_balanced_sample_indices": "04_active_learning.ipynb",
          "get_subset_base_indices": "04_active_learning.ipynb",
          "get_base_indices": "04_active_learning.ipynb",
          "RandomFixedLengthSampler": "04_active_learning.ipynb",
-         "TransformedDataset": "05_repeated_mnist.ipynb",
-         "create_repeated_MNIST_dataset": "05_repeated_mnist.ipynb",
-         "create_MNIST_dataset": "05_repeated_mnist.ipynb",
-         "get_targets": "05_repeated_mnist.ipynb"}
+         "FastMNIST": "05a_fast_mnist.ipynb",
+         "TransformedDataset": "05b_repeated_mnist.ipynb",
+         "create_repeated_MNIST_dataset": "05b_repeated_mnist.ipynb",
+         "create_MNIST_dataset": "05b_repeated_mnist.ipynb",
+         "get_targets": "05b_repeated_mnist.ipynb",
+         "train": "07_black_box_training.ipynb",
+         "create_metrics": "07_black_box_training.ipynb",
+         "configure_tb_logger": "07_black_box_training.ipynb",
+         "LOG_INTERVAL": "07_black_box_training.ipynb",
+         "HEAVY_LOG_INTERVAL": "07_black_box_training.ipynb",
+         "BayesianMNISTCNN": "A1_some_models.ipynb"}
 
 modules = ["batchbald.py",
            "joint_entropy.py",
            "consistent_mc_dropout.py",
            "active_learning.py",
-           "repeated_mnist.py"]
+           "fast_mnist.py",
+           "repeated_mnist.py",
+           "black_box_model_training.py",
+           "example_models.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"
 

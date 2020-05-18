@@ -416,8 +416,8 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
     <span class="k">if</span> <span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">(</span><span class="n">candidate_scores</span><span class="p">,</span> <span class="n">candidate_indices</span><span class="p">)</span>
-    
-    <span class="n">conditional_entropies_N</span> <span class="o">=</span> <span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">)</span>   
+
+    <span class="n">conditional_entropies_N</span> <span class="o">=</span> <span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">probs_N_K_C</span><span class="p">)</span>
 
     <span class="n">batch_joint_entropy</span> <span class="o">=</span> <span class="n">joint_entropy</span><span class="o">.</span><span class="n">DynamicJointEntropy</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span>
                                                             <span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>

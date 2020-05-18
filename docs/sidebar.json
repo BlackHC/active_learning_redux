@@ -5,7 +5,10 @@
     "Joint Entropies": "/joint_entropy_computation",
     "Consistent MC Dropout": "/consistent_mc_dropout",
     "Active Learning": "/active_learning",
+    "FastMNIST": "/fast_mnist",
     "Repeated-MNIST Dataset": "/repeated_mnist",
-    "Example Experiment": "/example_experiment"
+    "Example Experiment": "/example_experiment",
+    "Black Box Model Training": "/black_box_training",
+    "Some Models": "/A1_some_models"
   }
 }

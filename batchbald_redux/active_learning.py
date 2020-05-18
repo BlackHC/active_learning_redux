@@ -10,7 +10,6 @@ import torch.utils.data as data
 import torch
 import collections
 
-
 # Cell
 
 
