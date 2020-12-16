@@ -32,9 +32,10 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "get_targets": "05b_repeated_mnist.ipynb",
          "train": "07_black_box_training.ipynb",
          "create_metrics": "07_black_box_training.ipynb",
-         "configure_tb_logger": "07_black_box_training.ipynb",
          "LOG_INTERVAL": "07_black_box_training.ipynb",
          "HEAVY_LOG_INTERVAL": "07_black_box_training.ipynb",
+         "handler_save_predictions": "07_black_box_training.ipynb",
+         "get_predictions": "07_black_box_training.ipynb",
          "BayesianMNISTCNN": "A1_some_models.ipynb"}
 
 modules = ["batchbald.py",
