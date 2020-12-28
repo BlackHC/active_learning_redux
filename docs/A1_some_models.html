@@ -40,7 +40,7 @@ nb_path: "A1_some_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BayesianMNISTCNN" class="doc_header"><code>class</code> <code>BayesianMNISTCNN</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/example_models.py#L13" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
+<h2 id="BayesianMNISTCNN" class="doc_header"><code>class</code> <code>BayesianMNISTCNN</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/example_models.py#L18" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
 </blockquote>
 <p>A module that we can sample multiple times from given a single input batch.</p>
 <p>To be efficient, the module allows for a part of the forward pass to be deterministic.</p>
@@ -62,11 +62,16 @@ nb_path: "A1_some_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">BayesianModule</span><span class="p">,</span> <span class="n">ConsistentMCDropout</span><span class="p">,</span> <span class="n">ConsistentMCDropout2d</span>
-
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BayesianModule</span><span class="p">,</span>
+    <span class="n">ConsistentMCDropout</span><span class="p">,</span>
+    <span class="n">ConsistentMCDropout2d</span><span class="p">,</span>
+<span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">BayesianMNISTCNN</span><span class="p">(</span><span class="n">BayesianModule</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
@@ -105,8 +110,7 @@ nb_path: "A1_some_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span>    
-<span class="n">BayesianMNISTCNN</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">BayesianMNISTCNN</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -134,23 +138,6 @@ nb_path: "A1_some_models.ipynb"
 
 </div>
 
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span>
-</pre></div>
-
-    </div>
 </div>
 </div>
 

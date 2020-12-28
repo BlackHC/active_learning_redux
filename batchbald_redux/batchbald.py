@@ -16,6 +16,7 @@ from batchbald_redux import joint_entropy
 
 # Cell
 
+
 def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
 
@@ -71,9 +72,7 @@ class BatchBALDScorer:
     batch_joint_entropy: joint_entropy.JointEntropy
     batch_conditional_entropies: torch.Tensor
 
-    def __init__(
-        self, log_probs_N_K_C, max_size, num_samples: int, dtype=None, device=None
-    ):
+    def __init__(self, log_probs_N_K_C, max_size, num_samples: int, dtype=None, device=None):
         N, K, C = log_probs_N_K_C.shape
         self.log_probs_N_K_C = log_probs_N_K_C
 
@@ -98,9 +97,7 @@ class BatchBALDScorer:
         return scores_N
 
     def compute_scores(self, out_scores_N: torch.Tensor):
-        self.batch_joint_entropy.compute_batch(
-            self.log_probs_N_K_C, output_entropies_B=out_scores_N
-        )
+        self.batch_joint_entropy.compute_batch(self.log_probs_N_K_C, output_entropies_B=out_scores_N)
 
         out_scores_N -= self.conditional_entropies_N + self.batch_conditional_entropies
 
@@ -108,11 +105,7 @@ class BatchBALDScorer:
 
 
 def get_batchbald_batch(
-    log_probs_N_K_C: torch.Tensor,
-    batch_size: int,
-    num_samples: int,
-    dtype=None,
-    device=None,
+    log_probs_N_K_C: torch.Tensor, batch_size: int, num_samples: int, dtype=None, device=None
 ) -> CandidateBatch:
     N, K, C = log_probs_N_K_C.shape
 
@@ -180,9 +173,7 @@ def get_batchbald_batch_plain(
     for i in tqdm(range(batch_size), desc="BatchBALD", leave=False):
         if i > 0:
             latest_index = candidate_indices[-1]
-            batch_joint_entropy.add_variables(
-                log_probs_N_K_C[latest_index : latest_index + 1]
-            )
+            batch_joint_entropy.add_variables(log_probs_N_K_C[latest_index : latest_index + 1])
 
         shared_conditional_entropies = conditional_entropies_N[candidate_indices].sum()
 
@@ -200,6 +191,7 @@ def get_batchbald_batch_plain(
 
 # Cell
 
+
 def get_bald_scores(log_probs_N_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
 
@@ -211,9 +203,7 @@ def get_bald_scores(log_probs_N_K_C: torch.Tensor, dtype=None, device=None) -> t
 # Cell
 
 
-def get_bald_batch(
-    log_probs_N_K_C: torch.Tensor, batch_size: int, dtype=None, device=None
-) -> CandidateBatch:
+def get_bald_batch(log_probs_N_K_C: torch.Tensor, batch_size: int, dtype=None, device=None) -> CandidateBatch:
     N, K, C = log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)

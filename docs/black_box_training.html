@@ -91,7 +91,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L101" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L97" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -152,9 +152,7 @@ nb_path: "07_black_box_training.ipynb"
 
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">create_metrics</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 
-    <span class="n">validation_evaluator</span> <span class="o">=</span> <span class="n">create_supervised_evaluator</span><span class="p">(</span>
-        <span class="n">val_model</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
+    <span class="n">validation_evaluator</span> <span class="o">=</span> <span class="n">create_supervised_evaluator</span><span class="p">(</span><span class="n">val_model</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="nd">@trainer</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
@@ -163,9 +161,7 @@ nb_path: "07_black_box_training.ipynb"
     <span class="c1"># Only to look nicer.</span>
     <span class="n">RunningAverage</span><span class="p">(</span><span class="n">output_transform</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;crossentropy&quot;</span><span class="p">)</span>
 
-    <span class="n">setup_common_training_handlers</span><span class="p">(</span>
-        <span class="n">trainer</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span>
-    <span class="p">)</span>
+    <span class="n">setup_common_training_handlers</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
 
     <span class="n">ProgressBar</span><span class="p">(</span><span class="n">persist</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span>
         <span class="n">validation_evaluator</span><span class="p">,</span>
@@ -222,9 +218,7 @@ nb_path: "07_black_box_training.ipynb"
 <span class="kn">from</span> <span class="nn">batchbald_redux.fast_mnist</span> <span class="kn">import</span> <span class="n">FastMNIST</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.repeated_mnist</span> <span class="kn">import</span> <span class="n">create_repeated_MNIST_dataset</span>
 
-<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span>
-    <span class="n">num_repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span>
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span><span class="n">num_repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">BayesianMNISTCNN</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -296,7 +290,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="handler_save_predictions" class="doc_header"><code>handler_save_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L107" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>handler_save_predictions</code>(<strong><code>engine</code></strong>, <strong><code>target_list</code></strong>)</p>
+<h4 id="handler_save_predictions" class="doc_header"><code>handler_save_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L103" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>handler_save_predictions</code>(<strong><code>engine</code></strong>, <strong><code>target_list</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -320,7 +314,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L113" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L109" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
 </blockquote>
 
 </div>

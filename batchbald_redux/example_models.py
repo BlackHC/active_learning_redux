@@ -4,11 +4,16 @@ __all__ = ['BayesianMNISTCNN']
 
 # Cell
 
-from .consistent_mc_dropout import BayesianModule, ConsistentMCDropout, ConsistentMCDropout2d
-
 import torch
 from torch import nn as nn
 from torch.nn import functional as F
+
+from .consistent_mc_dropout import (
+    BayesianModule,
+    ConsistentMCDropout,
+    ConsistentMCDropout2d,
+)
+
 
 class BayesianMNISTCNN(BayesianModule):
     def __init__(self, num_classes=10):

@@ -58,9 +58,7 @@ class _ConsistentMCDropout(Module):
         super().__init__()
 
         if p < 0 or p > 1:
-            raise ValueError(
-                "dropout probability has to be between 0 and 1, " "but got {}".format(p)
-            )
+            raise ValueError("dropout probability has to be between 0 and 1, " "but got {}".format(p))
 
         self.p = p
         self.mask = None
@@ -81,9 +79,7 @@ class _ConsistentMCDropout(Module):
 
     def _create_mask(self, input, k):
         mask_shape = [1, k] + list(self._get_sample_mask_shape(input.shape[1:]))
-        mask = torch.empty(
-            mask_shape, dtype=torch.bool, device=input.device
-        ).bernoulli_(self.p)
+        mask = torch.empty(mask_shape, dtype=torch.bool, device=input.device).bernoulli_(self.p)
         return mask
 
     def forward(self, input: torch.Tensor):
@@ -209,9 +205,7 @@ def multi_sample_loss(loss):
     def wrapped_loss(input_B_K_C, target_B_, *args, **kwargs):
         assert input_B_K_C.shape[0] == target_B_.shape[0]
         input_BK_C = input_B_K_C.flatten(0, 1)
-        target_B_K_ = target_B_[:, None].expand(
-            input_B_K_C.shape[:2] + target_B_.shape[1:]
-        )
+        target_B_K_ = target_B_[:, None].expand(input_B_K_C.shape[:2] + target_B_.shape[1:])
         target_BK_ = target_B_K_.flatten(0, 1)
         return loss(input_BK_C, target_BK_, *args, **kwargs)
 
@@ -223,9 +217,7 @@ def multi_sample_loss(loss):
 def geometric_mean_loss(loss):
     @wraps(loss)
     def wrapped_loss(log_probs_B_K_C, target_N, *args, **kwargs):
-        return loss(
-            log_probs_B_K_C.mean(dim=1, keepdim=False), target_N, *args, **kwargs
-        )
+        return loss(log_probs_B_K_C.mean(dim=1, keepdim=False), target_N, *args, **kwargs)
 
     return wrapped_loss
 

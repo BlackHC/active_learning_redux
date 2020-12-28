@@ -234,9 +234,7 @@ Then, we will implement BatchBALD and BALD.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
-    <span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">yus_ws</span><span class="p">),</span> <span class="p">[</span><span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span>
-<span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">compute_conditional_entropy</span><span class="p">(</span><span class="n">yus_ws</span><span class="p">),</span> <span class="p">[</span><span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">compute_entropy</span><span class="p">(</span><span class="n">yus_ws</span><span class="p">),</span> <span class="p">[</span><span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">,</span> <span class="mf">1.3863</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 
@@ -265,7 +263,7 @@ Then, we will implement BatchBALD and BALD.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="compute_conditional_entropy" class="doc_header"><code>compute_conditional_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L19" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_conditional_entropy</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="compute_conditional_entropy" class="doc_header"><code>compute_conditional_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L20" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_conditional_entropy</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 
 </div>
@@ -289,7 +287,7 @@ Then, we will implement BatchBALD and BALD.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="compute_entropy" class="doc_header"><code>compute_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L38" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_entropy</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="compute_entropy" class="doc_header"><code>compute_entropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>compute_entropy</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 
 </div>
@@ -460,7 +458,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="CandidateBatch" class="doc_header"><code>class</code> <code>CandidateBatch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L61" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CandidateBatch</code>(<strong><code>scores</code></strong>:<code>List</code>[<code>float</code>], <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
+<h2 id="CandidateBatch" class="doc_header"><code>class</code> <code>CandidateBatch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L62" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CandidateBatch</code>(<strong><code>scores</code></strong>:<code>List</code>[<code>float</code>], <strong><code>indices</code></strong>:<code>List</code>[<code>int</code>])</p>
 </blockquote>
 <p>CandidateBatch(scores: List[float], indices: List[int])</p>
 
@@ -505,7 +503,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BatchBALDScorer" class="doc_header"><code>class</code> <code>BatchBALDScorer</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L68" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BatchBALDScorer</code>(<strong><code>log_probs_N_K_C</code></strong>, <strong><code>max_size</code></strong>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h2 id="BatchBALDScorer" class="doc_header"><code>class</code> <code>BatchBALDScorer</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L69" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BatchBALDScorer</code>(<strong><code>log_probs_N_K_C</code></strong>, <strong><code>max_size</code></strong>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -529,7 +527,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L110" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L107" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -553,7 +551,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbald_batch_plain" class="doc_header"><code>get_batchbald_batch_plain</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L154" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch_plain</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batchbald_batch_plain" class="doc_header"><code>get_batchbald_batch_plain</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L147" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch_plain</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -579,9 +577,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
     <span class="n">batch_joint_entropy</span><span class="p">:</span> <span class="n">joint_entropy</span><span class="o">.</span><span class="n">JointEntropy</span>
     <span class="n">batch_conditional_entropies</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span>
 
@@ -606,9 +602,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
         <span class="k">return</span> <span class="n">scores_N</span>
 
     <span class="k">def</span> <span class="nf">compute_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_scores_N</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">output_entropies_B</span><span class="o">=</span><span class="n">out_scores_N</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">compute_batch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">output_entropies_B</span><span class="o">=</span><span class="n">out_scores_N</span><span class="p">)</span>
 
         <span class="n">out_scores_N</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditional_entropies_N</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_conditional_entropies</span>
 
@@ -616,11 +610,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <span class="k">def</span> <span class="nf">get_batchbald_batch</span><span class="p">(</span>
-    <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
 
@@ -688,9 +678,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;BatchBALD&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">latest_index</span> <span class="o">=</span> <span class="n">candidate_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span>
-                <span class="n">log_probs_N_K_C</span><span class="p">[</span><span class="n">latest_index</span> <span class="p">:</span> <span class="n">latest_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">batch_joint_entropy</span><span class="o">.</span><span class="n">add_variables</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">[</span><span class="n">latest_index</span> <span class="p">:</span> <span class="n">latest_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
 
         <span class="n">shared_conditional_entropies</span> <span class="o">=</span> <span class="n">conditional_entropies_N</span><span class="p">[</span><span class="n">candidate_indices</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -811,7 +799,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_bald_scores" class="doc_header"><code>get_bald_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L203" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_scores</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_bald_scores" class="doc_header"><code>get_bald_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L195" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_scores</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -871,7 +859,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_bald_batch" class="doc_header"><code>get_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L214" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_bald_batch" class="doc_header"><code>get_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -891,9 +879,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_bald_batch</span><span class="p">(</span>
-    <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_bald_batch</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -975,7 +961,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbaldical_batch" class="doc_header"><code>get_batchbaldical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L233" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbaldical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batchbaldical_batch" class="doc_header"><code>get_batchbaldical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L223" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbaldical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>

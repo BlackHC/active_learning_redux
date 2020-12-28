@@ -4,13 +4,14 @@ __all__ = ['FastMNIST']
 
 # Cell
 
+import torch
+import torch.utils.data as data
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
-import torch.utils.data as data
-import torch
 
 # Cell
 from torchvision.datasets import MNIST
+
 
 # From https://tinyurl.com/pytorch-fast-mnist
 class FastMNIST(MNIST):
