@@ -1,14 +1,16 @@
 {
   "batchbald_redux": {
     "Overview": "/",
-    "BatchBALD Algorithm": "/batchbald",
-    "Joint Entropies": "/joint_entropy_computation",
-    "Consistent MC Dropout": "/consistent_mc_dropout",
-    "Active Learning": "/active_learning",
-    "FastMNIST": "/fast_mnist",
-    "Repeated-MNIST Dataset": "/repeated_mnist",
-    "Example Experiment": "/example_experiment",
-    "Black Box Model Training": "/black_box_training",
-    "Some Models": "/A1_some_models"
+    "BatchBALD Algorithm": "batchbald.html",
+    "Joint Entropies": "joint_entropy_computation.html",
+    "Consistent MC Dropout": "consistent_mc_dropout.html",
+    "Active Learning": "active_learning.html",
+    "FastMNIST": "fast_mnist.html",
+    "Repeated-MNIST Dataset": "repeated_mnist.html",
+    "Example Experiment": "example_experiment.html",
+    "Black Box Model Training": "black_box_training.html",
+    "Analysis of BALD scores during Training": "BALD_score_analysis.html",
+    "Semi-Supervised Learning": "SSL.html",
+    "Some Models": "A1_some_models.html"
   }
 }

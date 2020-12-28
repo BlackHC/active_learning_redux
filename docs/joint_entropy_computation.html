@@ -2,11 +2,13 @@
 
 title: Joint Entropies
 
+
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Computing joint entropies exactly or by using importance sampling"
 description: "Computing joint entropies exactly or by using importance sampling"
+nb_path: "02_joint_entropy_computation.ipynb"
 ---
 <!--
 
@@ -134,13 +136,6 @@ description: "Computing joint entropies exactly or by using importance sampling"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
 <div class="output_wrapper">
 <div class="output">
 
@@ -150,9 +145,9 @@ description: "Computing joint entropies exactly or by using importance sampling"
 <div class="output_markdown rendered_html output_subarea ">
 <h2 id="JointEntropy" class="doc_header"><code>class</code> <code>JointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>JointEntropy</code>()</p>
 </blockquote>
-<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
 
 </div>
 
@@ -160,6 +155,13 @@ description: "Computing joint entropies exactly or by using importance sampling"
 
 </div>
 </div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -217,7 +219,7 @@ description: "Computing joint entropies exactly or by using importance sampling"
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Exact-Joint-Entropies">Exact Joint Entropies<a class="anchor-link" href="#Exact-Joint-Entropies"> </a></h2><p>To compute exact joint entropies, we have to compute all possible configurations of the $y_i$ and evaluate $p(y_1, \dots, y_n)$ by averaging over $p(y_1, \dots, y_n|w)$.</p>
 <p>The number of samples $M=C^N$, where $N$ is the number of variables in the joint and $C$ is the number of classes.</p>
-<p>For this, we provide a class <a href="/batchbald_redux/joint_entropy_computation#ExactJointEntropy"><code>ExactJointEntropy</code></a> that takes $K$ and starts with no variables in the joint.</p>
+<p>For this, we provide a class <a href="/batchbald_redux/joint_entropy_computation.html#ExactJointEntropy"><code>ExactJointEntropy</code></a> that takes $K$ and starts with no variables in the joint.</p>
 <h3 id="In-the-Paper">In the Paper<a class="anchor-link" href="#In-the-Paper"> </a></h3><p><img src="/batchbald_redux/batchbald_exact_joint_entropy.png" alt="Version in the paper"></p>
 
 </div>
@@ -229,6 +231,33 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ExactJointEntropy" class="doc_header"><code>class</code> <code>ExactJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L38" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ExactJointEntropy</code>(<strong><code>joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+</blockquote>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -313,33 +342,6 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="ExactJointEntropy" class="doc_header"><code>class</code> <code>ExactJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L38" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ExactJointEntropy</code>(<strong><code>joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation#JointEntropy"><code>JointEntropy</code></a></p>
-</blockquote>
-<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -538,7 +540,7 @@ description: "Computing joint entropies exactly or by using importance sampling"
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>To compute approximate joint entropies, we have to sample possible configurations of the $y_i$ from $p(y_1, \dots, y_n|w)$ stratified by $p(w)$ and evaluate $p(y_1, \dots, y_n)$ by averaging over $p(y_1, \dots, y_n|w)$.</p>
 <p>The number of samples is $M$, so we use $\frac{M}{K}$ samples per $w$.</p>
-<p>For this, we provide a class <a href="/batchbald_redux/joint_entropy_computation#SampledJointEntropy"><code>SampledJointEntropy</code></a> that takes $K$ and $M$, and implements the 'JointEntropy' interface.</p>
+<p>For this, we provide a class <a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy"><code>SampledJointEntropy</code></a> that takes $K$ and $M$, and implements the 'JointEntropy' interface.</p>
 
 </div>
 </div>
@@ -550,57 +552,6 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </div>
 </div>
 </div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">batch_multi_choices</span><span class="p">(</span><span class="n">probs_b_C</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    probs_b_C: Ni... x C</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        choices: Ni... x M</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">probs_B_C</span> <span class="o">=</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="c1"># samples: Ni... x draw_per_xx</span>
-    <span class="n">choices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs_B_C</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="n">choices_b_M</span> <span class="o">=</span> <span class="n">choices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">M</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">choices_b_M</span>
-
-
-<span class="k">def</span> <span class="nf">gather_expand</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">dr</span> <span class="o">==</span> <span class="n">ir</span> <span class="ow">or</span> <span class="mi">1</span> <span class="ow">in</span> <span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-
-    <span class="n">max_shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
-    <span class="n">new_data_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
-    <span class="n">new_data_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
-
-    <span class="n">new_index_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
-    <span class="n">new_index_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_data_shape</span><span class="p">)</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_index_shape</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span> <span class="o">=</span> <span class="kc">False</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -652,6 +603,57 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">batch_multi_choices</span><span class="p">(</span><span class="n">probs_b_C</span><span class="p">,</span> <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    probs_b_C: Ni... x C</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        choices: Ni... x M</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">probs_B_C</span> <span class="o">=</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># samples: Ni... x draw_per_xx</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs_B_C</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">choices_b_M</span> <span class="o">=</span> <span class="n">choices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">probs_b_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="n">M</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">choices_b_M</span>
+
+
+<span class="k">def</span> <span class="nf">gather_expand</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">dr</span> <span class="o">==</span> <span class="n">ir</span> <span class="ow">or</span> <span class="mi">1</span> <span class="ow">in</span> <span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="n">max_shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span> <span class="n">ir</span><span class="p">)</span> <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
+    <span class="n">new_data_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
+    <span class="n">new_data_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="n">new_index_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">max_shape</span><span class="p">)</span>
+    <span class="n">new_index_shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_data_shape</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">new_index_shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="n">gather_expand</span><span class="o">.</span><span class="n">DEBUG_CHECKS</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="In-the-Paper">In the Paper<a class="anchor-link" href="#In-the-Paper"> </a></h3><p><img src="/batchbald_redux/batchbald_importance_sampling.png" alt="Version in the paper"></p>
@@ -665,6 +667,33 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="SampledJointEntropy" class="doc_header"><code>class</code> <code>SampledJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L153" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SampledJointEntropy</code>(<strong><code>sampled_joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+</blockquote>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy.add_variables"><code>SampledJointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy.compute"><code>SampledJointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy.compute_batch"><code>SampledJointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -784,33 +813,6 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="SampledJointEntropy" class="doc_header"><code>class</code> <code>SampledJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L153" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SampledJointEntropy</code>(<strong><code>sampled_joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation#JointEntropy"><code>JointEntropy</code></a></p>
-</blockquote>
-<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation#SampledJointEntropy.add_variables"><code>SampledJointEntropy.add_variables</code></a>.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#SampledJointEntropy.compute"><code>SampledJointEntropy.compute</code></a> computes the joint entropy.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#SampledJointEntropy.compute_batch"><code>SampledJointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -1010,6 +1012,33 @@ description: "Computing joint entropies exactly or by using importance sampling"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L265" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+</blockquote>
+<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
+<p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
@@ -1058,33 +1087,6 @@ description: "Computing joint entropies exactly or by using importance sampling"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L265" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation#JointEntropy"><code>JointEntropy</code></a></p>
-</blockquote>
-<p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
-<p><a href="/batchbald_redux/joint_entropy_computation#JointEntropy.compute_batch"><code>JointEntropy.compute_batch</code></a> computes the joint entropy of the added variables with each of the variables in the provided batch probabilities in turn.</p>
-
-</div>
-
-</div>
-
 </div>
 </div>
 

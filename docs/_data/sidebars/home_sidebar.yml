@@ -11,31 +11,37 @@ entries:
       url: /
     - output: web,pdf
       title: BatchBALD Algorithm
-      url: /batchbald
+      url: batchbald.html
     - output: web,pdf
       title: Joint Entropies
-      url: /joint_entropy_computation
+      url: joint_entropy_computation.html
     - output: web,pdf
       title: Consistent MC Dropout
-      url: /consistent_mc_dropout
+      url: consistent_mc_dropout.html
     - output: web,pdf
       title: Active Learning
-      url: /active_learning
+      url: active_learning.html
     - output: web,pdf
       title: FastMNIST
-      url: /fast_mnist
+      url: fast_mnist.html
     - output: web,pdf
       title: Repeated-MNIST Dataset
-      url: /repeated_mnist
+      url: repeated_mnist.html
     - output: web,pdf
       title: Example Experiment
-      url: /example_experiment
+      url: example_experiment.html
     - output: web,pdf
       title: Black Box Model Training
-      url: /black_box_training
+      url: black_box_training.html
+    - output: web,pdf
+      title: Analysis of BALD scores during Training
+      url: BALD_score_analysis.html
+    - output: web,pdf
+      title: Semi-Supervised Learning
+      url: SSL.html
     - output: web,pdf
       title: Some Models
-      url: /A1_some_models
+      url: A1_some_models.html
     output: web
     title: batchbald_redux
   output: web
