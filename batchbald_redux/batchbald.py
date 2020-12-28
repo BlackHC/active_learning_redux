@@ -16,18 +16,16 @@ from batchbald_redux import joint_entropy
 
 # Cell
 
-
-def compute_conditional_entropy(probs_N_K_C: torch.Tensor) -> torch.Tensor:
-    N, K, C = probs_N_K_C.shape
+def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
+    N, K, C = log_probs_N_K_C.shape
 
     entropies_N = torch.empty(N, dtype=torch.double)
 
     pbar = tqdm(total=N, desc="Conditional Entropy", leave=False)
 
-    @toma.execute.chunked(probs_N_K_C, 1024)
-    def compute(probs_n_K_C, start: int, end: int):
-        nats_n_K_C = probs_n_K_C * torch.log(probs_n_K_C)
-        nats_n_K_C[probs_n_K_C == 0] = 0.0
+    @toma.execute.chunked(log_probs_N_K_C, 1024)
+    def compute(log_probs_n_K_C, start: int, end: int):
+        nats_n_K_C = log_probs_n_K_C * torch.exp(log_probs_n_K_C)
 
         entropies_N[start:end].copy_(-torch.sum(nats_n_K_C, dim=(1, 2)) / K)
         pbar.update(end - start)
@@ -37,60 +35,17 @@ def compute_conditional_entropy(probs_N_K_C: torch.Tensor) -> torch.Tensor:
     return entropies_N
 
 
-def compute_entropy(probs_N_K_C: torch.Tensor) -> torch.Tensor:
-    N, K, C = probs_N_K_C.shape
+def compute_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
+    N, K, C = log_probs_N_K_C.shape
 
     entropies_N = torch.empty(N, dtype=torch.double)
 
     pbar = tqdm(total=N, desc="Entropy", leave=False)
 
-    @toma.execute.chunked(probs_N_K_C, 1024)
-    def compute(probs_n_K_C, start: int, end: int):
-        mean_probs_n_C = probs_n_K_C.mean(dim=1)
-        nats_n_C = mean_probs_n_C * torch.log(mean_probs_n_C)
-        nats_n_C[mean_probs_n_C == 0] = 0.0
-
-        entropies_N[start:end].copy_(-torch.sum(nats_n_C, dim=1))
-        pbar.update(end - start)
-
-    pbar.close()
-
-    return entropies_N
-
-# Internal Cell
-# Not publishing these at the moment.
-
-
-def compute_conditional_entropy_from_logits(logits_N_K_C: torch.Tensor) -> torch.Tensor:
-    N, K, C = logits_N_K_C.shape
-
-    entropies_N = torch.empty(N, dtype=torch.double)
-
-    pbar = tqdm(total=N, desc="Conditional Entropy", leave=False)
-
-    @toma.execute.chunked(logits_N_K_C, 1024)
-    def compute(logits_n_K_C, start: int, end: int):
-        nats_n_K_C = logits_n_K_C * torch.exp(logits_n_K_C)
-
-        entropies_N[start:end].copy_(-torch.sum(nats_n_K_C, dim=(1, 2)) / K)
-        pbar.update(end - start)
-
-    pbar.close()
-
-    return entropies_N
-
-
-def compute_entropy_from_logits(logits_N_K_C: torch.Tensor) -> torch.Tensor:
-    N, K, C = logits_N_K_C.shape
-
-    entropies_N = torch.empty(N, dtype=torch.double)
-
-    pbar = tqdm(total=N, desc="Entropy", leave=False)
-
-    @toma.execute.chunked(logits_N_K_C, 1024)
-    def compute(logits_n_K_C, start: int, end: int):
-        mean_logits_n_C = torch.logsumexp(logits_n_K_C, dim=1) - math.log(K)
-        nats_n_C = mean_logits_n_C * torch.exp(mean_logits_n_C)
+    @toma.execute.chunked(log_probs_N_K_C, 1024)
+    def compute(log_probs_n_K_C, start: int, end: int):
+        mean_log_probs_n_C = torch.logsumexp(log_probs_n_K_C, dim=1) - math.log(K)
+        nats_n_C = mean_log_probs_n_C * torch.exp(mean_log_probs_n_C)
 
         entropies_N[start:end].copy_(-torch.sum(nats_n_C, dim=1))
         pbar.update(end - start)
@@ -111,18 +66,18 @@ class CandidateBatch:
 
 
 class BatchBALDScorer:
-    probs_N_K_C: torch.tensor
+    log_probs_N_K_C: torch.tensor
     conditional_entropies_N: torch.Tensor
     batch_joint_entropy: joint_entropy.JointEntropy
     batch_conditional_entropies: torch.Tensor
 
     def __init__(
-        self, probs_N_K_C, max_size, num_samples: int, dtype=None, device=None
+        self, log_probs_N_K_C, max_size, num_samples: int, dtype=None, device=None
     ):
-        N, K, C = probs_N_K_C.shape
-        self.probs_N_K_C = probs_N_K_C
+        N, K, C = log_probs_N_K_C.shape
+        self.log_probs_N_K_C = log_probs_N_K_C
 
-        self.conditional_entropies_N = compute_conditional_entropy(self.probs_N_K_C)
+        self.conditional_entropies_N = compute_conditional_entropy(self.log_probs_N_K_C)
         self.batch_conditional_entropies = 0
 
         self.batch_joint_entropy = joint_entropy.DynamicJointEntropy(
@@ -130,13 +85,13 @@ class BatchBALDScorer:
         )
 
     def append_to_batch(self, index: int):
-        self.batch_joint_entropy.add_variables(self.probs_N_K_C[index : index + 1])
+        self.batch_joint_entropy.add_variables(self.log_probs_N_K_C[index : index + 1])
         self.batch_conditional_entropies += self.conditional_entropies_N[index].clone()
 
     def alloc_scores(self) -> torch.Tensor:
         # We always keep these on the CPU.
         scores_N = torch.empty(
-            self.probs_N_K_C.shape[0],
+            self.log_probs_N_K_C.shape[0],
             dtype=torch.double,
             pin_memory=torch.cuda.is_available(),
         )
@@ -144,7 +99,7 @@ class BatchBALDScorer:
 
     def compute_scores(self, out_scores_N: torch.Tensor):
         self.batch_joint_entropy.compute_batch(
-            self.probs_N_K_C, output_entropies_B=out_scores_N
+            self.log_probs_N_K_C, output_entropies_B=out_scores_N
         )
 
         out_scores_N -= self.conditional_entropies_N + self.batch_conditional_entropies
@@ -153,13 +108,13 @@ class BatchBALDScorer:
 
 
 def get_batchbald_batch(
-    probs_N_K_C: torch.Tensor,
+    log_probs_N_K_C: torch.Tensor,
     batch_size: int,
     num_samples: int,
     dtype=None,
     device=None,
 ) -> CandidateBatch:
-    N, K, C = probs_N_K_C.shape
+    N, K, C = log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)
 
@@ -170,7 +125,7 @@ def get_batchbald_batch(
         return CandidateBatch(candidate_scores, candidate_indices)
 
     batchbald_scorer = BatchBALDScorer(
-        probs_N_K_C,
+        log_probs_N_K_C,
         max_size=batch_size - 1,
         num_samples=num_samples,
         dtype=dtype,
@@ -197,13 +152,13 @@ def get_batchbald_batch(
 
 
 def get_batchbald_batch_plain(
-    probs_N_K_C: torch.Tensor,
+    log_probs_N_K_C: torch.Tensor,
     batch_size: int,
     num_samples: int,
     dtype=None,
     device=None,
 ) -> CandidateBatch:
-    N, K, C = probs_N_K_C.shape
+    N, K, C = log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)
 
@@ -213,7 +168,7 @@ def get_batchbald_batch_plain(
     if batch_size == 0:
         return CandidateBatch(candidate_scores, candidate_indices)
 
-    conditional_entropies_N = compute_conditional_entropy(probs_N_K_C)
+    conditional_entropies_N = compute_conditional_entropy(log_probs_N_K_C)
 
     batch_joint_entropy = joint_entropy.DynamicJointEntropy(
         num_samples, batch_size - 1, K, C, dtype=dtype, device=device
@@ -226,12 +181,12 @@ def get_batchbald_batch_plain(
         if i > 0:
             latest_index = candidate_indices[-1]
             batch_joint_entropy.add_variables(
-                probs_N_K_C[latest_index : latest_index + 1]
+                log_probs_N_K_C[latest_index : latest_index + 1]
             )
 
         shared_conditional_entropies = conditional_entropies_N[candidate_indices].sum()
 
-        batch_joint_entropy.compute_batch(probs_N_K_C, output_entropies_B=scores_N)
+        batch_joint_entropy.compute_batch(log_probs_N_K_C, output_entropies_B=scores_N)
 
         scores_N -= conditional_entropies_N + shared_conditional_entropies
         scores_N[candidate_indices] = -float("inf")
@@ -245,12 +200,11 @@ def get_batchbald_batch_plain(
 
 # Cell
 
+def get_bald_scores(log_probs_N_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
+    N, K, C = log_probs_N_K_C.shape
 
-def get_bald_scores(probs_N_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
-    N, K, C = probs_N_K_C.shape
-
-    scores_N = -compute_conditional_entropy(probs_N_K_C)
-    scores_N += compute_entropy(probs_N_K_C)
+    scores_N = -compute_conditional_entropy(log_probs_N_K_C)
+    scores_N += compute_entropy(log_probs_N_K_C)
 
     return scores_N
 
@@ -258,16 +212,16 @@ def get_bald_scores(probs_N_K_C: torch.Tensor, dtype=None, device=None) -> torch
 
 
 def get_bald_batch(
-    probs_N_K_C: torch.Tensor, batch_size: int, dtype=None, device=None
+    log_probs_N_K_C: torch.Tensor, batch_size: int, dtype=None, device=None
 ) -> CandidateBatch:
-    N, K, C = probs_N_K_C.shape
+    N, K, C = log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)
 
     candidate_indices = []
     candidate_scores = []
 
-    scores_N = get_bald_scores(probs_N_K_C, dtype=dtype, device=device)
+    scores_N = get_bald_scores(log_probs_N_K_C, dtype=dtype, device=device)
 
     candiate_scores, candidate_indices = torch.topk(scores_N, batch_size)
 
@@ -277,15 +231,15 @@ def get_bald_batch(
 
 
 def get_batchbaldical_batch(
-    training_probs_N_K_C: torch.Tensor,
-    pool_probs_N_K_C: torch.Tensor,
+    training_log_probs_N_K_C: torch.Tensor,
+    pool_log_probs_N_K_C: torch.Tensor,
     batch_size: int,
     num_samples: int,
     dtype=None,
     device=None,
 ) -> CandidateBatch:
-    assert training_probs_N_K_C.shape == pool_probs_N_K_C.shape
-    N, K, C = training_probs_N_K_C.shape
+    assert training_log_probs_N_K_C.shape == pool_log_probs_N_K_C.shape
+    N, K, C = training_log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)
 
@@ -296,7 +250,7 @@ def get_batchbaldical_batch(
         return CandidateBatch(candidate_scores, candidate_indices)
 
     training_batchbald_scorer = BatchBALDScorer(
-        training_probs_N_K_C,
+        training_log_probs_N_K_C,
         max_size=batch_size - 1,
         num_samples=num_samples,
         dtype=dtype,
@@ -304,7 +258,7 @@ def get_batchbaldical_batch(
     )
 
     pool_batchbald_scorer = BatchBALDScorer(
-        pool_probs_N_K_C,
+        pool_log_probs_N_K_C,
         max_size=batch_size - 1,
         num_samples=num_samples,
         dtype=dtype,
