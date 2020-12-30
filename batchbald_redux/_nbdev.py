@@ -36,11 +36,14 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "create_MNIST_dataset": "05b_repeated_mnist.ipynb",
          "get_targets": "05b_repeated_mnist.ipynb",
          "train": "07_black_box_training.ipynb",
+         "evaluate": "07_black_box_training.ipynb",
          "create_metrics": "07_black_box_training.ipynb",
          "LOG_INTERVAL": "07_black_box_training.ipynb",
          "handler_save_predictions": "07_black_box_training.ipynb",
          "get_predictions": "07_black_box_training.ipynb",
-         "BayesianMNISTCNN": "A1_some_models.ipynb"}
+         "Experiment": "09_experiment.ipynb",
+         "BayesianMNISTCNN": "A1_some_models.ipynb",
+         "BayesianMNISTCNN_EBM": "A1_some_models.ipynb"}
 
 modules = ["batchbald.py",
            "joint_entropy.py",
@@ -49,6 +52,7 @@ modules = ["batchbald.py",
            "fast_mnist.py",
            "repeated_mnist.py",
            "black_box_model_training.py",
+           "experiment.py",
            "example_models.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"

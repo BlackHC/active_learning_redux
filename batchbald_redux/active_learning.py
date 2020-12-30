@@ -44,9 +44,11 @@ class ActiveLearningData:
         return indices
 
     def acquire(self, pool_indices):
-        """Acquire elements from the pool dataset into the training dataset.
+        """
+        Acquire elements from the pool dataset into the training dataset.
 
-        Add them to training dataset & remove them from the pool dataset."""
+        Add them to training dataset & remove them from the pool dataset.
+        """
         indices = self.get_dataset_indices(pool_indices)
 
         self.training_mask[indices] = True
@@ -65,15 +67,19 @@ class ActiveLearningData:
         return pool_indices
 
     def extract_dataset_from_pool(self, size) -> data.Dataset:
-        """Extract a dataset randomly from the pool dataset and make those indices unavailable.
+        """
+        Extract a dataset randomly from the pool dataset and make those indices unavailable.
 
-        Useful for extracting a validation set."""
+        Useful for extracting a validation set.
+        """
         return self.extract_dataset_from_pool_from_indices(self.get_random_pool_indices(size))
 
     def extract_dataset_from_pool_from_indices(self, pool_indices) -> data.Dataset:
-        """Extract a dataset from the pool dataset and make those indices unavailable.
+        """
+        Extract a dataset from the pool dataset and make those indices unavailable.
 
-        Useful for extracting a validation set."""
+        Useful for extracting a validation set.
+        """
         dataset_indices = self.get_dataset_indices(pool_indices)
 
         self.remove_from_pool(pool_indices)

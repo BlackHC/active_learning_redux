@@ -40,6 +40,9 @@ entries:
       title: Semi-Supervised Learning
       url: SSL.html
     - output: web,pdf
+      title: An experiment template
+      url: experiment.html
+    - output: web,pdf
       title: Some Models
       url: A1_some_models.html
     output: web
