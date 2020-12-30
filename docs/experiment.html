@@ -246,7 +246,7 @@ nb_path: "09_experiment.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_training_set</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_training_set</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">experiment</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
@@ -255,6 +255,217 @@ nb_path: "09_experiment.ipynb"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Training set size 20:
+
+Perf after training {&#39;accuracy&#39;: 0.6184, &#39;crossentropy&#39;: 4.713012725067139}
+Acquiring (label, score)s: 7 (1.314), 7 (1.303), 7 (1.237), 7 (1.215), 2 (1.21), 7 (1.207), 2 (1.198), 2 (1.196), 7 (1.196), 7 (1.196)
+Training set size 30:
+
+Perf after training {&#39;accuracy&#39;: 0.6501, &#39;crossentropy&#39;: 4.576156882095337}
+Acquiring (label, score)s: 5 (1.403), 8 (1.331), 4 (1.303), 3 (1.3), 3 (1.265), 9 (1.25), 3 (1.249), 3 (1.241), 4 (1.222), 9 (1.22)
+Training set size 40:
+
+Perf after training {&#39;accuracy&#39;: 0.7086, &#39;crossentropy&#39;: 2.193311638832092}
+Acquiring (label, score)s: 4 (1.297), 4 (1.232), 5 (1.232), 5 (1.231), 5 (1.219), 5 (1.206), 0 (1.195), 5 (1.189), 7 (1.173), 9 (1.17)
+Training set size 50:
+
+Perf after training {&#39;accuracy&#39;: 0.7608, &#39;crossentropy&#39;: 1.9754455966949462}
+Acquiring (label, score)s: 0 (1.234), 6 (1.214), 2 (1.208), 3 (1.201), 0 (1.201), 9 (1.197), 1 (1.197), 2 (1.191), 3 (1.19), 2 (1.19)
+Training set size 60:
+
+Perf after training {&#39;accuracy&#39;: 0.7984, &#39;crossentropy&#39;: 1.5577151654243468}
+Acquiring (label, score)s: 1 (1.261), 9 (1.249), 2 (1.248), 0 (1.217), 7 (1.206), 5 (1.198), 3 (1.195), 2 (1.192), 3 (1.191), 9 (1.183)
+Training set size 70:
+
+Perf after training {&#39;accuracy&#39;: 0.8284, &#39;crossentropy&#39;: 1.070880346775055}
+Acquiring (label, score)s: 2 (1.203), 2 (1.198), 2 (1.189), 0 (1.166), 7 (1.162), 5 (1.143), 3 (1.137), 5 (1.135), 4 (1.133), 4 (1.127)
+Training set size 80:
+
+Perf after training {&#39;accuracy&#39;: 0.8569, &#39;crossentropy&#39;: 0.913114131975174}
+Done.
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;hparams&#39;: {&#39;acquisition_size&#39;: 10,
+  &#39;max_training_set&#39;: 80,
+  &#39;num_pool_samples&#39;: 20,
+  &#39;num_eval_samples&#39;: 4,
+  &#39;num_training_samples&#39;: 1,
+  &#39;num_patience_epochs&#39;: 3,
+  &#39;max_training_epochs&#39;: 1,
+  &#39;validation_set_size&#39;: 1024,
+  &#39;initial_set_size&#39;: 20,
+  &#39;samples_per_epoch&#39;: 32768},
+ &#39;initial_training_set_indices&#39;: tensor([41376, 32395, 47549,  5049, 49034, 33411, 11929, 46723, 10032, 27715,
+          4160, 37802, 13018, 18609, 30609, 25413, 26449,  1904, 48999, 40092]),
+ &#39;active_learning_steps&#39;: [{&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.6044921875,
+     &#39;crossentropy&#39;: 4.612063035368919}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.6184,
+    &#39;crossentropy&#39;: 4.713012725067139},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [17963,
+     28675,
+     25782,
+     12819,
+     43191,
+     39687,
+     19229,
+     45077,
+     25797,
+     52443],
+    &#39;labels&#39;: [7, 7, 7, 7, 2, 7, 2, 2, 7, 7],
+    &#39;scores&#39;: [1.3138152360916138,
+     1.3030644655227661,
+     1.2367550432682037,
+     1.2148968577384949,
+     1.2101951837539673,
+     1.206555187702179,
+     1.1978866457939148,
+     1.1956741213798523,
+     1.195625126361847,
+     1.1955157816410065]}},
+  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.64453125,
+     &#39;crossentropy&#39;: 4.338195472955704}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.6501,
+    &#39;crossentropy&#39;: 4.576156882095337},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [19959,
+     44944,
+     5293,
+     42565,
+     26311,
+     11096,
+     4138,
+     40375,
+     59300,
+     21840],
+    &#39;labels&#39;: [5, 8, 4, 3, 3, 9, 3, 3, 4, 9],
+    &#39;scores&#39;: [1.4030729532241821,
+     1.3311661779880524,
+     1.3030898571014404,
+     1.2996869385242462,
+     1.2650838494300842,
+     1.250482201576233,
+     1.2488097548484802,
+     1.2406066954135895,
+     1.2218926548957825,
+     1.2204528450965881]}},
+  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.697265625,
+     &#39;crossentropy&#39;: 2.154685102403164}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7086,
+    &#39;crossentropy&#39;: 2.193311638832092},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [55073,
+     52909,
+     56306,
+     15000,
+     34829,
+     43221,
+     28102,
+     14318,
+     2574,
+     52923],
+    &#39;labels&#39;: [4, 4, 5, 5, 5, 5, 0, 5, 7, 9],
+    &#39;scores&#39;: [1.2967806458473206,
+     1.231921136379242,
+     1.2319045662879944,
+     1.2305855751037598,
+     1.2188929319381714,
+     1.2055236101150513,
+     1.194618046283722,
+     1.189286470413208,
+     1.1734674870967865,
+     1.1696651577949524]}},
+  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.75, &#39;crossentropy&#39;: 2.236232250928879}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7608,
+    &#39;crossentropy&#39;: 1.9754455966949462},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [37092,
+     19276,
+     8552,
+     11693,
+     32693,
+     19934,
+     49569,
+     22269,
+     8771,
+     40279],
+    &#39;labels&#39;: [0, 6, 2, 3, 0, 9, 1, 2, 3, 2],
+    &#39;scores&#39;: [1.2335737347602844,
+     1.213731288909912,
+     1.2081089615821838,
+     1.2011119425296783,
+     1.2005239725112915,
+     1.197088897228241,
+     1.196723997592926,
+     1.1913535296916962,
+     1.190462052822113,
+     1.190326601266861]}},
+  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.791015625,
+     &#39;crossentropy&#39;: 1.5833088010549545}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7984,
+    &#39;crossentropy&#39;: 1.5577151654243468},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [8772,
+     23463,
+     35652,
+     21308,
+     51988,
+     48260,
+     1007,
+     27537,
+     33583,
+     47540],
+    &#39;labels&#39;: [1, 9, 2, 0, 7, 5, 3, 2, 3, 9],
+    &#39;scores&#39;: [1.261091023683548,
+     1.2491463422775269,
+     1.2480011582374573,
+     1.2168364822864532,
+     1.2063267827033997,
+     1.197663575410843,
+     1.194612830877304,
+     1.1920059323310852,
+     1.1905683875083923,
+     1.1833900809288025]}},
+  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.8134765625,
+     &#39;crossentropy&#39;: 1.1898921206593513}],
+   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.8284,
+    &#39;crossentropy&#39;: 1.070880346775055},
+   &#39;acquisition&#39;: {&#39;indices&#39;: [5166,
+     2184,
+     48460,
+     30127,
+     54066,
+     18326,
+     670,
+     36268,
+     31114,
+     20287],
+    &#39;labels&#39;: [2, 2, 2, 0, 7, 5, 3, 5, 4, 4],
+    &#39;scores&#39;: [1.2029272019863129,
+     1.1984767317771912,
+     1.1892695426940918,
+     1.165510356426239,
+     1.1616138815879822,
+     1.142547845840454,
+     1.1372374892234802,
+     1.1345313787460327,
+     1.1334386467933655,
+     1.1267679929733276]}}]}</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
