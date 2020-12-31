@@ -12,6 +12,7 @@
     "Analysis of BALD scores during Training": "BALD_score_analysis.html",
     "Semi-Supervised Learning": "SSL.html",
     "An experiment template": "experiment.html",
+    "BALD-ICAL Experiment": "bald_ical_experiment.html",
     "Some Models": "A1_some_models.html"
   }
 }

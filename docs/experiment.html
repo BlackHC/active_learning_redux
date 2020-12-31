@@ -62,6 +62,7 @@ nb_path: "09_experiment.ipynb"
 <span class="kn">from</span> <span class="nn">batchbald_redux.active_learning</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ActiveLearningData</span><span class="p">,</span>
     <span class="n">RandomFixedLengthSampler</span><span class="p">,</span>
+    <span class="n">get_balanced_sample_indices</span><span class="p">,</span>
     <span class="n">get_base_indices</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.batchbald</span> <span class="kn">import</span> <span class="n">get_bald_batch</span>
@@ -95,9 +96,9 @@ nb_path: "09_experiment.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L44" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>32768</code></em>)</p>
+<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>32768</code></em>)</p>
 </blockquote>
-<p>Experiment(acquisition_size: int = 10, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 32768)</p>
+<p>Experiment(acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 32768)</p>
 
 </div>
 
@@ -161,7 +162,10 @@ nb_path: "09_experiment.ipynb"
         <span class="c1"># Active Learning setup</span>
         <span class="n">active_learning_data</span><span class="p">,</span> <span class="n">validation_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">()</span>
 
-        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">get_random_pool_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span><span class="p">)</span>
+        <span class="c1"># initial_training_set_indices = active_learning_data.get_random_pool_indices(self.initial_set_size)</span>
+        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">get_balanced_sample_indices</span><span class="p">(</span>
+            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">//</span> <span class="mi">10</span>
+        <span class="p">)</span>
         <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
 
         <span class="n">results</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>

@@ -43,6 +43,9 @@ entries:
       title: An experiment template
       url: experiment.html
     - output: web,pdf
+      title: BALD-ICAL Experiment
+      url: bald_ical_experiment.html
+    - output: web,pdf
       title: Some Models
       url: A1_some_models.html
     output: web

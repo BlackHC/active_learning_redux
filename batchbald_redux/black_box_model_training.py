@@ -16,7 +16,11 @@ from ignite.engine import Events, create_supervised_evaluator, create_supervised
 from ignite.metrics import Accuracy, Loss, RunningAverage
 from torch import nn
 
-from .consistent_mc_dropout import SamplerModel, GeometricMeanPrediction, multi_sample_loss
+from .consistent_mc_dropout import (
+    GeometricMeanPrediction,
+    SamplerModel,
+    multi_sample_loss,
+)
 
 # Cell
 
@@ -36,6 +40,7 @@ def train(
     device: str,
     epochs_log: list,
     loss=None,
+    validation_loss=None,
     optimizer=None
 ):
     """
@@ -51,6 +56,8 @@ def train(
     """
     if loss is None:
         loss = nn.NLLLoss()
+    if validation_loss is None:
+        validation_loss = loss
 
     train_model = SamplerModel(model, training_samples)
     validation_model = GeometricMeanPrediction(SamplerModel(model, validation_samples))
@@ -63,7 +70,7 @@ def train(
 
     trainer = create_supervised_trainer(train_model, optimizer, multi_sample_loss(loss), device=device)
 
-    metrics = create_metrics(loss)
+    metrics = create_metrics(validation_loss)
 
     validation_evaluator = create_supervised_evaluator(validation_model, metrics=metrics, device=device)
 
