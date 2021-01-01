@@ -11,6 +11,8 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
+from .repeated_mnist import TransformedDataset
+
 # Cell
 
 
@@ -88,9 +90,9 @@ class ActiveLearningData:
 # Cell
 
 
-def get_balanced_sample_indices(target_classes: List, num_classes, n_per_digit=2) -> List[int]:
+def get_balanced_sample_indices(dataset: data.Dataset, num_classes, n_per_digit=2) -> List[int]:
     """Given `target_classes` randomly sample `n_per_digit` for each of the `num_classes` classes."""
-    permed_indices = torch.randperm(len(target_classes))
+    permed_indices = torch.randperm(len(dataset))
 
     if n_per_digit == 0:
         return []
@@ -100,7 +102,8 @@ def get_balanced_sample_indices(target_classes: List, num_classes, n_per_digit=2
 
     for i in range(len(permed_indices)):
         permed_index = int(permed_indices[i])
-        index, target = permed_index, int(target_classes[permed_index])
+        _, label = dataset[permed_index]
+        index, target = permed_index, int(label)
 
         num_target_samples = num_samples_by_class[target]
         if num_target_samples == n_per_digit:
@@ -122,6 +125,8 @@ def get_subset_base_indices(dataset: data.Subset, indices: List[int]):
 def get_base_indices(dataset: data.Dataset, indices: List[int]):
     if isinstance(dataset, data.Subset):
         return get_base_indices(dataset.dataset, get_subset_base_indices(dataset, indices))
+    if isinstance(dataset, TransformedDataset):
+        return get_base_indices(dataset.dataset, indices)
     return indices
 
 

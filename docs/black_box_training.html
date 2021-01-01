@@ -58,7 +58,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L31" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>epochs_log</code></strong>:<code>list</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L32" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>:param model:
 :param train_loader:
@@ -91,7 +91,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L110" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L125" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -115,7 +115,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L132" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L147" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -148,7 +148,7 @@ nb_path: "07_black_box_training.ipynb"
     <span class="n">patience</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">epochs_log</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">training_log</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">validation_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span>
@@ -199,19 +199,33 @@ nb_path: "07_black_box_training.ipynb"
         <span class="n">event_name</span><span class="o">=</span><span class="n">Events</span><span class="o">.</span><span class="n">ITERATION_COMPLETED</span><span class="p">(</span><span class="n">every</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">),</span>
     <span class="p">)</span>
 
+    <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epochs_log</span> <span class="o">=</span> <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>
+
     <span class="c1"># Logging</span>
     <span class="nd">@validation_evaluator</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">log_training_results</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
         <span class="n">epochs_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
 
-    <span class="c1"># TODO: use my early stopping module (that restores the module!)</span>
     <span class="c1"># Add early stopping</span>
     <span class="k">if</span> <span class="n">patience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">add_early_stopping_by_val_score</span><span class="p">(</span><span class="n">patience</span><span class="p">,</span> <span class="n">validation_evaluator</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;crossentropy&quot;</span><span class="p">)</span>
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">RestoringEarlyStopping</span><span class="p">(</span>
+            <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>
+            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crossentropy&quot;</span><span class="p">]),</span>
+            <span class="n">module</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">training_engine</span><span class="o">=</span><span class="n">trainer</span><span class="p">,</span>
+            <span class="n">validation_engine</span><span class="o">=</span><span class="n">validation_evaluator</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">early_stopping</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Kick everything off</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">max_epochs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">early_stopping</span><span class="p">:</span>
+        <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;best_epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">early_stopping</span><span class="o">.</span><span class="n">best_epoch</span>
 
     <span class="c1"># Return the optimizer in case we want to continue training.</span>
     <span class="k">return</span> <span class="n">optimizer</span>
@@ -278,7 +292,7 @@ nb_path: "07_black_box_training.ipynb"
 <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">epochs_log</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">training_log</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="n">train</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -289,10 +303,10 @@ nb_path: "07_black_box_training.ipynb"
     <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">max_epochs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
-    <span class="n">epochs_log</span><span class="o">=</span><span class="n">epochs_log</span><span class="p">,</span>
+    <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">epochs_log</span>
+<span class="n">training_log</span>
 </pre></div>
 
     </div>
@@ -306,6 +320,8 @@ nb_path: "07_black_box_training.ipynb"
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>
+RestoringEarlyStopping: Restoring best parameters. (Score: -0.11676170641109347)
+RestoringEarlyStopping: Restoring optimizer.
 </pre>
 </div>
 </div>
@@ -315,9 +331,11 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[{&#39;accuracy&#39;: 0.9716833333333333, &#39;crossentropy&#39;: 0.17012315871218842},
- {&#39;accuracy&#39;: 0.9762, &#39;crossentropy&#39;: 0.1445935408587257},
- {&#39;accuracy&#39;: 0.9837333333333333, &#39;crossentropy&#39;: 0.10963566452643524}]</pre>
+<pre>{&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.9723333333333334,
+   &#39;crossentropy&#39;: 0.1676989432533582},
+  {&#39;accuracy&#39;: 0.9791833333333333, &#39;crossentropy&#39;: 0.13145085282996297},
+  {&#39;accuracy&#39;: 0.98265, &#39;crossentropy&#39;: 0.11676170641109347}],
+ &#39;best_epoch&#39;: 3}</pre>
 </div>
 
 </div>
@@ -380,7 +398,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="handler_save_predictions" class="doc_header"><code>handler_save_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L138" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>handler_save_predictions</code>(<strong><code>engine</code></strong>, <strong><code>target_list</code></strong>)</p>
+<h4 id="handler_save_predictions" class="doc_header"><code>handler_save_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L153" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>handler_save_predictions</code>(<strong><code>engine</code></strong>, <strong><code>target_list</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -404,7 +422,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L145" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L160" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
 </blockquote>
 
 </div>

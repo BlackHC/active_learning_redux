@@ -28,6 +28,9 @@ entries:
       title: Repeated-MNIST Dataset
       url: repeated_mnist.html
     - output: web,pdf
+      title: Restoring Early Stopping
+      url: restoring_early_stopping.html
+    - output: web,pdf
       title: Example Experiment
       url: example_experiment.html
     - output: web,pdf

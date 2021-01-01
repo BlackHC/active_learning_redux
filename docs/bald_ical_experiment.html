@@ -26,6 +26,23 @@ nb_path: "09a_bald_ical_experiment.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Appended /home/blackhc/PycharmProjects/bald-ical/src to paths
+Switched to directory /home/blackhc/PycharmProjects/bald-ical
+%load_ext autoreload
+%autoreload 2
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -44,20 +61,13 @@ nb_path: "09a_bald_ical_experiment.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
+<span class="kn">import</span> <span class="nn">blackhc.project.script</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.utils.data</span>
-<span class="kn">from</span> <span class="nn">ignite.contrib.engines.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">add_early_stopping_by_val_score</span><span class="p">,</span>
-    <span class="n">setup_common_training_handlers</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ignite.contrib.handlers</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">ignite.engine</span> <span class="kn">import</span> <span class="n">Events</span><span class="p">,</span> <span class="n">create_supervised_evaluator</span><span class="p">,</span> <span class="n">create_supervised_trainer</span>
-<span class="kn">from</span> <span class="nn">ignite.metrics</span> <span class="kn">import</span> <span class="n">Accuracy</span><span class="p">,</span> <span class="n">Loss</span><span class="p">,</span> <span class="n">RunningAverage</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">blackhc.project.experiment</span> <span class="kn">import</span> <span class="n">embedded_experiments</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.active_learning</span> <span class="kn">import</span> <span class="p">(</span>
@@ -68,14 +78,8 @@ nb_path: "09a_bald_ical_experiment.ipynb"
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.batchbald</span> <span class="kn">import</span> <span class="n">get_batchbaldical_batch</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">get_predictions</span><span class="p">,</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">GeometricMeanPrediction</span><span class="p">,</span>
-    <span class="n">SamplerModel</span><span class="p">,</span>
-    <span class="n">geometric_mean_loss</span><span class="p">,</span>
-    <span class="n">multi_sample_loss</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">GeometricMeanPrediction</span><span class="p">,</span> <span class="n">SamplerModel</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.example_models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.fast_mnist</span> <span class="kn">import</span> <span class="n">FastMNIST</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.repeated_mnist</span> <span class="kn">import</span> <span class="n">create_repeated_MNIST_dataset</span>
 </pre></div>
 
@@ -97,7 +101,7 @@ nb_path: "09a_bald_ical_experiment.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PredictionDataset" class="doc_header"><code>class</code> <code>PredictionDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/bald_ical_experiment.py#L47" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PredictionDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
+<h2 id="PredictionDataset" class="doc_header"><code>class</code> <code>PredictionDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/bald_ical_experiment.py#L32" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PredictionDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
 </blockquote>
 <p>An abstract class representing a :class:<code>Dataset</code>.</p>
 <p>All datasets that represent a map from keys to data samples should subclass
@@ -128,10 +132,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-
-
-<span class="k">class</span> <span class="nc">PredictionDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">PredictionDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">predictions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
 
@@ -168,9 +169,9 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/bald_ical_experiment.py#L69" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>32768</code></em>)</p>
+<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/bald_ical_experiment.py#L54" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>4096</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>24576</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
-<p>Experiment(acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 32768)</p>
+<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 4096, initial_set_size: int = 20, samples_per_epoch: int = 24576, repeated_mnist_repetitions: int = 4, add_dataset_noise: bool = True)</p>
 
 </div>
 
@@ -191,6 +192,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1337</span>
     <span class="n">acquisition_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">max_training_set</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
@@ -199,12 +201,16 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
-    <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span>
     <span class="n">initial_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
-    <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32768</span>
+    <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span> <span class="o">*</span> <span class="mi">6</span>
+    <span class="n">repeated_mnist_repetitions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">add_dataset_noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ActiveLearningData</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-        <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span><span class="n">num_repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span>
+            <span class="n">num_repetitions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_dataset_noise</span>
+        <span class="p">)</span>
         <span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
 
         <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_set_size</span><span class="p">)</span>
@@ -236,7 +242,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">candidate_batch</span>
 
-    <span class="k">def</span> <span class="nf">train_pool_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">epochs_log</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">train_pool_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">training_log</span><span class="p">):</span>
         <span class="n">eval_model</span> <span class="o">=</span> <span class="n">GeometricMeanPrediction</span><span class="p">(</span><span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">))</span>
         <span class="n">log_probs_N_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">eval_model</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
 
@@ -258,29 +264,31 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
             <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
             <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
             <span class="n">train_loader</span><span class="o">=</span><span class="n">train_pool_prediction_loader</span><span class="p">,</span>
-            <span class="n">validation_loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span>
-            <span class="n">patience</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
             <span class="n">max_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-            <span class="n">epochs_log</span><span class="o">=</span><span class="n">epochs_log</span><span class="p">,</span>
+            <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">epochs_log</span><span class="p">)</span>
+        <span class="c1"># print(training_log)</span>
 
         <span class="k">return</span> <span class="n">pool_model</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;hparams&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;hparams&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="c1"># Active Learning setup</span>
         <span class="n">active_learning_data</span><span class="p">,</span> <span class="n">validation_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">()</span>
 
         <span class="c1"># initial_training_set_indices = active_learning_data.get_random_pool_indices(self.initial_set_size)</span>
         <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">get_balanced_sample_indices</span><span class="p">(</span>
-            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">//</span> <span class="mi">10</span>
+            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">//</span> <span class="mi">10</span>
         <span class="p">)</span>
         <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
 
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
 
         <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
             <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
@@ -288,20 +296,24 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
             <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
             <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">active_learning_steps</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">active_learning_steps</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span>
 
         <span class="c1"># Active Training Loop</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">training_set_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set size </span><span class="si">{</span><span class="n">training_set_size</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
 
-            <span class="n">iteration_log</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">training_log</span><span class="o">=</span><span class="p">[],</span> <span class="n">pool_training_log</span><span class="o">=</span><span class="p">[],</span> <span class="n">evalution_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># iteration_log = dict(training={}, pool_training={}, evalution_metrics=None, acquisition=None)</span>
+            <span class="n">active_learning_steps</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
+            <span class="n">iteration_log</span> <span class="o">=</span> <span class="n">active_learning_steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_model</span><span class="p">()</span>
             <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -315,7 +327,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                 <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
                 <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_training_epochs</span><span class="p">,</span>
                 <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                <span class="n">epochs_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training_log&quot;</span><span class="p">],</span>
+                <span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">],</span>
             <span class="p">)</span>
 
             <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
@@ -328,27 +340,28 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
-            <span class="n">num_epochs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training_log&quot;</span><span class="p">])</span>
+            <span class="n">num_epochs</span> <span class="o">=</span> <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">][</span><span class="s2">&quot;best_epoch&quot;</span><span class="p">]</span>
 
             <span class="n">train_pool_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">train_pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+            <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">pool_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_pool_model</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                 <span class="n">train_pool_dataset</span><span class="o">=</span><span class="n">train_pool_dataset</span><span class="p">,</span>
                 <span class="n">train_pool_loader</span><span class="o">=</span><span class="n">train_pool_loader</span><span class="p">,</span>
-                <span class="n">pool_loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span>
+                <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
                 <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
-                <span class="n">epochs_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training_log&quot;</span><span class="p">],</span>
+                <span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training&quot;</span><span class="p">],</span>
             <span class="p">)</span>
 
-            <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_model</span><span class="p">,</span> <span class="n">validation_loader</span><span class="p">)</span>
 
             <span class="n">candidate_global_indices</span> <span class="o">=</span> <span class="n">get_base_indices</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">candidate_labels</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_global_indices</span>
+                <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_global_indices</span>
             <span class="p">]</span>
 
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;acquisition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -359,10 +372,6 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
             <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">candidate_labels</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acquiring (label, score)s: </span><span class="si">{</span><span class="n">ls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="n">active_learning_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iteration_log</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">active_learning_steps</span>
 </pre></div>
 
     </div>
@@ -399,111 +408,54 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 </div>
 </div>
 
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Experiment</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span> <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">store</span> <span class="ow">in</span> <span class="n">embedded_experiments</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">configs</span><span class="p">)):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">seed</span> <span class="o">+=</span> <span class="n">job_id</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">store</span><span class="p">[</span><span class="s2">&quot;exception&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+            <span class="k">raise</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Training set size 20:
-
-
-Perf after training {&#39;accuracy&#39;: 0.5975, &#39;crossentropy&#39;: 4.8086667861938475}
-
-[{&#39;accuracy&#39;: 0.6056870591427022, &#39;crossentropy&#39;: 2.9092245187956034}]
-Acquiring (label, score)s: 8 (1.061), 3 (1.805), 0 (2.161), 0 (2.359), 0 (2.444)
-Training set size 25:
-
-Perf after training {&#39;accuracy&#39;: 0.6697, &#39;crossentropy&#39;: 2.978123592376709}
-
-[{&#39;accuracy&#39;: 0.6761394465545306, &#39;crossentropy&#39;: 1.6447105759585996}]
-Acquiring (label, score)s: 3 (1.019), 3 (1.717), 1 (2.092), 4 (2.252), 4 (2.314)
-Training set size 30:
-
-Perf after training {&#39;accuracy&#39;: 0.6773, &#39;crossentropy&#39;: 3.2113266704559327}
-
-[{&#39;accuracy&#39;: 0.6746642702116115, &#39;crossentropy&#39;: 1.9547087855139829}]
-</pre>
-</div>
-</div>
 
 <div class="output_area">
 
 <div class="output_subarea output_text output_error">
 <pre>
 <span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-21-f2570d8b9439&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-intense-fg ansi-bold">      4</span> 
-<span class="ansi-green-intense-fg ansi-bold">      5</span> results <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
-<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg"> </span>experiment<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">      7</span> 
-<span class="ansi-green-intense-fg ansi-bold">      8</span> results
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-8-b53445d8f32b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span>     configs <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span>Experiment<span class="ansi-blue-fg">(</span>seed<span class="ansi-blue-fg">=</span>seed<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> seed <span class="ansi-green-fg">in</span> range<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">5</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span> 
+<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">for</span> job_id<span class="ansi-blue-fg">,</span> store <span class="ansi-green-fg">in</span> embedded_experiments<span class="ansi-blue-fg">(</span>__file__<span class="ansi-blue-fg">,</span> len<span class="ansi-blue-fg">(</span>configs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>         config <span class="ansi-blue-fg">=</span> configs<span class="ansi-blue-fg">[</span>job_id<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span>         config<span class="ansi-blue-fg">.</span>seed <span class="ansi-blue-fg">+=</span> job_id
 
-<span class="ansi-green-fg">&lt;ipython-input-20-550d45423a98&gt;</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, results)</span>
-<span class="ansi-green-intense-fg ansi-bold">    156</span>             )
-<span class="ansi-green-intense-fg ansi-bold">    157</span> 
-<span class="ansi-green-fg">--&gt; 158</span><span class="ansi-red-fg">             </span>candidate_batch <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>get_candidate_batch<span class="ansi-blue-fg">(</span>model<span class="ansi-blue-fg">,</span> pool_model<span class="ansi-blue-fg">,</span> pool_loader<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    159</span> 
-<span class="ansi-green-intense-fg ansi-bold">    160</span>             candidate_global_indices <span class="ansi-blue-fg">=</span> get_base_indices<span class="ansi-blue-fg">(</span>active_learning_data<span class="ansi-blue-fg">.</span>pool_dataset<span class="ansi-blue-fg">,</span> candidate_batch<span class="ansi-blue-fg">.</span>indices<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-20-550d45423a98&gt;</span> in <span class="ansi-cyan-fg">get_candidate_batch</span><span class="ansi-blue-fg">(self, model, pool_model, pool_loader)</span>
-<span class="ansi-green-intense-fg ansi-bold">     39</span> 
-<span class="ansi-green-intense-fg ansi-bold">     40</span>         <span class="ansi-red-fg"># Evaluate BALD scores</span>
-<span class="ansi-green-fg">---&gt; 41</span><span class="ansi-red-fg">         candidate_batch = get_batchbaldical_batch(
-</span><span class="ansi-green-intense-fg ansi-bold">     42</span>             normal_log_probs_N_K_C<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">     43</span>             pool_log_probs_N_K_C<span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/batchbald.py</span> in <span class="ansi-cyan-fg">get_batchbaldical_batch</span><span class="ansi-blue-fg">(training_log_probs_N_K_C, pool_log_probs_N_K_C, batch_size, num_samples, dtype, device)</span>
-<span class="ansi-green-intense-fg ansi-bold">    240</span>         <span class="ansi-green-fg">return</span> CandidateBatch<span class="ansi-blue-fg">(</span>candidate_scores<span class="ansi-blue-fg">,</span> candidate_indices<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    241</span> 
-<span class="ansi-green-fg">--&gt; 242</span><span class="ansi-red-fg">     training_batchbald_scorer = BatchBALDScorer(
-</span><span class="ansi-green-intense-fg ansi-bold">    243</span>         training_log_probs_N_K_C<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    244</span>         max_size<span class="ansi-blue-fg">=</span>batch_size <span class="ansi-blue-fg">-</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/batchbald.py</span> in <span class="ansi-cyan-fg">__init__</span><span class="ansi-blue-fg">(self, log_probs_N_K_C, max_size, num_samples, dtype, device)</span>
-<span class="ansi-green-intense-fg ansi-bold">     77</span>         self<span class="ansi-blue-fg">.</span>log_probs_N_K_C <span class="ansi-blue-fg">=</span> log_probs_N_K_C
-<span class="ansi-green-intense-fg ansi-bold">     78</span> 
-<span class="ansi-green-fg">---&gt; 79</span><span class="ansi-red-fg">         </span>self<span class="ansi-blue-fg">.</span>conditional_entropies_N <span class="ansi-blue-fg">=</span> compute_conditional_entropy<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>log_probs_N_K_C<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     80</span>         self<span class="ansi-blue-fg">.</span>batch_conditional_entropies <span class="ansi-blue-fg">=</span> <span class="ansi-cyan-fg">0</span>
-<span class="ansi-green-intense-fg ansi-bold">     81</span> 
-
-<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/batchbald.py</span> in <span class="ansi-cyan-fg">compute_conditional_entropy</span><span class="ansi-blue-fg">(log_probs_N_K_C)</span>
-<span class="ansi-green-intense-fg ansi-bold">     26</span> 
-<span class="ansi-green-intense-fg ansi-bold">     27</span>     <span class="ansi-blue-fg">@</span>toma<span class="ansi-blue-fg">.</span>execute<span class="ansi-blue-fg">.</span>chunked<span class="ansi-blue-fg">(</span>log_probs_N_K_C<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1024</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 28</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">def</span> compute<span class="ansi-blue-fg">(</span>log_probs_n_K_C<span class="ansi-blue-fg">,</span> start<span class="ansi-blue-fg">:</span> int<span class="ansi-blue-fg">,</span> end<span class="ansi-blue-fg">:</span> int<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     29</span>         nats_n_K_C <span class="ansi-blue-fg">=</span> log_probs_n_K_C <span class="ansi-blue-fg">*</span> torch<span class="ansi-blue-fg">.</span>exp<span class="ansi-blue-fg">(</span>log_probs_n_K_C<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     30</span> 
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/toma/__init__.py</span> in <span class="ansi-cyan-fg">execute_chunked</span><span class="ansi-blue-fg">(func)</span>
-<span class="ansi-green-intense-fg ansi-bold">    199</span> 
-<span class="ansi-green-intense-fg ansi-bold">    200</span>             <span class="ansi-green-fg">def</span> execute_chunked<span class="ansi-blue-fg">(</span>func<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 201</span><span class="ansi-red-fg">                 return explicit.chunked(
-</span><span class="ansi-green-intense-fg ansi-bold">    202</span>                     func<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    203</span>                     tensor<span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/toma/__init__.py</span> in <span class="ansi-cyan-fg">chunked</span><span class="ansi-blue-fg">(func, tensor, initial_step, toma_dimension, toma_context, toma_cache_type, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    293</span>             <span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span>tensor<span class="ansi-blue-fg">.</span>narrow<span class="ansi-blue-fg">(</span>dim<span class="ansi-blue-fg">=</span>toma_dimension<span class="ansi-blue-fg">,</span> start<span class="ansi-blue-fg">=</span>start<span class="ansi-blue-fg">,</span> length<span class="ansi-blue-fg">=</span>end <span class="ansi-blue-fg">-</span> start<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> start<span class="ansi-blue-fg">,</span> end<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    294</span> 
-<span class="ansi-green-fg">--&gt; 295</span><span class="ansi-red-fg">         explicit.range(
-</span><span class="ansi-green-intense-fg ansi-bold">    296</span>             body<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    297</span>             <span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/toma/__init__.py</span> in <span class="ansi-cyan-fg">range</span><span class="ansi-blue-fg">(func, start, end, initial_step, toma_context, toma_cache_type, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    269</span>                 func<span class="ansi-blue-fg">(</span>current<span class="ansi-blue-fg">,</span> min<span class="ansi-blue-fg">(</span>current <span class="ansi-blue-fg">+</span> batchsize<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> end<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    270</span>                 current <span class="ansi-blue-fg">+=</span> batchsize<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 271</span><span class="ansi-red-fg">                 </span>gc_cuda<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    272</span>             <span class="ansi-green-fg">except</span> RuntimeError <span class="ansi-green-fg">as</span> exception<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    273</span>                 <span class="ansi-green-fg">if</span> batchsize<span class="ansi-blue-fg">.</span>get<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">&gt;</span> <span class="ansi-cyan-fg">1</span> <span class="ansi-green-fg">and</span> should_reduce_batch_size<span class="ansi-blue-fg">(</span>exception<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/toma/torch_cuda_memory.py</span> in <span class="ansi-cyan-fg">gc_cuda</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">     10</span> <span class="ansi-green-fg">def</span> gc_cuda<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     11</span>     <span class="ansi-blue-fg">&#34;&#34;&#34;Gargage collect Torch (CUDA) memory.&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">---&gt; 12</span><span class="ansi-red-fg">     </span>gc<span class="ansi-blue-fg">.</span>collect<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     13</span>     <span class="ansi-green-fg">if</span> torch<span class="ansi-blue-fg">.</span>cuda<span class="ansi-blue-fg">.</span>is_available<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     14</span>         torch<span class="ansi-blue-fg">.</span>cuda<span class="ansi-blue-fg">.</span>empty_cache<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-
-<span class="ansi-red-fg">KeyboardInterrupt</span>: </pre>
+<span class="ansi-red-fg">NameError</span>: name &#39;__file__&#39; is not defined</pre>
 </div>
 </div>
 

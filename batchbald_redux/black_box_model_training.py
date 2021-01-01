@@ -21,6 +21,7 @@ from .consistent_mc_dropout import (
     SamplerModel,
     multi_sample_loss,
 )
+from .restoring_early_stopping import RestoringEarlyStopping
 
 # Cell
 
@@ -38,7 +39,7 @@ def train(
     patience: Optional[int],
     max_epochs: int,
     device: str,
-    epochs_log: list,
+    training_log: dict,
     loss=None,
     validation_loss=None,
     optimizer=None
@@ -89,19 +90,33 @@ def train(
         event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
     )
 
+    training_log["epochs"] = []
+    epochs_log = training_log["epochs"]
+
     # Logging
     @validation_evaluator.on(Events.EPOCH_COMPLETED)
     def log_training_results(engine):
         metrics = dict(engine.state.metrics)
         epochs_log.append(metrics)
 
-    # TODO: use my early stopping module (that restores the module!)
     # Add early stopping
     if patience is not None:
-        add_early_stopping_by_val_score(patience, validation_evaluator, trainer, "crossentropy")
+        early_stopping = RestoringEarlyStopping(
+            patience=patience,
+            score_function=lambda: float(-validation_evaluator.state.metrics["crossentropy"]),
+            module=model,
+            optimizer=optimizer,
+            training_engine=trainer,
+            validation_engine=validation_evaluator,
+        )
+    else:
+        early_stopping = None
 
     # Kick everything off
     trainer.run(train_loader, max_epochs=max_epochs)
+
+    if early_stopping:
+        training_log["best_epoch"] = early_stopping.best_epoch
 
     # Return the optimizer in case we want to continue training.
     return optimizer

@@ -7,6 +7,7 @@
     "Active Learning": "active_learning.html",
     "FastMNIST": "fast_mnist.html",
     "Repeated-MNIST Dataset": "repeated_mnist.html",
+    "Restoring Early Stopping": "restoring_early_stopping.html",
     "Example Experiment": "example_experiment.html",
     "Black Box Model Training": "black_box_training.html",
     "Analysis of BALD scores during Training": "BALD_score_analysis.html",
