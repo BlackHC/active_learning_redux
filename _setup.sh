@@ -26,6 +26,6 @@ source activate "$ENV_PATH"
 conda install -y -q pip
 conda install -y pytorch=1.7 torchvision cudatoolkit=11 ignite -c pytorch
 
-pip install -r requirements.txt
+pip install -e .[dev,test]
 
 # nvidia-smi || true
