@@ -43,14 +43,23 @@ entries:
       title: Semi-Supervised Learning
       url: SSL.html
     - output: web,pdf
-      title: An experiment template
-      url: bald_experiment.html
-    - output: web,pdf
       title: BALD-ICAL Experiment
       url: batchbald_experiment.html
     - output: web,pdf
+      title: RandomBALD Experiment
+      url: randombald_experiment.html
+    - output: web,pdf
+      title: ThompsonBALD Experiment
+      url: thompsonbald_experiment.html
+    - output: web,pdf
+      title: BALD Experiment
+      url: bald_experiment.html
+    - output: web,pdf
       title: Some Models
       url: A1_some_models.html
+    - output: web,pdf
+      title: Results Visualizations
+      url: B_results_visualization.html
     output: web
     title: batchbald_redux
   output: web
