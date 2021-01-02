@@ -45,7 +45,7 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "LOG_INTERVAL": "07_black_box_training.ipynb",
          "handler_save_predictions": "07_black_box_training.ipynb",
          "get_predictions": "07_black_box_training.ipynb",
-         "PredictionDataset": "09d_thompsonbald_experiment.ipynb",
+         "PredictionDataset": "09b_batchbald_experiment.ipynb",
          "Experiment": "09e_bald_experiment.ipynb",
          "BayesianMNISTCNN": "A1_some_models.ipynb",
          "BayesianMNISTCNN_EBM": "A1_some_models.ipynb"}
