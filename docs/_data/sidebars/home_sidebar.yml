@@ -44,10 +44,10 @@ entries:
       url: SSL.html
     - output: web,pdf
       title: An experiment template
-      url: experiment.html
+      url: bald_experiment.html
     - output: web,pdf
       title: BALD-ICAL Experiment
-      url: bald_ical_experiment.html
+      url: batchbald_experiment.html
     - output: web,pdf
       title: Some Models
       url: A1_some_models.html
