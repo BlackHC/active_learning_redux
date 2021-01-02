@@ -288,7 +288,7 @@ def compute_each_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Ten
 
     @toma.execute.chunked(log_probs_N_K_C, 1024)
     def compute(log_probs_n_K_C, start: int, end: int):
-        nats_n_K_C = log_probs_N_K_C * torch.exp(log_probs_N_K_C)
+        nats_n_K_C = log_probs_n_K_C * torch.exp(log_probs_n_K_C)
 
         entropies_N_K[start:end].copy_(-torch.sum(nats_n_K_C, dim=2))
         pbar.update(end - start)
