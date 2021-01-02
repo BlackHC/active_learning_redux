@@ -144,7 +144,7 @@ class Experiment:
 
         # initial_training_set_indices = active_learning_data.get_random_pool_indices(self.initial_set_size)
         initial_training_set_indices = get_balanced_sample_indices(
-            active_learning_data.dataset, 10, self.initial_set_size // 10
+            active_learning_data.pool_dataset, 10, self.initial_set_size // 10
         )
         active_learning_data.acquire(initial_training_set_indices)
 
