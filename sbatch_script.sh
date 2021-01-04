@@ -2,6 +2,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --output="slurm-%j.batch.out"
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user="p2q7s5y8l4r6x7x7@oatml.slack.com"
 
 echo "SBATCH node: $(hostname)"
 

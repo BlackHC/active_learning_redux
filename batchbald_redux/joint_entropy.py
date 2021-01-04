@@ -80,6 +80,9 @@ class ExactJointEntropy(JointEntropy):
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+            if start == 0:
+                pbar.reset()
+
             chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
             b = chunked_probs_b_K_C.shape[0]
 
@@ -212,6 +215,9 @@ class SampledJointEntropy(JointEntropy):
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+            if start == 0:
+                pbar.reset()
+
             b = chunked_log_probs_b_K_C.shape[0]
 
             probs_b_M_C = torch.empty(

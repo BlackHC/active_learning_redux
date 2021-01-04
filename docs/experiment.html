@@ -1,13 +1,13 @@
 ---
 
-title: An experiment template
+title: Experiment
 
 
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Modularity might not be the solution, but it's all we got."
-description: "Modularity might not be the solution, but it's all we got."
+summary: "Can we get better by training on our assumptions?"
+description: "Can we get better by training on our assumptions?"
 nb_path: "09_experiment.ipynb"
 ---
 <!--
@@ -25,6 +25,23 @@ nb_path: "09_experiment.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Appended /home/blackhc/PycharmProjects/bald-ical/src to paths
+Switched to directory /home/blackhc/PycharmProjects/bald-ical
+%load_ext autoreload
+%autoreload 2
+</pre>
+</div>
+</div>
+
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -44,19 +61,15 @@ nb_path: "09_experiment.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
+<span class="kn">import</span> <span class="nn">blackhc.project.script</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.utils.data</span>
-<span class="kn">from</span> <span class="nn">ignite.contrib.engines.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">add_early_stopping_by_val_score</span><span class="p">,</span>
-    <span class="n">setup_common_training_handlers</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ignite.contrib.handlers</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">ignite.engine</span> <span class="kn">import</span> <span class="n">Events</span><span class="p">,</span> <span class="n">create_supervised_evaluator</span><span class="p">,</span> <span class="n">create_supervised_trainer</span>
-<span class="kn">from</span> <span class="nn">ignite.metrics</span> <span class="kn">import</span> <span class="n">Accuracy</span><span class="p">,</span> <span class="n">Loss</span><span class="p">,</span> <span class="n">RunningAverage</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">blackhc.project.experiment</span> <span class="kn">import</span> <span class="n">embedded_experiments</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.active_learning</span> <span class="kn">import</span> <span class="p">(</span>
@@ -65,16 +78,17 @@ nb_path: "09_experiment.ipynb"
     <span class="n">get_balanced_sample_indices</span><span class="p">,</span>
     <span class="n">get_base_indices</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.batchbald</span> <span class="kn">import</span> <span class="n">get_bald_batch</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">get_predictions</span><span class="p">,</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">GeometricMeanPrediction</span><span class="p">,</span>
-    <span class="n">SamplerModel</span><span class="p">,</span>
-    <span class="n">geometric_mean_loss</span><span class="p">,</span>
-    <span class="n">multi_sample_loss</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.batchbald</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CandidateBatch</span><span class="p">,</span>
+    <span class="n">get_bald_batch</span><span class="p">,</span>
+    <span class="n">get_batchbald_batch</span><span class="p">,</span>
+    <span class="n">get_batchbaldical_batch</span><span class="p">,</span>
+    <span class="n">get_random_bald_batch</span><span class="p">,</span>
+    <span class="n">get_thompson_bald_batch</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">get_predictions</span><span class="p">,</span> <span class="n">train</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">GeometricMeanPrediction</span><span class="p">,</span> <span class="n">SamplerModel</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.example_models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.fast_mnist</span> <span class="kn">import</span> <span class="n">FastMNIST</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.repeated_mnist</span> <span class="kn">import</span> <span class="n">create_repeated_MNIST_dataset</span>
 </pre></div>
 
@@ -96,9 +110,163 @@ nb_path: "09_experiment.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>32768</code></em>)</p>
+<h2 id="AcquisitionFunction" class="doc_header"><code>AcquisitionFunction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L41" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Enum</code> = [random, bald, batchbald, randombald, thompsonbald, batchbaldical]</p>
 </blockquote>
-<p>Experiment(acquisition_size: int = 10, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 32768)</p>
+<p>An enumeration.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">AcquisitionFunction</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">random</span> <span class="o">=</span> <span class="s2">&quot;Random&quot;</span>
+    <span class="n">bald</span> <span class="o">=</span> <span class="s2">&quot;BALD&quot;</span>
+    <span class="n">batchbald</span> <span class="o">=</span> <span class="s2">&quot;BatchBALD&quot;</span>
+    <span class="n">randombald</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD&quot;</span>
+    <span class="n">thompsonbald</span> <span class="o">=</span> <span class="s2">&quot;ThompsonBALD&quot;</span>
+    <span class="n">batchbaldical</span> <span class="o">=</span> <span class="s2">&quot;BatchBALD-ICAL&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="PredictionDataset" class="doc_header"><code>class</code> <code>PredictionDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L52" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PredictionDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
+</blockquote>
+<p>An abstract class representing a :class:<code>Dataset</code>.</p>
+<p>All datasets that represent a map from keys to data samples should subclass
+it. All subclasses should overwrite :meth:<code>__getitem__</code>, supporting fetching a
+data sample for a given key. Subclasses could also optionally overwrite
+:meth:<code>__len__</code>, which is expected to return the size of the dataset by many
+:class:<code>~torch.utils.data.Sampler</code> implementations and the default options
+of :class:<code>~torch.utils.data.DataLoader</code>.</p>
+<p>.. note::
+  :class:<code>~torch.utils.data.DataLoader</code> by default constructs a index
+  sampler that yields integral indices.  To make it work with a map-style
+  dataset with non-integral indices/keys, a custom sampler must be provided.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">PredictionDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">predictions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">predictions</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> == </span><span class="si">{</span><span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">predictions</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mnist_initial_samples</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mi">38043</span><span class="p">,</span>
+    <span class="mi">40091</span><span class="p">,</span>
+    <span class="mi">17418</span><span class="p">,</span>
+    <span class="mi">2094</span><span class="p">,</span>
+    <span class="mi">39879</span><span class="p">,</span>
+    <span class="mi">3133</span><span class="p">,</span>
+    <span class="mi">5011</span><span class="p">,</span>
+    <span class="mi">40683</span><span class="p">,</span>
+    <span class="mi">54379</span><span class="p">,</span>
+    <span class="mi">24287</span><span class="p">,</span>
+    <span class="mi">9849</span><span class="p">,</span>
+    <span class="mi">59305</span><span class="p">,</span>
+    <span class="mi">39508</span><span class="p">,</span>
+    <span class="mi">39356</span><span class="p">,</span>
+    <span class="mi">8758</span><span class="p">,</span>
+    <span class="mi">52579</span><span class="p">,</span>
+    <span class="mi">13655</span><span class="p">,</span>
+    <span class="mi">7636</span><span class="p">,</span>
+    <span class="mi">21562</span><span class="p">,</span>
+    <span class="mi">41329</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L74" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>4</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>4096</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>24576</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>2</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong><code>acquisition_function</code></strong>:<a href="/batchbald_redux/experiment.html#AcquisitionFunction"><code>AcquisitionFunction</code></a>=<em><code>&lt;AcquisitionFunction.bald: 'BALD'&gt;</code></em>)</p>
+</blockquote>
+<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 4, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 4096, initial_set_size: int = 20, samples_per_epoch: int = 24576, repeated_mnist_repetitions: int = 2, add_dataset_noise: bool = True, acquisition_function: batchbald_redux.experiment.AcquisitionFunction = &lt;AcquisitionFunction.bald: 'BALD'&gt;)</p>
 
 </div>
 
@@ -119,7 +287,8 @@ nb_path: "09_experiment.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
-    <span class="n">acquisition_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1337</span>
+    <span class="n">acquisition_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">max_training_set</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
@@ -127,12 +296,17 @@ nb_path: "09_experiment.ipynb"
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
-    <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span>
     <span class="n">initial_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
-    <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32768</span>
+    <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span> <span class="o">*</span> <span class="mi">6</span>
+    <span class="n">repeated_mnist_repetitions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">add_dataset_noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">acquisition_function</span><span class="p">:</span> <span class="n">AcquisitionFunction</span> <span class="o">=</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span>
 
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ActiveLearningData</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-        <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span><span class="n">num_repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span>
+            <span class="n">num_repetitions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_dataset_noise</span>
+        <span class="p">)</span>
         <span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
 
         <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_set_size</span><span class="p">)</span>
@@ -145,50 +319,165 @@ nb_path: "09_experiment.ipynb"
     <span class="k">def</span> <span class="nf">new_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_random_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_pool_samples</span><span class="p">):</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_thompson_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
         <span class="c1"># Evaluate pool set</span>
-        <span class="n">bald_model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">)</span>
-        <span class="n">pool_log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">bald_model</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
 
         <span class="c1"># Evaluate BALD scores</span>
-        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_bald_batch</span><span class="p">(</span>
-            <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_thompson_bald_batch</span><span class="p">(</span>
+            <span class="n">log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">candidate_batch</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;hparams&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_random_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_random_bald_batch</span><span class="p">(</span>
+            <span class="n">log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
+    <span class="k">def</span> <span class="nf">get_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_bald_batch</span><span class="p">(</span>
+            <span class="n">log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
+    <span class="k">def</span> <span class="nf">get_batchbald_ical_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">normal_log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="n">pool_log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">pool_model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batchbaldical_batch</span><span class="p">(</span>
+            <span class="n">normal_log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">num_samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
+    <span class="k">def</span> <span class="nf">get_batchbald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batchbald_batch</span><span class="p">(</span>
+            <span class="n">log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">num_samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
+    <span class="k">def</span> <span class="nf">train_pool_model</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">training_log</span>
+    <span class="p">):</span>
+        <span class="n">eval_model</span> <span class="o">=</span> <span class="n">GeometricMeanPrediction</span><span class="p">(</span><span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">))</span>
+        <span class="n">log_probs_N_C</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">eval_model</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+
+        <span class="n">train_pool_prediction_dataset</span> <span class="o">=</span> <span class="n">PredictionDataset</span><span class="p">(</span><span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">log_probs_N_C</span><span class="p">)</span>
+        <span class="n">train_pool_prediction_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">train_pool_prediction_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">pool_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_model</span><span class="p">()</span>
+        <span class="n">pool_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_optimizer</span><span class="p">(</span><span class="n">pool_model</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">KLDivLoss</span><span class="p">(</span><span class="n">log_target</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;batchmean&quot;</span><span class="p">)</span>
+
+        <span class="n">train</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">pool_model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">pool_optimizer</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">validation_loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">(),</span>
+            <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
+            <span class="n">train_loader</span><span class="o">=</span><span class="n">train_pool_prediction_loader</span><span class="p">,</span>
+            <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
+            <span class="n">max_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># print(training_log)</span>
+
+        <span class="k">return</span> <span class="n">pool_model</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="c1"># Active Learning setup</span>
         <span class="n">active_learning_data</span><span class="p">,</span> <span class="n">validation_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">()</span>
 
         <span class="c1"># initial_training_set_indices = active_learning_data.get_random_pool_indices(self.initial_set_size)</span>
-        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">get_balanced_sample_indices</span><span class="p">(</span>
-            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">//</span> <span class="mi">10</span>
-        <span class="p">)</span>
+        <span class="c1"># initial_training_set_indices = get_balanced_sample_indices(</span>
+        <span class="c1">#     active_learning_data.pool_dataset, 10, self.initial_set_size // 10</span>
+        <span class="c1"># )</span>
+        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">mnist_initial_samples</span>
         <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
 
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
 
         <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
             <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
             <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
+            <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">active_learning_steps</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">active_learning_steps</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span>
 
         <span class="c1"># Active Training Loop</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">training_set_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set size </span><span class="si">{</span><span class="n">training_set_size</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
 
-            <span class="n">iteration_log</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">training_log</span><span class="o">=</span><span class="p">[],</span> <span class="n">evalution_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">acquisition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="c1"># iteration_log = dict(training={}, pool_training={}, evalution_metrics=None, acquisition=None)</span>
+            <span class="n">active_learning_steps</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
+            <span class="n">iteration_log</span> <span class="o">=</span> <span class="n">active_learning_steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_model</span><span class="p">()</span>
             <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -202,7 +491,7 @@ nb_path: "09_experiment.ipynb"
                 <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
                 <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_training_epochs</span><span class="p">,</span>
                 <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                <span class="n">epochs_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training_log&quot;</span><span class="p">],</span>
+                <span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">],</span>
             <span class="p">)</span>
 
             <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
@@ -215,12 +504,40 @@ nb_path: "09_experiment.ipynb"
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
-            <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="n">num_epochs</span> <span class="o">=</span> <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">][</span><span class="s2">&quot;best_epoch&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">:</span>
+                <span class="n">train_pool_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">train_pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">pool_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_pool_model</span><span class="p">(</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">train_pool_dataset</span><span class="o">=</span><span class="n">train_pool_dataset</span><span class="p">,</span>
+                    <span class="n">train_pool_loader</span><span class="o">=</span><span class="n">train_pool_loader</span><span class="p">,</span>
+                    <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
+                    <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span>
+                    <span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batchbald_ical_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batchbald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_thompson_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_functionac</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">random</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_candidate_batch</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="sa">f</span><span class="s2">&quot;Unknown acquisition function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span><span class="si">}</span><span class="s2">!&quot;</span>
 
             <span class="n">candidate_global_indices</span> <span class="o">=</span> <span class="n">get_base_indices</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
-            <span class="n">candidate_labels</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_global_indices</span>
-            <span class="p">]</span>
+            <span class="n">candidate_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_global_indices</span><span class="p">]</span>
 
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;acquisition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">indices</span><span class="o">=</span><span class="n">candidate_global_indices</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">candidate_labels</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span>
@@ -230,10 +547,6 @@ nb_path: "09_experiment.ipynb"
 
             <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">candidate_labels</span><span class="p">,</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acquiring (label, score)s: </span><span class="si">{</span><span class="n">ls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="n">active_learning_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iteration_log</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">active_learning_steps</span>
 </pre></div>
 
     </div>
@@ -243,6 +556,14 @@ nb_path: "09_experiment.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>TODO:</p>
+<p>validate pool_model on the pool set only! (and not on train and pool together!)</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -262,212 +583,127 @@ nb_path: "09_experiment.ipynb"
 </div>
 </div>
 
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="n">AcquisitionFunction</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span><span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Training set size 20:
-
-Perf after training {&#39;accuracy&#39;: 0.6184, &#39;crossentropy&#39;: 4.713012725067139}
-Acquiring (label, score)s: 7 (1.314), 7 (1.303), 7 (1.237), 7 (1.215), 2 (1.21), 7 (1.207), 2 (1.198), 2 (1.196), 7 (1.196), 7 (1.196)
-Training set size 30:
-
-Perf after training {&#39;accuracy&#39;: 0.6501, &#39;crossentropy&#39;: 4.576156882095337}
-Acquiring (label, score)s: 5 (1.403), 8 (1.331), 4 (1.303), 3 (1.3), 3 (1.265), 9 (1.25), 3 (1.249), 3 (1.241), 4 (1.222), 9 (1.22)
-Training set size 40:
-
-Perf after training {&#39;accuracy&#39;: 0.7086, &#39;crossentropy&#39;: 2.193311638832092}
-Acquiring (label, score)s: 4 (1.297), 4 (1.232), 5 (1.232), 5 (1.231), 5 (1.219), 5 (1.206), 0 (1.195), 5 (1.189), 7 (1.173), 9 (1.17)
-Training set size 50:
-
-Perf after training {&#39;accuracy&#39;: 0.7608, &#39;crossentropy&#39;: 1.9754455966949462}
-Acquiring (label, score)s: 0 (1.234), 6 (1.214), 2 (1.208), 3 (1.201), 0 (1.201), 9 (1.197), 1 (1.197), 2 (1.191), 3 (1.19), 2 (1.19)
-Training set size 60:
-
-Perf after training {&#39;accuracy&#39;: 0.7984, &#39;crossentropy&#39;: 1.5577151654243468}
-Acquiring (label, score)s: 1 (1.261), 9 (1.249), 2 (1.248), 0 (1.217), 7 (1.206), 5 (1.198), 3 (1.195), 2 (1.192), 3 (1.191), 9 (1.183)
-Training set size 70:
-
-Perf after training {&#39;accuracy&#39;: 0.8284, &#39;crossentropy&#39;: 1.070880346775055}
-Acquiring (label, score)s: 2 (1.203), 2 (1.198), 2 (1.189), 0 (1.166), 7 (1.162), 5 (1.143), 3 (1.137), 5 (1.135), 4 (1.133), 4 (1.127)
-Training set size 80:
-
-Perf after training {&#39;accuracy&#39;: 0.8569, &#39;crossentropy&#39;: 0.913114131975174}
-Done.
-</pre>
-</div>
-</div>
 
 <div class="output_area">
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;hparams&#39;: {&#39;acquisition_size&#39;: 10,
-  &#39;max_training_set&#39;: 80,
-  &#39;num_pool_samples&#39;: 20,
-  &#39;num_eval_samples&#39;: 4,
-  &#39;num_training_samples&#39;: 1,
-  &#39;num_patience_epochs&#39;: 3,
-  &#39;max_training_epochs&#39;: 1,
-  &#39;validation_set_size&#39;: 1024,
-  &#39;initial_set_size&#39;: 20,
-  &#39;samples_per_epoch&#39;: 32768},
- &#39;initial_training_set_indices&#39;: tensor([41376, 32395, 47549,  5049, 49034, 33411, 11929, 46723, 10032, 27715,
-          4160, 37802, 13018, 18609, 30609, 25413, 26449,  1904, 48999, 40092]),
- &#39;active_learning_steps&#39;: [{&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.6044921875,
-     &#39;crossentropy&#39;: 4.612063035368919}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.6184,
-    &#39;crossentropy&#39;: 4.713012725067139},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [17963,
-     28675,
-     25782,
-     12819,
-     43191,
-     39687,
-     19229,
-     45077,
-     25797,
-     52443],
-    &#39;labels&#39;: [7, 7, 7, 7, 2, 7, 2, 2, 7, 7],
-    &#39;scores&#39;: [1.3138152360916138,
-     1.3030644655227661,
-     1.2367550432682037,
-     1.2148968577384949,
-     1.2101951837539673,
-     1.206555187702179,
-     1.1978866457939148,
-     1.1956741213798523,
-     1.195625126361847,
-     1.1955157816410065]}},
-  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.64453125,
-     &#39;crossentropy&#39;: 4.338195472955704}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.6501,
-    &#39;crossentropy&#39;: 4.576156882095337},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [19959,
-     44944,
-     5293,
-     42565,
-     26311,
-     11096,
-     4138,
-     40375,
-     59300,
-     21840],
-    &#39;labels&#39;: [5, 8, 4, 3, 3, 9, 3, 3, 4, 9],
-    &#39;scores&#39;: [1.4030729532241821,
-     1.3311661779880524,
-     1.3030898571014404,
-     1.2996869385242462,
-     1.2650838494300842,
-     1.250482201576233,
-     1.2488097548484802,
-     1.2406066954135895,
-     1.2218926548957825,
-     1.2204528450965881]}},
-  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.697265625,
-     &#39;crossentropy&#39;: 2.154685102403164}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7086,
-    &#39;crossentropy&#39;: 2.193311638832092},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [55073,
-     52909,
-     56306,
-     15000,
-     34829,
-     43221,
-     28102,
-     14318,
-     2574,
-     52923],
-    &#39;labels&#39;: [4, 4, 5, 5, 5, 5, 0, 5, 7, 9],
-    &#39;scores&#39;: [1.2967806458473206,
-     1.231921136379242,
-     1.2319045662879944,
-     1.2305855751037598,
-     1.2188929319381714,
-     1.2055236101150513,
-     1.194618046283722,
-     1.189286470413208,
-     1.1734674870967865,
-     1.1696651577949524]}},
-  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.75, &#39;crossentropy&#39;: 2.236232250928879}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7608,
-    &#39;crossentropy&#39;: 1.9754455966949462},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [37092,
-     19276,
-     8552,
-     11693,
-     32693,
-     19934,
-     49569,
-     22269,
-     8771,
-     40279],
-    &#39;labels&#39;: [0, 6, 2, 3, 0, 9, 1, 2, 3, 2],
-    &#39;scores&#39;: [1.2335737347602844,
-     1.213731288909912,
-     1.2081089615821838,
-     1.2011119425296783,
-     1.2005239725112915,
-     1.197088897228241,
-     1.196723997592926,
-     1.1913535296916962,
-     1.190462052822113,
-     1.190326601266861]}},
-  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.791015625,
-     &#39;crossentropy&#39;: 1.5833088010549545}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.7984,
-    &#39;crossentropy&#39;: 1.5577151654243468},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [8772,
-     23463,
-     35652,
-     21308,
-     51988,
-     48260,
-     1007,
-     27537,
-     33583,
-     47540],
-    &#39;labels&#39;: [1, 9, 2, 0, 7, 5, 3, 2, 3, 9],
-    &#39;scores&#39;: [1.261091023683548,
-     1.2491463422775269,
-     1.2480011582374573,
-     1.2168364822864532,
-     1.2063267827033997,
-     1.197663575410843,
-     1.194612830877304,
-     1.1920059323310852,
-     1.1905683875083923,
-     1.1833900809288025]}},
-  {&#39;training_log&#39;: [{&#39;accuracy&#39;: 0.8134765625,
-     &#39;crossentropy&#39;: 1.1898921206593513}],
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.8284,
-    &#39;crossentropy&#39;: 1.070880346775055},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [5166,
-     2184,
-     48460,
-     30127,
-     54066,
-     18326,
-     670,
-     36268,
-     31114,
-     20287],
-    &#39;labels&#39;: [2, 2, 2, 0, 7, 5, 3, 5, 4, 4],
-    &#39;scores&#39;: [1.2029272019863129,
-     1.1984767317771912,
-     1.1892695426940918,
-     1.165510356426239,
-     1.1616138815879822,
-     1.142547845840454,
-     1.1372374892234802,
-     1.1345313787460327,
-     1.1334386467933655,
-     1.1267679929733276]}}]}</pre>
+<pre>{&lt;AcquisitionFunction.batchbald: &#39;BatchBALD&#39;&gt;,
+ &lt;AcquisitionFunction.batchbaldical: &#39;BatchBALD-ICAL&#39;&gt;,
+ &lt;AcquisitionFunction.random: &#39;Random&#39;&gt;,
+ &lt;AcquisitionFunction.randombald: &#39;RandomBALD&#39;&gt;,
+ &lt;AcquisitionFunction.thompsonbald: &#39;ThompsonBALD&#39;&gt;}</pre>
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Experiment</span><span class="p">(</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+                <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">AcquisitionFunction</span><span class="p">)</span>
+            <span class="o">-</span> <span class="p">{</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">,</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">,</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">Experiment</span><span class="p">(</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+                <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">{</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">,</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">}</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">Experiment</span><span class="p">(</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+                <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">acquisition_size</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">{</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">store</span> <span class="ow">in</span> <span class="n">embedded_experiments</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">configs</span><span class="p">)):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">seed</span> <span class="o">+=</span> <span class="n">job_id</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">store</span><span class="p">[</span><span class="s2">&quot;exception&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+            <span class="k">raise</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-8-b53445d8f32b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span>     configs <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span>Experiment<span class="ansi-blue-fg">(</span>seed<span class="ansi-blue-fg">=</span>seed<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">for</span> seed <span class="ansi-green-fg">in</span> range<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">5</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span> 
+<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">for</span> job_id<span class="ansi-blue-fg">,</span> store <span class="ansi-green-fg">in</span> embedded_experiments<span class="ansi-blue-fg">(</span>__file__<span class="ansi-blue-fg">,</span> len<span class="ansi-blue-fg">(</span>configs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>         config <span class="ansi-blue-fg">=</span> configs<span class="ansi-blue-fg">[</span>job_id<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span>         config<span class="ansi-blue-fg">.</span>seed <span class="ansi-blue-fg">+=</span> job_id
+
+<span class="ansi-red-fg">NameError</span>: name &#39;__file__&#39; is not defined</pre>
+</div>
 </div>
 
 </div>
