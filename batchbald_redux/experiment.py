@@ -343,7 +343,7 @@ class Experiment:
                 candidate_batch = self.get_thompson_bald_candidate_batch(model, pool_loader)
             elif self.acquisition_function == AcquisitionFunction.randombald:
                 candidate_batch = self.get_random_bald_candidate_batch(model, pool_loader)
-            elif self.acquisition_functionac == AcquisitionFunction.random:
+            elif self.acquisition_function == AcquisitionFunction.random:
                 candidate_batch = self.get_random_candidate_batch(len(active_learning_data.pool_dataset))
             else:
                 raise f"Unknown acquisition function {self.acquisition_function}!"
