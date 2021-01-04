@@ -31,7 +31,7 @@ from .batchbald import (
     get_thompson_bald_batch,
 )
 from .black_box_model_training import evaluate, get_predictions, train
-from .consistent_mc_dropout import GeometricMeanPrediction, SamplerModel
+from .consistent_mc_dropout import SamplerModel
 from .example_models import BayesianMNISTCNN
 from .repeated_mnist import create_repeated_MNIST_dataset
 
@@ -220,8 +220,17 @@ class Experiment:
     def train_pool_model(
         self, *, model, train_pool_dataset, train_pool_loader, validation_loader, num_epochs, training_log
     ):
-        eval_model = GeometricMeanPrediction(SamplerModel(model, self.num_eval_samples))
-        log_probs_N_C = get_predictions(model=eval_model, loader=train_pool_loader, device=self.device).cpu()
+        log_probs_N_C = (
+            get_predictions(
+                model=model,
+                num_samples=self.num_eval_samples,
+                num_classes=10,
+                loader=train_pool_loader,
+                device=self.device,
+            )
+            .mean(dim=1)
+            .cpu()
+        )
 
         train_pool_prediction_dataset = PredictionDataset(train_pool_dataset, log_probs_N_C)
         train_pool_prediction_loader = torch.utils.data.DataLoader(
@@ -316,13 +325,13 @@ class Experiment:
                 print("Done.")
                 break
 
-            num_epochs = iteration_log["training"]["best_epoch"]
-
             if self.acquisition_function == AcquisitionFunction.batchbaldical:
                 train_pool_dataset = torch.utils.data.ConcatDataset(
                     [active_learning_data.training_dataset, active_learning_data.pool_dataset]
                 )
                 train_pool_loader = torch.utils.data.DataLoader(train_pool_dataset, batch_size=64, drop_last=False)
+
+                num_epochs = iteration_log["training"]["best_epoch"]
 
                 iteration_log["pool_training"] = {}
                 pool_model = self.train_pool_model(
