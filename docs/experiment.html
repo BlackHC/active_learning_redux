@@ -753,33 +753,33 @@ RestoringEarlyStopping: Restoring optimizer.
     <span class="n">configs</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">[</span>
             <span class="n">Experiment</span><span class="p">(</span>
-                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="o">+</span><span class="mi">120</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
                 <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">{</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">,</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">,</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">]</span>
         <span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
             <span class="n">Experiment</span><span class="p">(</span>
-                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="o">+</span><span class="mi">120</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
                 <span class="n">num_pool_samples</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">acquisition_size</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombald</span><span class="p">,</span>
-            <span class="p">}</span>
+            <span class="p">]</span>
         <span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
             <span class="n">Experiment</span><span class="p">(</span>
-                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="o">+</span><span class="mi">120</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">random</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                 <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>

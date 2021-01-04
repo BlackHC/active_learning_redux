@@ -375,33 +375,33 @@ if __name__ == "__main__":
     configs = (
         [
             Experiment(
-                seed=seed,
+                seed=seed+120,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
                 num_pool_samples=100,
             )
             for seed in range(5)
             for acquisition_size in [5, 10]
-            for acquisition_function in {AcquisitionFunction.batchbald, AcquisitionFunction.batchbaldical}
+            for acquisition_function in [AcquisitionFunction.batchbald, AcquisitionFunction.batchbaldical]
         ]
         + [
             Experiment(
-                seed=seed,
+                seed=seed+120,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
                 num_pool_samples=max(20, acquisition_size),
             )
             for seed in range(5)
             for acquisition_size in [5, 10, 20, 50]
-            for acquisition_function in {
+            for acquisition_function in [
                 AcquisitionFunction.bald,
                 AcquisitionFunction.thompsonbald,
                 AcquisitionFunction.randombald,
-            }
+            ]
         ]
         + [
             Experiment(
-                seed=seed,
+                seed=seed+120,
                 acquisition_function=AcquisitionFunction.random,
                 acquisition_size=5,
                 num_pool_samples=20,
