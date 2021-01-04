@@ -369,18 +369,6 @@ if __name__ == "__main__":
                 seed=seed,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
-                num_pool_samples=20,
-            )
-            for seed in range(5)
-            for acquisition_size in [5, 10, 20]
-            for acquisition_function in set(AcquisitionFunction)
-            - {AcquisitionFunction.batchbald, AcquisitionFunction.batchbaldical, AcquisitionFunction.thompsonbald}
-        ]
-        + [
-            Experiment(
-                seed=seed,
-                acquisition_function=acquisition_function,
-                acquisition_size=acquisition_size,
                 num_pool_samples=100,
             )
             for seed in range(5)
@@ -396,7 +384,21 @@ if __name__ == "__main__":
             )
             for seed in range(5)
             for acquisition_size in [5, 10, 20, 50]
-            for acquisition_function in {AcquisitionFunction.thompsonbald}
+            for acquisition_function in {
+                AcquisitionFunction.bald,
+                AcquisitionFunction.thompsonbald,
+                AcquisitionFunction.randombald,
+            }
+        ]
+        + [
+            Experiment(
+                seed=seed,
+                acquisition_function=AcquisitionFunction.random,
+                acquisition_size=5,
+                num_pool_samples=20,
+            )
+            for seed in range(40)
+            for acquisition_size in [5]
         ]
     )
 

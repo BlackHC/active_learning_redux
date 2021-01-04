@@ -1330,11 +1330,11 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
     <span class="n">L</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="n">C</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
 
-    <span class="n">candidate_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">L</span><span class="p">)[:</span><span class="n">batch_size</span><span class="p">]</span>
+    <span class="n">candidate_scores</span><span class="p">,</span> <span class="n">candidate_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">scores_N</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
-    <span class="n">candidate_scores</span> <span class="o">=</span> <span class="n">scores_N</span><span class="p">[</span><span class="n">candidate_indices</span><span class="p">]</span>
+    <span class="n">sub_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">L</span><span class="p">)[:</span><span class="n">batch_size</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">(</span><span class="n">candidate_scores</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">candidate_indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">CandidateBatch</span><span class="p">(</span><span class="n">candidate_scores</span><span class="p">[</span><span class="n">sub_indices</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">candidate_indices</span><span class="p">[</span><span class="n">sub_indices</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 </pre></div>
 
     </div>

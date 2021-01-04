@@ -334,8 +334,8 @@ def get_random_bald_batch(log_probs_N_K_C: torch.Tensor, batch_size: int, dtype=
 
     L = min(batch_size * C, N)
 
-    candidate_indices = torch.randperm(L)[:batch_size]
+    candidate_scores, candidate_indices = torch.topk(scores_N, L)
 
-    candidate_scores = scores_N[candidate_indices]
+    sub_indices = torch.randperm(L)[:batch_size]
 
-    return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())
+    return CandidateBatch(candidate_scores[sub_indices].tolist(), candidate_indices[sub_indices].tolist())
