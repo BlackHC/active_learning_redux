@@ -166,3 +166,101 @@ store['active_learning_steps'][10]['pool_training']={}
 store['active_learning_steps'][10]['pool_training']['epochs']=[]
 store['active_learning_steps'][10]['pool_training']['epochs'].append({'accuracy': 0.913330078125, 'crossentropy': 0.3736619877163321})
 store['active_learning_steps'][10]['pool_training']['best_epoch']=1
+store['active_learning_steps'][10]['acquisition']={'indices': [52035, 35350, 103212, 38301, 91624, 105491, 82595, 39461, 17569, 108189], 'labels': [3, 5, 5, 4, 9, 5, 4, 3, 3, 1], 'scores': [0.9013231083161799, 1.6307931963825255, 2.236385810435039, 2.6569382995396182, 2.9615042340026365, 3.1648787130978495, 3.2977252643158352, 3.4060600918197124, 3.473961088439477, 3.5227963041418047]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][11]['training']={}
+store['active_learning_steps'][11]['training']['epochs']=[]
+store['active_learning_steps'][11]['training']['epochs'].append({'accuracy': 0.890380859375, 'crossentropy': 0.6676939795725048})
+store['active_learning_steps'][11]['training']['epochs'].append({'accuracy': 0.890869140625, 'crossentropy': 0.7330664531327784})
+store['active_learning_steps'][11]['training']['epochs'].append({'accuracy': 0.90673828125, 'crossentropy': 0.7534194670151919})
+store['active_learning_steps'][11]['training']['epochs'].append({'accuracy': 0.905517578125, 'crossentropy': 0.7200562669895589})
+store['active_learning_steps'][11]['training']['best_epoch']=1
+store['active_learning_steps'][11]['evalution_metrics']={'accuracy': 0.8969, 'crossentropy': 0.6125392056822777}
+store['active_learning_steps'][11]['pool_training']={}
+store['active_learning_steps'][11]['pool_training']['epochs']=[]
+store['active_learning_steps'][11]['pool_training']['epochs'].append({'accuracy': 0.900146484375, 'crossentropy': 0.41048600245267153})
+store['active_learning_steps'][11]['pool_training']['best_epoch']=1
+store['active_learning_steps'][11]['acquisition']={'indices': [90588, 2381, 14484, 47651, 99974, 85715, 69538, 28947, 76096, 111139], 'labels': [4, 7, 2, 3, 9, 8, 7, 6, 3, 6], 'scores': [0.6987947588645134, 1.3597255948792433, 1.9105282016797134, 2.3585271985290994, 2.6659554929209555, 2.8822481236686377, 3.0207737188433845, 3.1260937616376885, 3.2059381059022867, 3.2345551315286616]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][12]['training']={}
+store['active_learning_steps'][12]['training']['epochs']=[]
+store['active_learning_steps'][12]['training']['epochs'].append({'accuracy': 0.912109375, 'crossentropy': 0.5580132673494518})
+store['active_learning_steps'][12]['training']['epochs'].append({'accuracy': 0.908203125, 'crossentropy': 0.581811809912324})
+store['active_learning_steps'][12]['training']['epochs'].append({'accuracy': 0.908935546875, 'crossentropy': 0.6651419110130519})
+store['active_learning_steps'][12]['training']['epochs'].append({'accuracy': 0.91357421875, 'crossentropy': 0.7240115841850638})
+store['active_learning_steps'][12]['training']['best_epoch']=1
+store['active_learning_steps'][12]['evalution_metrics']={'accuracy': 0.9173, 'crossentropy': 0.5157259170532227}
+store['active_learning_steps'][12]['pool_training']={}
+store['active_learning_steps'][12]['pool_training']['epochs']=[]
+store['active_learning_steps'][12]['pool_training']['epochs'].append({'accuracy': 0.917724609375, 'crossentropy': 0.38069462147541344})
+store['active_learning_steps'][12]['pool_training']['best_epoch']=1
+store['active_learning_steps'][12]['acquisition']={'indices': [17071, 62803, 27340, 9769, 97750, 12655, 67735, 48700, 64461, 92695], 'labels': [2, 3, 5, 8, 5, 9, 5, 3, 3, 2], 'scores': [0.69838320257483, 1.3571839053437562, 1.8944986938782415, 2.2845592492172324, 2.5380763159791613, 2.69992777010411, 2.8151535057412884, 2.905260381328973, 2.9458200051655528, 2.980019078857252]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][13]['training']={}
+store['active_learning_steps'][13]['training']['epochs']=[]
+store['active_learning_steps'][13]['training']['epochs'].append({'accuracy': 0.9140625, 'crossentropy': 0.5303211559075862})
+store['active_learning_steps'][13]['training']['epochs'].append({'accuracy': 0.919189453125, 'crossentropy': 0.5650713732466102})
+store['active_learning_steps'][13]['training']['epochs'].append({'accuracy': 0.91552734375, 'crossentropy': 0.650434557814151})
+store['active_learning_steps'][13]['training']['epochs'].append({'accuracy': 0.902099609375, 'crossentropy': 0.7484418542589992})
+store['active_learning_steps'][13]['training']['best_epoch']=1
+store['active_learning_steps'][13]['evalution_metrics']={'accuracy': 0.9139, 'crossentropy': 0.4956039622426033}
+store['active_learning_steps'][13]['pool_training']={}
+store['active_learning_steps'][13]['pool_training']['epochs']=[]
+store['active_learning_steps'][13]['pool_training']['epochs'].append({'accuracy': 0.920166015625, 'crossentropy': 0.37694079091306776})
+store['active_learning_steps'][13]['pool_training']['best_epoch']=1
+store['active_learning_steps'][13]['acquisition']={'indices': [66846, 79298, 36582, 72636, 83788, 19053, 106478, 10976, 46373, 3856], 'labels': [2, 6, 8, 6, 1, 2, 8, 6, 9, 6], 'scores': [0.7163118810239055, 1.30447344935852, 1.8389843727475763, 2.2582653129446215, 2.5788978437553234, 2.81837529942591, 3.0087238931932223, 3.148921317385576, 3.263387401957303, 3.355193813306875]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][14]['training']={}
+store['active_learning_steps'][14]['training']['epochs']=[]
+store['active_learning_steps'][14]['training']['epochs'].append({'accuracy': 0.904052734375, 'crossentropy': 0.5540621397085488})
+store['active_learning_steps'][14]['training']['epochs'].append({'accuracy': 0.904296875, 'crossentropy': 0.6161528960801661})
+store['active_learning_steps'][14]['training']['epochs'].append({'accuracy': 0.909912109375, 'crossentropy': 0.6490583077538759})
+store['active_learning_steps'][14]['training']['epochs'].append({'accuracy': 0.898193359375, 'crossentropy': 0.7320750779472291})
+store['active_learning_steps'][14]['training']['best_epoch']=1
+store['active_learning_steps'][14]['evalution_metrics']={'accuracy': 0.8987, 'crossentropy': 0.5650398689985275}
+store['active_learning_steps'][14]['pool_training']={}
+store['active_learning_steps'][14]['pool_training']['epochs']=[]
+store['active_learning_steps'][14]['pool_training']['epochs'].append({'accuracy': 0.89453125, 'crossentropy': 0.3942454068455845})
+store['active_learning_steps'][14]['pool_training']['best_epoch']=1
+store['active_learning_steps'][14]['acquisition']={'indices': [59919, 57985, 59574, 73760, 591, 18443, 55162, 98185, 23853, 34561], 'labels': [1, 4, 5, 6, 2, 0, 6, 6, 9, 5], 'scores': [0.7468445444373176, 1.4162571450043, 1.939058555247366, 2.332129345608065, 2.5885274025910405, 2.769148091839654, 2.9027711453635257, 2.9950045408257973, 3.0477781743978487, 3.096335957595644]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][15]['training']={}
+store['active_learning_steps'][15]['training']['epochs']=[]
+store['active_learning_steps'][15]['training']['epochs'].append({'accuracy': 0.91552734375, 'crossentropy': 0.4814231132622808})
+store['active_learning_steps'][15]['training']['epochs'].append({'accuracy': 0.9189453125, 'crossentropy': 0.535331372404471})
+store['active_learning_steps'][15]['training']['epochs'].append({'accuracy': 0.9140625, 'crossentropy': 0.597501358250156})
+store['active_learning_steps'][15]['training']['epochs'].append({'accuracy': 0.9140625, 'crossentropy': 0.6632739943452179})
+store['active_learning_steps'][15]['training']['best_epoch']=1
+store['active_learning_steps'][15]['evalution_metrics']={'accuracy': 0.923, 'crossentropy': 0.4684414025843143}
+store['active_learning_steps'][15]['pool_training']={}
+store['active_learning_steps'][15]['pool_training']['epochs']=[]
+store['active_learning_steps'][15]['pool_training']['epochs'].append({'accuracy': 0.922607421875, 'crossentropy': 0.3393577076494694})
+store['active_learning_steps'][15]['pool_training']['best_epoch']=1
+store['active_learning_steps'][15]['acquisition']={'indices': [12196, 114858, 53585, 74246, 31102, 67933, 14185, 94502, 23020, 25638], 'labels': [2, 3, 2, 7, 4, 2, 4, 0, 2, 6], 'scores': [0.8583215844413516, 1.497129169392155, 2.0498470768275583, 2.5010607836938368, 2.8576547459107466, 3.09536748905201, 3.253425799955564, 3.387758635525088, 3.4732855037416774, 3.5132151262513984]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][16]['training']={}
+store['active_learning_steps'][16]['training']['epochs']=[]
+store['active_learning_steps'][16]['training']['epochs'].append({'accuracy': 0.921630859375, 'crossentropy': 0.4672635805327445})
+store['active_learning_steps'][16]['training']['epochs'].append({'accuracy': 0.92236328125, 'crossentropy': 0.5218179081566632})
+store['active_learning_steps'][16]['training']['epochs'].append({'accuracy': 0.92724609375, 'crossentropy': 0.5487300811801106})
+store['active_learning_steps'][16]['training']['epochs'].append({'accuracy': 0.91748046875, 'crossentropy': 0.6154011578764766})
+store['active_learning_steps'][16]['training']['best_epoch']=1
+store['active_learning_steps'][16]['evalution_metrics']={'accuracy': 0.9286, 'crossentropy': 0.45161190390586853}
+store['active_learning_steps'][16]['pool_training']={}
+store['active_learning_steps'][16]['pool_training']['epochs']=[]
+store['active_learning_steps'][16]['pool_training']['epochs'].append({'accuracy': 0.9208984375, 'crossentropy': 0.33735384012106806})
+store['active_learning_steps'][16]['pool_training']['best_epoch']=1
+store['active_learning_steps'][16]['acquisition']={'indices': [57575, 70256, 44006, 14405, 91926, 59986, 119992, 41970, 18501, 54455], 'labels': [0, 2, 5, 6, 5, 6, 9, 5, 4, 4], 'scores': [0.7187465092092037, 1.3765488497742662, 1.9200954737838805, 2.350542307677114, 2.671337380287057, 2.88524589087005, 8.9077621489564, 2.935905311892917, 2.995367988691661, 3.0753870582494622]}
+store['active_learning_steps'].append({})
+store['active_learning_steps'][17]['training']={}
+store['active_learning_steps'][17]['training']['epochs']=[]
+store['active_learning_steps'][17]['training']['epochs'].append({'accuracy': 0.92138671875, 'crossentropy': 0.447267125477083})
+store['active_learning_steps'][17]['training']['epochs'].append({'accuracy': 0.927978515625, 'crossentropy': 0.510126510518603})
+store['active_learning_steps'][17]['training']['epochs'].append({'accuracy': 0.92529296875, 'crossentropy': 0.5356719748815522})
+store['active_learning_steps'][17]['training']['epochs'].append({'accuracy': 0.92578125, 'crossentropy': 0.5668750935001299})
+store['active_learning_steps'][17]['training']['best_epoch']=1
+store['active_learning_steps'][17]['evalution_metrics']={'accuracy': 0.9278, 'crossentropy': 0.43653381954431536}
+store['active_learning_steps'][17]['pool_training']={}
+store['active_learning_steps'][17]['pool_training']['epochs']=[]
+store['active_learning_steps'][17]['pool_training']['epochs'].append({'accuracy': 0.92333984375, 'crossentropy': 0.3247538118157536})
+store['active_learning_steps'][17]['pool_training']['best_epoch']=1
