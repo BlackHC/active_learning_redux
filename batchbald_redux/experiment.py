@@ -25,10 +25,13 @@ from .active_learning import (
 from .batchbald import (
     CandidateBatch,
     get_bald_batch,
+    get_bald_ical_scores,
     get_batchbald_batch,
     get_batchbaldical_batch,
     get_random_bald_batch,
     get_thompson_bald_batch,
+    get_top_k_scorers,
+    get_top_random_scorers,
 )
 from .black_box_model_training import evaluate, get_predictions, train
 from .consistent_mc_dropout import SamplerModel
@@ -45,6 +48,8 @@ class AcquisitionFunction(Enum):
     randombald = "RandomBALD"
     thompsonbald = "ThompsonBALD"
     batchbaldical = "BatchBALD-ICAL"
+    baldical = "BALD-ICAL"
+    randombaldical = "RandomBALD-ICAL"
 
 # Cell
 
@@ -201,6 +206,24 @@ class Experiment:
         )
         return candidate_batch
 
+    def get_bald_ical_candidate_batch(self, model, pool_model, *, pool_loader, get_scorers):
+        # Evaluate pool set
+        normal_log_probs_N_K_C = get_predictions(
+            model=model, num_samples=self.num_pool_samples, num_classes=10, loader=pool_loader, device=self.device
+        )
+
+        pool_log_probs_N_K_C = get_predictions(
+            model=pool_model, num_samples=self.num_pool_samples, num_classes=10, loader=pool_loader, device=self.device
+        )
+
+        scores_N = get_bald_ical_scores(
+            normal_log_probs_N_K_C, pool_log_probs_N_K_C, dtype=torch.double, device=self.device
+        )
+
+        candidate_batch = get_scorers(scores_N, batch_size=self.acquisition_size)
+
+        return candidate_batch
+
     def get_batchbald_candidate_batch(self, model, pool_loader):
         # Evaluate pool set
         log_probs_N_K_C = get_predictions(
@@ -325,7 +348,11 @@ class Experiment:
                 print("Done.")
                 break
 
-            if self.acquisition_function == AcquisitionFunction.batchbaldical:
+            if self.acquisition_function in (
+                AcquisitionFunction.batchbaldical,
+                AcquisitionFunction.baldical,
+                AcquisitionFunction.randombaldical,
+            ):
                 train_pool_dataset = torch.utils.data.ConcatDataset(
                     [active_learning_data.training_dataset, active_learning_data.pool_dataset]
                 )
@@ -343,7 +370,23 @@ class Experiment:
                     training_log=iteration_log["pool_training"],
                 )
 
-                candidate_batch = self.get_batchbald_ical_candidate_batch(model, pool_model, pool_loader)
+                if self.acquisition_function == AcquisitionFunction.batchbaldical:
+                    candidate_batch = self.get_batchbald_ical_candidate_batch(model, pool_model, pool_loader)
+                elif self.acquisition_function == AcquisitionFunction.baldical:
+                    candidate_batch = self.get_bald_ical_candidate_batch(
+                        model, pool_model, pool_loader=pool_loader, get_scorers=get_top_k_scorers
+                    )
+                elif self.acquisition_function == AcquisitionFunction.randombaldical:
+                    candidate_batch = self.get_bald_ical_candidate_batch(
+                        model,
+                        pool_model,
+                        pool_loader=pool_loader,
+                        get_scorers=lambda scores_N, batch_size: get_top_random_scorers(
+                            scores_N, batch_size=batch_size, num_classes=10
+                        ),
+                    )
+                else:
+                    raise f"Unexpected acquisition function {self.acquisition_function}!"
             elif self.acquisition_function == AcquisitionFunction.bald:
                 candidate_batch = self.get_bald_candidate_batch(model, pool_loader)
             elif self.acquisition_function == AcquisitionFunction.batchbald:
@@ -372,44 +415,60 @@ class Experiment:
 # Cell
 
 if __name__ == "__main__":
-    configs = (
-        [
-            Experiment(
-                seed=seed+120,
-                acquisition_function=acquisition_function,
-                acquisition_size=acquisition_size,
-                num_pool_samples=100,
-            )
-            for seed in range(5)
-            for acquisition_size in [5, 10]
-            for acquisition_function in [AcquisitionFunction.batchbald, AcquisitionFunction.batchbaldical]
-        ]
-        + [
-            Experiment(
-                seed=seed+120,
-                acquisition_function=acquisition_function,
-                acquisition_size=acquisition_size,
-                num_pool_samples=max(20, acquisition_size),
-            )
-            for seed in range(5)
-            for acquisition_size in [5, 10, 20, 50]
-            for acquisition_function in [
-                AcquisitionFunction.bald,
-                AcquisitionFunction.thompsonbald,
-                AcquisitionFunction.randombald,
+    if False:
+        configs = (
+            [
+                Experiment(
+                    seed=seed + 120,
+                    acquisition_function=acquisition_function,
+                    acquisition_size=acquisition_size,
+                    num_pool_samples=100,
+                )
+                for seed in range(5)
+                for acquisition_size in [5, 10]
+                for acquisition_function in [AcquisitionFunction.batchbald, AcquisitionFunction.batchbaldical]
             ]
+            + [
+                Experiment(
+                    seed=seed + 120,
+                    acquisition_function=acquisition_function,
+                    acquisition_size=acquisition_size,
+                    num_pool_samples=max(20, acquisition_size),
+                )
+                for seed in range(5)
+                for acquisition_size in [5, 10, 20, 50]
+                for acquisition_function in [
+                    AcquisitionFunction.bald,
+                    AcquisitionFunction.thompsonbald,
+                    AcquisitionFunction.randombald,
+                ]
+            ]
+            + [
+                Experiment(
+                    seed=seed + 120,
+                    acquisition_function=AcquisitionFunction.random,
+                    acquisition_size=5,
+                    num_pool_samples=20,
+                )
+                for seed in range(40)
+                for acquisition_size in [5]
+            ]
+        )
+
+    configs = [
+        Experiment(
+            seed=seed + 240,
+            acquisition_function=acquisition_function,
+            acquisition_size=acquisition_size,
+            num_pool_samples=max(20, acquisition_size),
+        )
+        for seed in range(5)
+        for acquisition_size in [5, 10, 20, 50]
+        for acquisition_function in [
+            AcquisitionFunction.baldical,
+            AcquisitionFunction.randombaldical,
         ]
-        + [
-            Experiment(
-                seed=seed+120,
-                acquisition_function=AcquisitionFunction.random,
-                acquisition_size=5,
-                num_pool_samples=20,
-            )
-            for seed in range(40)
-            for acquisition_size in [5]
-        ]
-    )
+    ]
 
     for job_id, store in embedded_experiments(__file__, len(configs)):
         config = configs[job_id]
