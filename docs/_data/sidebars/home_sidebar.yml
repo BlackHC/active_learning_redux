@@ -50,7 +50,7 @@ entries:
       url: A1_some_models.html
     - output: web,pdf
       title: Results Visualizations
-      url: B_results_visualization.html
+      url: C_examine_AL_bald_scores.html
     output: web
     title: batchbald_redux
   output: web

@@ -4,13 +4,14 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_batchbald_batch_plain', 'get_bald_scores', 'get_top_k_scorers', 'get_bald_batch',
            'get_batchbaldical_batch', 'compute_each_conditional_entropy', 'get_thompson_bald_batch',
            'get_top_random_scorers', 'get_random_bald_batch', 'get_bald_ical_scores', 'get_bald_ical_batch',
-           'get_top_random_bald_ical_batch']
+           'get_top_random_bald_ical_batch', 'get_sampled_tempered_scorers', 'get_ical_scores', 'get_batchical_batch']
 
 # Cell
 import math
 from dataclasses import dataclass
 from typing import List
 
+import numpy as np
 import torch
 from toma import toma
 from tqdm.auto import tqdm
@@ -208,6 +209,9 @@ def get_bald_scores(log_probs_N_K_C: torch.Tensor, *, dtype=None, device=None) -
 
 
 def get_top_k_scorers(scores_N: torch.Tensor, *, batch_size: int) -> CandidateBatch:
+    N = len(scores_N)
+    batch_size = min(batch_size, N)
+
     candidate_scores, candidate_indices = torch.topk(scores_N, batch_size)
 
     return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())
@@ -215,8 +219,6 @@ def get_top_k_scorers(scores_N: torch.Tensor, *, batch_size: int) -> CandidateBa
 
 def get_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:
     N, K, C = log_probs_N_K_C.shape
-
-    batch_size = min(batch_size, N)
 
     scores_N = get_bald_scores(log_probs_N_K_C, dtype=dtype, device=device)
 
@@ -334,7 +336,10 @@ def get_thompson_bald_batch(
 
 
 def get_top_random_scorers(scores_N: torch.Tensor, *, num_classes: int, batch_size: int) -> CandidateBatch:
-    L = min(batch_size * num_classes, len(scores_N))
+    N = len(scores_N)
+    batch_size = min(batch_size, N)
+
+    L = min(batch_size * num_classes, N)
 
     candidate_scores, candidate_indices = torch.topk(scores_N, L)
 
@@ -345,8 +350,6 @@ def get_top_random_scorers(scores_N: torch.Tensor, *, num_classes: int, batch_si
 
 def get_random_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:
     N, K, C = log_probs_N_K_C.shape
-
-    batch_size = min(batch_size, N)
 
     scores_N = get_bald_scores(log_probs_N_K_C, dtype=dtype, device=device)
 
@@ -362,6 +365,8 @@ def get_bald_ical_scores(
     dtype=None,
     device=None,
 ) -> torch.Tensor:
+    assert training_log_probs_N_K_C.shape == pool_log_probs_N_K_C.shape
+
     training_scores_N = get_bald_scores(training_log_probs_N_K_C, dtype=dtype, device=device)
     pool_scores_N = get_bald_scores(pool_log_probs_N_K_C, dtype=dtype, device=device)
 
@@ -396,5 +401,101 @@ def get_top_random_bald_ical_batch(
     return get_top_random_scorers(
         get_bald_ical_scores(training_log_probs_N_K_C, pool_log_probs_N_K_C, dtype=dtype, device=device),
         batch_size=batch_size,
-        num_classes=num_classes
+        num_classes=num_classes,
     )
+
+# Cell
+
+
+def get_sampled_tempered_scorers(scores_N: torch.Tensor, *, temperature: float, batch_size: int) -> CandidateBatch:
+    N = len(scores_N)
+    batch_size = min(batch_size, N)
+
+    tempered_scores_N = scores_N ** temperature
+    partition_constant = tempered_scores_N.sum()
+    p = tempered_scores_N / partition_constant
+
+    candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p)
+    candidate_scores = scores_N[candidate_indices]
+
+    return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())
+
+# Cell
+
+
+def get_ical_scores(
+    training_log_probs_N_K_C: torch.Tensor,
+    pool_log_probs_N_K_C: torch.Tensor,
+    *,
+    dtype=None,
+    device=None,
+) -> torch.Tensor:
+    assert training_log_probs_N_K_C.shape == pool_log_probs_N_K_C.shape
+
+    N, K, C = training_log_probs_N_K_C.shape
+
+    scores_N = compute_entropy(training_log_probs_N_K_C) - compute_entropy(pool_log_probs_N_K_C)
+
+    return scores_N
+
+# Cell
+
+
+# TODO: refactor the BatchBALDScorer to deduplicate some of this?
+def get_batchical_batch(
+    training_log_probs_N_K_C: torch.Tensor,
+    pool_log_probs_N_K_C: torch.Tensor,
+    *,
+    batch_size: int,
+    num_samples: int,
+    dtype=None,
+    device=None,
+) -> CandidateBatch:
+    assert training_log_probs_N_K_C.shape == pool_log_probs_N_K_C.shape
+    N, K, C = training_log_probs_N_K_C.shape
+
+    batch_size = min(batch_size, N)
+
+    candidate_indices = []
+    candidate_scores = []
+
+    if batch_size == 0:
+        return CandidateBatch(candidate_scores, candidate_indices)
+
+    training_joint_entropy = joint_entropy.DynamicJointEntropy(
+        num_samples, batch_size, K, C, dtype=dtype, device=device
+    )
+
+    pool_joint_entropy = joint_entropy.DynamicJointEntropy(num_samples, batch_size, K, C, dtype=dtype, device=device)
+
+    # We always keep these on the CPU.
+    training_scores_N = torch.empty(
+        N,
+        dtype=torch.double,
+        pin_memory=torch.cuda.is_available(),
+    )
+
+    pool_scores_N = torch.empty(
+        N,
+        dtype=torch.double,
+        pin_memory=torch.cuda.is_available(),
+    )
+
+    for i in tqdm(range(batch_size), desc="BatchBALD", leave=False):
+        if i > 0:
+            latest_index = candidate_indices[-1]
+            training_joint_entropy.add_variables(training_log_probs_N_K_C[latest_index : latest_index + 1])
+            pool_joint_entropy.add_variables(pool_log_probs_N_K_C[latest_index : latest_index + 1])
+
+        training_joint_entropy.compute_batch(training_log_probs_N_K_C, output_entropies_B=training_scores_N)
+        pool_joint_entropy.compute_batch(pool_log_probs_N_K_C, output_entropies_B=pool_scores_N)
+
+        scores_N = training_scores_N - pool_scores_N
+        scores_N[candidate_indices] = -float("inf")
+
+        candidate_score, candidate_index = scores_N.max(dim=0)
+
+        candidate_indices.append(candidate_index.item())
+        candidate_scores.append(candidate_score.item())
+
+    return CandidateBatch(candidate_scores, candidate_indices)
