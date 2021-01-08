@@ -51,7 +51,7 @@ class AcquisitionFunction(Enum):
     baldical = "BALD-ICAL"
     randombaldical = "RandomBALD-ICAL"
     temperedbald = "TemperedBALD"
-    # temperedbaldical = "TemperedBALD-ICAL"
+    temperedbaldical = "TemperedBALD-ICAL"
     # ical = "ICAL"
     # randomical = "RandomICAL"
     # temperedical = "TemperedICAL"
@@ -347,6 +347,7 @@ class Experiment:
                 AcquisitionFunction.batchbaldical,
                 AcquisitionFunction.baldical,
                 AcquisitionFunction.randombaldical,
+                AcquisitionFunction.temperedbaldical
             ):
                 train_pool_dataset = torch.utils.data.ConcatDataset(
                     [active_learning_data.training_dataset, active_learning_data.pool_dataset]
@@ -378,6 +379,15 @@ class Experiment:
                         pool_loader=pool_loader,
                         get_scorers=lambda scores_N, batch_size: get_top_random_scorers(
                             scores_N, batch_size=batch_size, num_classes=10
+                        ),
+                    )
+                elif self.acquisition_function == AcquisitionFunction.temperedbaldical:
+                    candidate_batch = self.get_bald_ical_candidate_batch(
+                        model,
+                        pool_model,
+                        pool_loader=pool_loader,
+                        get_scorers=lambda scores_N, batch_size: get_sampled_tempered_scorers(
+                            scores_N, batch_size=batch_size, temperature=self.temperature
                         ),
                     )
                 else:
@@ -478,10 +488,25 @@ if __name__ == "__main__":
                 AcquisitionFunction.randombaldical,
             ]
         ]
-
+    if False:
+        configs = [
+            Experiment(
+                seed=seed + 340,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+                temperature=temperature,
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for acquisition_function in [
+                AcquisitionFunction.temperedbald,
+            ]
+            for temperature in [13, 15, 18]
+        ]
     configs = [
         Experiment(
-            seed=seed + 280,
+            seed=seed + 340,
             acquisition_function=acquisition_function,
             acquisition_size=acquisition_size,
             num_pool_samples=20,
@@ -492,7 +517,21 @@ if __name__ == "__main__":
         for acquisition_function in [
             AcquisitionFunction.temperedbald,
         ]
-        for temperature in [13, 15, 18]
+        for temperature in [8, 10]
+    ] + [
+        Experiment(
+            seed=seed + 340,
+            acquisition_function=acquisition_function,
+            acquisition_size=acquisition_size,
+            num_pool_samples=20,
+            temperature=temperature,
+        )
+        for seed in range(5)
+        for acquisition_size in [5, 10, 20, 50]
+        for acquisition_function in [
+            AcquisitionFunction.temperedbaldical,
+        ]
+        for temperature in [8, 10, 13]
     ]
 
     for job_id, store in embedded_experiments(__file__, len(configs)):

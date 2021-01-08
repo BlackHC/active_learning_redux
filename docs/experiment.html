@@ -113,7 +113,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="AcquisitionFunction" class="doc_header"><code>AcquisitionFunction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L44" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Enum</code> = [random, bald, batchbald, randombald, thompsonbald, batchbaldical, baldical, randombaldical, temperedbald]</p>
+<h2 id="AcquisitionFunction" class="doc_header"><code>AcquisitionFunction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L44" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Enum</code> = [random, bald, batchbald, randombald, thompsonbald, batchbaldical, baldical, randombaldical, temperedbald, temperedbaldical]</p>
 </blockquote>
 <p>An enumeration.</p>
 
@@ -144,7 +144,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">baldical</span> <span class="o">=</span> <span class="s2">&quot;BALD-ICAL&quot;</span>
     <span class="n">randombaldical</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD-ICAL&quot;</span>
     <span class="n">temperedbald</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD&quot;</span>
-    <span class="c1"># temperedbaldical = &quot;TemperedBALD-ICAL&quot;</span>
+    <span class="n">temperedbaldical</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD-ICAL&quot;</span>
     <span class="c1"># ical = &quot;ICAL&quot;</span>
     <span class="c1"># randomical = &quot;RandomICAL&quot;</span>
     <span class="c1"># temperedical = &quot;TemperedICAL&quot;</span>
@@ -538,6 +538,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbaldical</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">baldical</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombaldical</span><span class="p">,</span>
+                <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbaldical</span>
             <span class="p">):</span>
                 <span class="n">train_pool_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">(</span>
                     <span class="p">[</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">]</span>
@@ -569,6 +570,15 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                         <span class="n">pool_loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span>
                         <span class="n">get_scorers</span><span class="o">=</span><span class="k">lambda</span> <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">get_top_random_scorers</span><span class="p">(</span>
                             <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbaldical</span><span class="p">:</span>
+                    <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bald_ical_candidate_batch</span><span class="p">(</span>
+                        <span class="n">model</span><span class="p">,</span>
+                        <span class="n">pool_model</span><span class="p">,</span>
+                        <span class="n">pool_loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span>
+                        <span class="n">get_scorers</span><span class="o">=</span><span class="k">lambda</span> <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">get_sampled_tempered_scorers</span><span class="p">(</span>
+                            <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -631,7 +641,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
     <span class="n">seed</span><span class="o">=</span><span class="mi">1120</span><span class="p">,</span>
     <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">max_training_set</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbald</span><span class="p">,</span>
+    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbaldical</span><span class="p">,</span>
     <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">save_bald_scores</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -653,14 +663,16 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Training set size 20:
-RestoringEarlyStopping: Restoring best parameters. (Score: -3.1366674788296223)
+RestoringEarlyStopping: Restoring best parameters. (Score: -3.190309688448906)
 RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.5792, &#39;crossentropy&#39;: 3.334561510848999}
-Acquiring (label, score)s: 4 (0.7344), 9 (0.7843), 2 (1.146), 6 (0.8342), 2 (1.134), 2 (0.8554), 6 (0.7022), 0 (0.8333), 6 (0.7434), 8 (1.156)
+Perf after training {&#39;accuracy&#39;: 0.5805, &#39;crossentropy&#39;: 3.396873377227783}
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.940417043864727)
+RestoringEarlyStopping: Restoring optimizer.
+Acquiring (label, score)s: 2 (0.911), 0 (0.9002), 4 (0.8106), 6 (1.03), 2 (0.683), 4 (0.8509), 7 (0.743), 6 (0.7977), 0 (0.6661), 6 (0.7659)
 Training set size 30:
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.7008162792772055)
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.464161915704608)
 RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.6632, &#39;crossentropy&#39;: 2.65623758392334}
+Perf after training {&#39;accuracy&#39;: 0.6823, &#39;crossentropy&#39;: 2.502089427947998}
 Done.
 </pre>
 </div>
@@ -940,10 +952,25 @@ Done.
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombaldical</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">]</span>
-
+    <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Experiment</span><span class="p">(</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">340</span><span class="p">,</span>
+                <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+                <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbald</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">]</span>
+        <span class="p">]</span>
     <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">Experiment</span><span class="p">(</span>
-            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">280</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">340</span><span class="p">,</span>
             <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
             <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
             <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
@@ -954,7 +981,21 @@ Done.
         <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
             <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbald</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    <span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">Experiment</span><span class="p">(</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">340</span><span class="p">,</span>
+            <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+            <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbaldical</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">]</span>
     <span class="p">]</span>
 
     <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">store</span> <span class="ow">in</span> <span class="n">embedded_experiments</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">configs</span><span class="p">)):</span>
