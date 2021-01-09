@@ -624,6 +624,7 @@ if __name__ == "__main__":
             for acquisition_function in [
                 AcquisitionFunction.ical,
                 AcquisitionFunction.bald,
+                AcquisitionFunction.baldical,
                 AcquisitionFunction.thompsonbald,
                 AcquisitionFunction.randombald,
             ]
@@ -633,7 +634,7 @@ if __name__ == "__main__":
                 seed=seed + 3000,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
-                num_pool_samples=20,
+                num_pool_samples=100,
             )
             for seed in range(5)
             for acquisition_size in [5]
