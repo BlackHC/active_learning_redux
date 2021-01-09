@@ -412,6 +412,7 @@ def get_sampled_tempered_scorers(scores_N: torch.Tensor, *, temperature: float, 
     batch_size = min(batch_size, N)
 
     tempered_scores_N = scores_N ** temperature
+    tempered_scores_N[tempered_scores_N < 0] = 0.0
     partition_constant = tempered_scores_N.sum()
     p = tempered_scores_N / partition_constant
 
