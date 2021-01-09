@@ -23,7 +23,9 @@ class TransformedDataset(data.Dataset):
     Arguments:
         dataset (Dataset): The whole Dataset
         transformer (LambdaType): (idx, sample) -> transformed_sample
+        vision_transformer (LambdaType): (sample) -> transformed_sample
     """
+    dataset: data.Dataset
 
     def __init__(self, dataset, *, transformer=None, vision_transformer=None):
         self.dataset = dataset

@@ -31,6 +31,9 @@ entries:
       title: Restoring Early Stopping
       url: restoring_early_stopping.html
     - output: web,pdf
+      title: Dataset Challenges
+      url: dataset_challenges.html
+    - output: web,pdf
       title: Example Experiment
       url: example_experiment.html
     - output: web,pdf
