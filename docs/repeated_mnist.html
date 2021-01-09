@@ -69,7 +69,8 @@ nb_path: "05b_repeated_mnist.ipynb"
 <p>Transforms a dataset.</p>
 <p>Arguments:
     dataset (Dataset): The whole Dataset
-    transformer (LambdaType): (idx, sample) -&gt; transformed_sample</p>
+    transformer (LambdaType): (idx, sample) -&gt; transformed_sample
+    vision_transformer (LambdaType): (sample) -&gt; transformed_sample</p>
 
 </div>
 
@@ -92,7 +93,7 @@ nb_path: "05b_repeated_mnist.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L43" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L45" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -116,7 +117,7 @@ nb_path: "05b_repeated_mnist.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L65" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L67" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -140,7 +141,7 @@ nb_path: "05b_repeated_mnist.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L69" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
+<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/repeated_mnist.py#L71" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
 </blockquote>
 <p>Get the targets of a dataset without any target transforms.</p>
 <p>This supports subsets and other derivative datasets.</p>
@@ -169,7 +170,9 @@ nb_path: "05b_repeated_mnist.ipynb"
 <span class="sd">    Arguments:</span>
 <span class="sd">        dataset (Dataset): The whole Dataset</span>
 <span class="sd">        transformer (LambdaType): (idx, sample) -&gt; transformed_sample</span>
+<span class="sd">        vision_transformer (LambdaType): (sample) -&gt; transformed_sample</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transformer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vision_transformer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
