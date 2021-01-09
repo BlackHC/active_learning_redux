@@ -253,6 +253,46 @@ nb_path: "B3_results_visualization_temperedbald.ipynb"
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-38-c0f30f284b3f&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>results_latest <span class="ansi-blue-fg">=</span> load_laaos_files<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-4-6eabd3c69b34&gt;</span> in <span class="ansi-cyan-fg">load_laaos_files</span><span class="ansi-blue-fg">(path, files, vanilla, tag, prefix)</span>
+<span class="ansi-green-intense-fg ansi-bold">     27</span>             <span class="ansi-green-fg">pass</span>
+<span class="ansi-green-intense-fg ansi-bold">     28</span> 
+<span class="ansi-green-fg">---&gt; 29</span><span class="ansi-red-fg">         </span>store <span class="ansi-blue-fg">=</span> laaos<span class="ansi-blue-fg">.</span>safe_load<span class="ansi-blue-fg">(</span>path<span class="ansi-blue-fg">,</span> exposed_symbols<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span>nan<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     30</span>         store<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;actual_name&#34;</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> name
+<span class="ansi-green-intense-fg ansi-bold">     31</span>         store<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;actual_path&#34;</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> path
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/laaos/__init__.py</span> in <span class="ansi-cyan-fg">safe_load</span><span class="ansi-blue-fg">(path, exposed_symbols, extra_mappings)</span>
+<span class="ansi-green-intense-fg ansi-bold">    559</span> <span class="ansi-green-fg">def</span> safe_load<span class="ansi-blue-fg">(</span>path<span class="ansi-blue-fg">:</span> str<span class="ansi-blue-fg">,</span> exposed_symbols<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">,</span> extra_mappings<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    560</span>     <span class="ansi-green-fg">with</span> open<span class="ansi-blue-fg">(</span>path<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">&#34;rt&#34;</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">as</span> file<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 561</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> safe_load_str<span class="ansi-blue-fg">(</span>file<span class="ansi-blue-fg">.</span>read<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> exposed_symbols<span class="ansi-blue-fg">=</span>exposed_symbols<span class="ansi-blue-fg">,</span> extra_mappings<span class="ansi-blue-fg">=</span>extra_mappings<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    562</span> 
+<span class="ansi-green-intense-fg ansi-bold">    563</span> 
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/laaos/__init__.py</span> in <span class="ansi-cyan-fg">safe_load_str</span><span class="ansi-blue-fg">(code, exposed_symbols, extra_mappings)</span>
+<span class="ansi-green-intense-fg ansi-bold">    554</span>     root <span class="ansi-blue-fg">=</span> dict<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    555</span>     exec<span class="ansi-blue-fg">(</span>code<span class="ansi-blue-fg">,</span> global_symbols<span class="ansi-blue-fg">,</span> root<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 556</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> root<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;store&#34;</span><span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">    557</span> 
+<span class="ansi-green-intense-fg ansi-bold">    558</span> 
+
+<span class="ansi-red-fg">KeyError</span>: &#39;store&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
