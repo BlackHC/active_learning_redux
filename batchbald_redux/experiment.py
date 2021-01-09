@@ -118,7 +118,7 @@ class Experiment:
     num_eval_samples: int = 20
     num_training_samples: int = 1
     num_patience_epochs: int = 3
-    max_training_epochs: int = 10
+    max_training_epochs: int = 30
     device = "cuda"
     validation_set_size: int = 4096
     initial_set_size: int = 20
@@ -600,33 +600,48 @@ if __name__ == "__main__":
                 seed=seed + 1000,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
-                num_pool_samples=20,
+                num_pool_samples=num_pool_samples,
                 temperature=temperature,
             )
             for seed in range(5)
             for acquisition_size in [5, 10, 20, 50]
+            for num_pool_samples in [20, 100]
             for acquisition_function in [
                 AcquisitionFunction.temperedical,
                 AcquisitionFunction.temperedbald,
                 AcquisitionFunction.temperedbaldical,
             ]
-            for temperature in [5]
+            for temperature in [2, 5, 8]
         ]
         + [
             Experiment(
                 seed=seed + 2000,
                 acquisition_function=acquisition_function,
                 acquisition_size=acquisition_size,
-                num_pool_samples=20,
+                num_pool_samples=num_pool_samples,
             )
             for seed in range(5)
             for acquisition_size in [5, 10, 20, 50]
+            for num_pool_samples in [20, 100]
             for acquisition_function in [
                 AcquisitionFunction.ical,
                 AcquisitionFunction.bald,
                 AcquisitionFunction.baldical,
-                AcquisitionFunction.thompsonbald,
                 AcquisitionFunction.randombald,
+            ]
+        ]
+        + [
+            Experiment(
+                seed=seed + 2000,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=max(num_pool_samples, acquisition_size),
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for num_pool_samples in [20, 100]
+            for acquisition_function in [
+                AcquisitionFunction.thompsonbald,
             ]
         ]
         + [
