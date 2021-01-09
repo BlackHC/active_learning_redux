@@ -115,14 +115,14 @@ class Experiment:
     acquisition_size: int = 5
     max_training_set: int = 300
     num_pool_samples: int = 20
-    num_eval_samples: int = 4
+    num_eval_samples: int = 20
     num_training_samples: int = 1
     num_patience_epochs: int = 3
     max_training_epochs: int = 10
     device = "cuda"
     validation_set_size: int = 4096
     initial_set_size: int = 20
-    samples_per_epoch: int = 4096 * 6
+    samples_per_epoch: int = 5056
     repeated_mnist_repetitions: int = 2
     add_dataset_noise: bool = True
     acquisition_function: AcquisitionFunction = AcquisitionFunction.bald
@@ -195,7 +195,7 @@ class Experiment:
             normal_log_probs_N_K_C,
             pool_log_probs_N_K_C,
             batch_size=self.acquisition_size,
-            num_samples=100000,
+            num_samples=1000000,
             dtype=torch.double,
             device=self.device,
         )
@@ -245,7 +245,7 @@ class Experiment:
         candidate_batch = get_batchbald_batch(
             log_probs_N_K_C,
             batch_size=self.acquisition_size,
-            num_samples=100000,
+            num_samples=1000000,
             dtype=torch.double,
             device=self.device,
         )
@@ -565,34 +565,84 @@ if __name__ == "__main__":
             ]
             for temperature in [8, 10, 13]
         ]
+    if False:
+        configs = [
+            Experiment(
+                seed=seed + 500,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+                temperature=temperature,
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for acquisition_function in [
+                AcquisitionFunction.temperedical,
+            ]
+            for temperature in [5, 8, 11]
+        ] + [
+            Experiment(
+                seed=seed + 600,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for acquisition_function in [
+                AcquisitionFunction.ical,
+            ]
+        ]
 
-    configs = [
-        Experiment(
-            seed=seed + 500,
-            acquisition_function=acquisition_function,
-            acquisition_size=acquisition_size,
-            num_pool_samples=20,
-            temperature=temperature,
-        )
-        for seed in range(5)
-        for acquisition_size in [5, 10, 20, 50]
-        for acquisition_function in [
-            AcquisitionFunction.temperedical,
+    configs = (
+        [
+            Experiment(
+                seed=seed + 1000,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+                temperature=temperature,
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for acquisition_function in [
+                AcquisitionFunction.temperedical,
+                AcquisitionFunction.temperedbald,
+                AcquisitionFunction.temperedbaldical,
+            ]
+            for temperature in [5]
         ]
-        for temperature in [5, 8, 11]
-    ] + [
-        Experiment(
-            seed=seed + 600,
-            acquisition_function=acquisition_function,
-            acquisition_size=acquisition_size,
-            num_pool_samples=20,
-        )
-        for seed in range(5)
-        for acquisition_size in [5, 10, 20, 50]
-        for acquisition_function in [
-            AcquisitionFunction.ical,
+        + [
+            Experiment(
+                seed=seed + 2000,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+            )
+            for seed in range(5)
+            for acquisition_size in [5, 10, 20, 50]
+            for acquisition_function in [
+                AcquisitionFunction.ical,
+                AcquisitionFunction.bald,
+                AcquisitionFunction.thompsonbald,
+                AcquisitionFunction.randombald,
+            ]
         ]
-    ]
+        + [
+            Experiment(
+                seed=seed + 3000,
+                acquisition_function=acquisition_function,
+                acquisition_size=acquisition_size,
+                num_pool_samples=20,
+            )
+            for seed in range(5)
+            for acquisition_size in [5]
+            for acquisition_function in [
+                AcquisitionFunction.batchbaldical,
+                AcquisitionFunction.batchbald,
+            ]
+        ]
+    )
 
     for job_id, store in embedded_experiments(__file__, len(configs)):
         config = configs[job_id]
