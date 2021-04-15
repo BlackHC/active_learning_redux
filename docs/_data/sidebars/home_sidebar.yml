@@ -53,7 +53,7 @@ entries:
       url: A1_some_models.html
     - output: web,pdf
       title: Results Visualizations
-      url: C_examine_AL_bald_scores.html
+      url: X_paper_plots.html
     output: web
     title: batchbald_redux
   output: web

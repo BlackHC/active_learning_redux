@@ -318,26 +318,90 @@ nb_path: "07_black_box_training.ipynb"
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-RestoringEarlyStopping: Restoring best parameters. (Score: -0.11676170641109347)
-RestoringEarlyStopping: Restoring optimizer.
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Engine run is terminating due to exception: .
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-5-00ede63817a0&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">     17</span> training_log <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
+<span class="ansi-green-intense-fg ansi-bold">     18</span> 
+<span class="ansi-green-fg">---&gt; 19</span><span class="ansi-red-fg"> train(
+</span><span class="ansi-green-intense-fg ansi-bold">     20</span>     model<span class="ansi-blue-fg">=</span>model<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     21</span>     training_samples<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">,</span>
 
+<span class="ansi-green-fg">&lt;ipython-input-4-761cd3c83dde&gt;</span> in <span class="ansi-cyan-fg">train</span><span class="ansi-blue-fg">(model, training_samples, validation_samples, train_loader, validation_loader, patience, max_epochs, device, training_log, loss, validation_loss, optimizer)</span>
+<span class="ansi-green-intense-fg ansi-bold">     89</span> 
+<span class="ansi-green-intense-fg ansi-bold">     90</span>     <span class="ansi-red-fg"># Kick everything off</span>
+<span class="ansi-green-fg">---&gt; 91</span><span class="ansi-red-fg">     </span>trainer<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>train_loader<span class="ansi-blue-fg">,</span> max_epochs<span class="ansi-blue-fg">=</span>max_epochs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     92</span> 
+<span class="ansi-green-intense-fg ansi-bold">     93</span>     <span class="ansi-green-fg">if</span> early_stopping<span class="ansi-blue-fg">:</span>
 
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.9723333333333334,
-   &#39;crossentropy&#39;: 0.1676989432533582},
-  {&#39;accuracy&#39;: 0.9791833333333333, &#39;crossentropy&#39;: 0.13145085282996297},
-  {&#39;accuracy&#39;: 0.98265, &#39;crossentropy&#39;: 0.11676170641109347}],
- &#39;best_epoch&#39;: 3}</pre>
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, data, max_epochs, epoch_length, seed)</span>
+<span class="ansi-green-intense-fg ansi-bold">    689</span> 
+<span class="ansi-green-intense-fg ansi-bold">    690</span>         self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>dataloader <span class="ansi-blue-fg">=</span> data
+<span class="ansi-green-fg">--&gt; 691</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_internal_run<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    692</span> 
+<span class="ansi-green-intense-fg ansi-bold">    693</span>     <span class="ansi-blue-fg">@</span>staticmethod
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    760</span>             self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+<span class="ansi-green-intense-fg ansi-bold">    761</span>             self<span class="ansi-blue-fg">.</span>logger<span class="ansi-blue-fg">.</span>error<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Engine run is terminating due to exception: %s.&#34;</span><span class="ansi-blue-fg">,</span> str<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 762</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_handle_exception<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    763</span> 
+<span class="ansi-green-intense-fg ansi-bold">    764</span>         self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_handle_exception</span><span class="ansi-blue-fg">(self, e)</span>
+<span class="ansi-green-intense-fg ansi-bold">    465</span>             self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>EXCEPTION_RAISED<span class="ansi-blue-fg">,</span> e<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    466</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 467</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> e
+<span class="ansi-green-intense-fg ansi-bold">    468</span> 
+<span class="ansi-green-intense-fg ansi-bold">    469</span>     <span class="ansi-blue-fg">@</span>property
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    728</span>                     self<span class="ansi-blue-fg">.</span>_setup_engine<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    729</span> 
+<span class="ansi-green-fg">--&gt; 730</span><span class="ansi-red-fg">                 </span>time_taken <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_run_once_on_dataset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    731</span>                 <span class="ansi-red-fg"># time is available for handlers but must be update after fire</span>
+<span class="ansi-green-intense-fg ansi-bold">    732</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">[</span>Events<span class="ansi-blue-fg">.</span>EPOCH_COMPLETED<span class="ansi-blue-fg">.</span>name<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> time_taken
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_run_once_on_dataset</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    809</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>iteration <span class="ansi-blue-fg">+=</span> <span class="ansi-cyan-fg">1</span>
+<span class="ansi-green-intense-fg ansi-bold">    810</span>                 self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_STARTED<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 811</span><span class="ansi-red-fg">                 </span>self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>output <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_process_function<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>batch<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    812</span>                 self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_COMPLETED<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    813</span> 
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/__init__.py</span> in <span class="ansi-cyan-fg">_update</span><span class="ansi-blue-fg">(engine, batch)</span>
+<span class="ansi-green-intense-fg ansi-bold">     99</span>         y_pred <span class="ansi-blue-fg">=</span> model<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    100</span>         loss <span class="ansi-blue-fg">=</span> loss_fn<span class="ansi-blue-fg">(</span>y_pred<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 101</span><span class="ansi-red-fg">         </span>loss<span class="ansi-blue-fg">.</span>backward<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    102</span> 
+<span class="ansi-green-intense-fg ansi-bold">    103</span>         <span class="ansi-green-fg">if</span> on_tpu<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/torch/tensor.py</span> in <span class="ansi-cyan-fg">backward</span><span class="ansi-blue-fg">(self, gradient, retain_graph, create_graph)</span>
+<span class="ansi-green-intense-fg ansi-bold">    219</span>                 retain_graph<span class="ansi-blue-fg">=</span>retain_graph<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    220</span>                 create_graph=create_graph)
+<span class="ansi-green-fg">--&gt; 221</span><span class="ansi-red-fg">         </span>torch<span class="ansi-blue-fg">.</span>autograd<span class="ansi-blue-fg">.</span>backward<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> gradient<span class="ansi-blue-fg">,</span> retain_graph<span class="ansi-blue-fg">,</span> create_graph<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    222</span> 
+<span class="ansi-green-intense-fg ansi-bold">    223</span>     <span class="ansi-green-fg">def</span> register_hook<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> hook<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/torch/autograd/__init__.py</span> in <span class="ansi-cyan-fg">backward</span><span class="ansi-blue-fg">(tensors, grad_tensors, retain_graph, create_graph, grad_variables)</span>
+<span class="ansi-green-intense-fg ansi-bold">    128</span>         retain_graph <span class="ansi-blue-fg">=</span> create_graph
+<span class="ansi-green-intense-fg ansi-bold">    129</span> 
+<span class="ansi-green-fg">--&gt; 130</span><span class="ansi-red-fg">     Variable._execution_engine.run_backward(
+</span><span class="ansi-green-intense-fg ansi-bold">    131</span>         tensors<span class="ansi-blue-fg">,</span> grad_tensors_<span class="ansi-blue-fg">,</span> retain_graph<span class="ansi-blue-fg">,</span> create_graph<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    132</span>         allow_unreachable=True)  # allow_unreachable flag
+
+<span class="ansi-red-fg">KeyboardInterrupt</span>: </pre>
 </div>
-
 </div>
 
 </div>
@@ -368,7 +432,7 @@ RestoringEarlyStopping: Restoring optimizer.
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;accuracy&#39;: 0.9844, &#39;crossentropy&#39;: 0.10267819431312382}</pre>
+<pre>{&#39;accuracy&#39;: 0.9715, &#39;crossentropy&#39;: 0.1681874878913164}</pre>
 </div>
 
 </div>
@@ -398,7 +462,31 @@ RestoringEarlyStopping: Restoring optimizer.
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L155" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_predictions_labels" class="doc_header"><code>get_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L155" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions_labels</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L198" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
 </blockquote>
 
 </div>
@@ -419,13 +507,14 @@ RestoringEarlyStopping: Restoring optimizer.
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_predictions</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_predictions_labels</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
-    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">N</span> <span class="o">*</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;get_predictions&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">N</span> <span class="o">*</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;get_predictions_labels&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_prediction_batch</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
@@ -437,7 +526,7 @@ RestoringEarlyStopping: Restoring optimizer.
         <span class="n">prediction_model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
 
         <span class="n">data_start</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_labels</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
             <span class="n">batch_x</span> <span class="o">=</span> <span class="n">batch_x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
             <span class="n">batch_predictions</span> <span class="o">=</span> <span class="n">prediction_model</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
@@ -446,12 +535,24 @@ RestoringEarlyStopping: Restoring optimizer.
             <span class="n">data_end</span> <span class="o">=</span> <span class="n">data_start</span> <span class="o">+</span> <span class="n">batch_size</span>
 
             <span class="n">predictions</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_predictions</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span> <span class="o">==</span> <span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
 
             <span class="n">data_start</span> <span class="o">=</span> <span class="n">data_end</span>
 
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
 
     <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span>
+
+
+<span class="k">def</span> <span class="nf">get_predictions</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">predictions</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">predictions</span>
 </pre></div>
@@ -476,11 +577,61 @@ RestoringEarlyStopping: Restoring optimizer.
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">get_predictions</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>10000</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">predictions</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(torch.Size([10000, 7, 10]), torch.Size([10000]))</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
