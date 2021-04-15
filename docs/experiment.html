@@ -84,13 +84,15 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">get_bald_scores</span><span class="p">,</span>
     <span class="n">get_batchbald_batch</span><span class="p">,</span>
     <span class="n">get_batchbaldical_batch</span><span class="p">,</span>
+    <span class="n">get_coreset_bald_scores</span><span class="p">,</span>
+    <span class="n">get_batch_coreset_bald_batch</span><span class="p">,</span>
     <span class="n">get_ical_scores</span><span class="p">,</span>
     <span class="n">get_sampled_tempered_scorers</span><span class="p">,</span>
     <span class="n">get_thompson_bald_batch</span><span class="p">,</span>
     <span class="n">get_top_k_scorers</span><span class="p">,</span>
     <span class="n">get_top_random_scorers</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">get_predictions</span><span class="p">,</span> <span class="n">train</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">get_predictions</span><span class="p">,</span> <span class="n">get_predictions_labels</span><span class="p">,</span> <span class="n">train</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">SamplerModel</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.example_models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.repeated_mnist</span> <span class="kn">import</span> <span class="n">create_repeated_MNIST_dataset</span>
@@ -114,7 +116,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="AcquisitionFunction" class="doc_header"><code>AcquisitionFunction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Enum</code> = [random, bald, batchbald, randombald, thompsonbald, batchbaldical, baldical, randombaldical, temperedbald, temperedbaldical, ical, temperedical]</p>
+<h2 id="AcquisitionFunction" class="doc_header"><code>AcquisitionFunction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L47" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Enum</code> = [random, bald, batchbald, batchbaldical, baldical, coresetbald, batchcoresetbald, ical, randombald, randombaldical, thompsonbald, temperedbald, temperedcoresetbald, temperedbaldical, temperedical]</p>
 </blockquote>
 <p>An enumeration.</p>
 
@@ -139,14 +141,17 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">random</span> <span class="o">=</span> <span class="s2">&quot;Random&quot;</span>
     <span class="n">bald</span> <span class="o">=</span> <span class="s2">&quot;BALD&quot;</span>
     <span class="n">batchbald</span> <span class="o">=</span> <span class="s2">&quot;BatchBALD&quot;</span>
-    <span class="n">randombald</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD&quot;</span>
-    <span class="n">thompsonbald</span> <span class="o">=</span> <span class="s2">&quot;ThompsonBALD&quot;</span>
     <span class="n">batchbaldical</span> <span class="o">=</span> <span class="s2">&quot;BatchBALD-ICAL&quot;</span>
     <span class="n">baldical</span> <span class="o">=</span> <span class="s2">&quot;BALD-ICAL&quot;</span>
-    <span class="n">randombaldical</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD-ICAL&quot;</span>
-    <span class="n">temperedbald</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD&quot;</span>
-    <span class="n">temperedbaldical</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD-ICAL&quot;</span>
+    <span class="n">coresetbald</span> <span class="o">=</span> <span class="s2">&quot;CoreSetBALD&quot;</span>
+    <span class="n">batchcoresetbald</span> <span class="o">=</span> <span class="s2">&quot;BatchCoreSetBALD&quot;</span>
     <span class="n">ical</span> <span class="o">=</span> <span class="s2">&quot;ICAL&quot;</span>
+    <span class="n">randombald</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD&quot;</span>
+    <span class="n">randombaldical</span> <span class="o">=</span> <span class="s2">&quot;RandomBALD-ICAL&quot;</span>
+    <span class="n">thompsonbald</span> <span class="o">=</span> <span class="s2">&quot;ThompsonBALD&quot;</span>
+    <span class="n">temperedbald</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD&quot;</span>
+    <span class="n">temperedcoresetbald</span> <span class="o">=</span> <span class="s2">&quot;TemperedCoreSetBALD&quot;</span>
+    <span class="n">temperedbaldical</span> <span class="o">=</span> <span class="s2">&quot;TemperedBALD-ICAL&quot;</span>
     <span class="n">temperedical</span> <span class="o">=</span> <span class="s2">&quot;TemperedICAL&quot;</span>
 </pre></div>
 
@@ -168,7 +173,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PredictionDataset" class="doc_header"><code>class</code> <code>PredictionDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L62" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PredictionDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
+<h2 id="PredictionDataset" class="doc_header"><code>class</code> <code>PredictionDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L67" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PredictionDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
 </blockquote>
 <p>An abstract class representing a :class:<code>Dataset</code>.</p>
 <p>All datasets that represent a map from keys to data samples should subclass
@@ -276,9 +281,9 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L113" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>4096</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>2</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong><code>acquisition_function</code></strong>:<a href="/batchbald_redux/experiment.html#AcquisitionFunction"><code>AcquisitionFunction</code></a>=<em><code>&lt;AcquisitionFunction.bald: 'BALD'&gt;</code></em>, <strong><code>save_bald_scores</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
+<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L118" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>30</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>4096</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>2</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong><code>acquisition_function</code></strong>:<a href="/batchbald_redux/experiment.html#AcquisitionFunction"><code>AcquisitionFunction</code></a>=<em><code>&lt;AcquisitionFunction.bald: 'BALD'&gt;</code></em>, <strong><code>save_bald_scores</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
 </blockquote>
-<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 10, validation_set_size: int = 4096, initial_set_size: int = 20, samples_per_epoch: int = 5056, repeated_mnist_repetitions: int = 2, add_dataset_noise: bool = True, acquisition_function: batchbald_redux.experiment.AcquisitionFunction = &lt;AcquisitionFunction.bald: 'BALD'&gt;, save_bald_scores: bool = False, temperature: float = 0.0)</p>
+<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 30, validation_set_size: int = 4096, initial_set_size: int = 20, samples_per_epoch: int = 5056, repeated_mnist_repetitions: int = 2, add_dataset_noise: bool = True, acquisition_function: batchbald_redux.experiment.AcquisitionFunction = &lt;AcquisitionFunction.bald: 'BALD'&gt;, save_bald_scores: bool = False, temperature: float = 0.0)</p>
 
 </div>
 
@@ -309,7 +314,7 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
     <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span>
     <span class="n">initial_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
@@ -353,6 +358,22 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
             <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
+    <span class="k">def</span> <span class="nf">get_coreset_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">get_scorers</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">labels_N</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">scores_N</span> <span class="o">=</span> <span class="n">get_coreset_bald_scores</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">labels_N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_bald_scores</span><span class="p">:</span>
+            <span class="n">bald_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores_N</span><span class="p">)</span>
+
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_scorers</span><span class="p">(</span><span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">candidate_batch</span>
 
     <span class="k">def</span> <span class="nf">get_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">get_scorers</span><span class="p">):</span>
@@ -442,6 +463,22 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">candidate_batch</span>
 
+    <span class="k">def</span> <span class="nf">get_batch_coreset_bald_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">):</span>
+        <span class="c1"># Evaluate pool set</span>
+        <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">labels_N</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate BALD scores</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batch_coreset_bald_batch</span><span class="p">(</span>
+            <span class="n">log_probs_N_K_C</span><span class="p">,</span>
+            <span class="n">labels_N</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidate_batch</span>
+
     <span class="k">def</span> <span class="nf">train_pool_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_pool_dataset</span><span class="p">,</span> <span class="n">train_pool_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">training_log</span>
     <span class="p">):</span>
@@ -506,7 +543,9 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
             <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
             <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 
         <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -616,6 +655,10 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                     <span class="k">raise</span> <span class="sa">f</span><span class="s2">&quot;Unexpected acquisition function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span><span class="si">}</span><span class="s2">!&quot;</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span><span class="p">:</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="n">get_scorers</span><span class="o">=</span><span class="n">get_top_k_scorers</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">coresetbald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coreset_bald_candidate_batch</span><span class="p">(</span>
+                    <span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="n">get_scorers</span><span class="o">=</span><span class="n">get_top_k_scorers</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombald</span><span class="p">:</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bald_candidate_batch</span><span class="p">(</span>
                     <span class="n">model</span><span class="p">,</span>
@@ -632,8 +675,18 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
                         <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
                     <span class="p">),</span>
                 <span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedcoresetbald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coreset_bald_candidate_batch</span><span class="p">(</span>
+                    <span class="n">model</span><span class="p">,</span>
+                    <span class="n">pool_loader</span><span class="p">,</span>
+                    <span class="n">get_scorers</span><span class="o">=</span><span class="k">lambda</span> <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">get_sampled_tempered_scorers</span><span class="p">(</span>
+                        <span class="n">scores_N</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchbald</span><span class="p">:</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batchbald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchcoresetbald</span><span class="p">:</span>
+                <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batch_coreset_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">:</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_thompson_bald_candidate_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_function</span> <span class="o">==</span> <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">random</span><span class="p">:</span>
@@ -670,11 +723,11 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span>
     <span class="n">seed</span><span class="o">=</span><span class="mi">1120</span><span class="p">,</span>
-    <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">max_training_set</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">ical</span><span class="p">,</span>
-    <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">max_training_set</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">batchcoresetbald</span><span class="p">,</span>
+    <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">save_bald_scores</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
@@ -694,16 +747,155 @@ of :class:<code>~torch.utils.data.DataLoader</code>.</p>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Training set size 20:
-RestoringEarlyStopping: Restoring best parameters. (Score: -3.3725577536970377)
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.5133121386170387)
 RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.5752, &#39;crossentropy&#39;: 3.6118988311767577}
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.887264061719179)
+Perf after training {&#39;accuracy&#39;: 0.5841, &#39;crossentropy&#39;: 2.534017028045654}
+Acquiring (label, score)s: 0 (4.352), 3 (4.603), 0 (4.605), 9 (4.605), 0 (4.605)
+Training set size 25:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.576579175889492)
 RestoringEarlyStopping: Restoring optimizer.
-Acquiring (label, score)s: 8 (1.455), 0 (1.45), 6 (1.443), 0 (1.442), 6 (1.435), 2 (1.435), 6 (1.435), 2 (1.434), 6 (1.434), 2 (1.424)
+Perf after training {&#39;accuracy&#39;: 0.5322, &#39;crossentropy&#39;: 2.611192865753174}
+Acquiring (label, score)s: 3 (4.504), 3 (4.604), 3 (4.605), 3 (4.605), 3 (4.605)
 Training set size 30:
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.388180371373892)
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.467010274529457)
 RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.6637, &#39;crossentropy&#39;: 2.4762866786956788}
+Perf after training {&#39;accuracy&#39;: 0.5532, &#39;crossentropy&#39;: 2.5229205623626707}
+Acquiring (label, score)s: 7 (4.405), 4 (4.604), 4 (4.605), 9 (4.605), 4 (4.605)
+Training set size 35:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.8668460305780172)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6341, &#39;crossentropy&#39;: 1.9239043365478516}
+Acquiring (label, score)s: 7 (4.279), 7 (4.602), 0 (4.605), 7 (4.605), 0 (4.605)
+Training set size 40:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.129183182492852)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.5687, &#39;crossentropy&#39;: 2.1679417846679687}
+Acquiring (label, score)s: 9 (3.948), 3 (4.602), 6 (4.605), 2 (4.605), 3 (4.605)
+Training set size 45:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.6570146046578884)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6655, &#39;crossentropy&#39;: 1.6252682800292968}
+Acquiring (label, score)s: 8 (3.706), 8 (4.58), 8 (4.605), 2 (4.605), 8 (4.605)
+Training set size 50:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.9345365706831217)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.581, &#39;crossentropy&#39;: 1.9488560020446777}
+Acquiring (label, score)s: 3 (3.07), 4 (4.547), 6 (4.603), 3 (4.605), 4 (4.605)
+Training set size 55:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.6173859648406506)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6513, &#39;crossentropy&#39;: 1.6471292100906372}
+Acquiring (label, score)s: 4 (2.631), 5 (4.299), 4 (4.566), 5 (4.601), 4 (4.605)
+Training set size 60:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.6276714149862528)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6485, &#39;crossentropy&#39;: 1.6560635515213014}
+Acquiring (label, score)s: 5 (2.905), 2 (4.371), 2 (4.581), 2 (4.603), 5 (4.605)
+Training set size 65:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.5859154742211103)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6167, &#39;crossentropy&#39;: 1.6043425155639648}
+Acquiring (label, score)s: 7 (2.932), 6 (4.414), 7 (4.591), 3 (4.605), 3 (4.605)
+Training set size 70:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.3969831224530935)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6789, &#39;crossentropy&#39;: 1.4155648038864135}
+Acquiring (label, score)s: 7 (1.742), 7 (3.719), 7 (4.437), 7 (4.58), 7 (4.602)
+Training set size 75:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.4291380029171705)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.6866, &#39;crossentropy&#39;: 1.4378791414260865}
+Acquiring (label, score)s: 1 (2.217), 1 (3.829), 4 (4.461), 1 (4.578), 4 (4.6)
+Training set size 80:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.4475281704217196)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.636, &#39;crossentropy&#39;: 1.4637528018951416}
+Acquiring (label, score)s: 0 (1.803), 2 (3.59), 0 (4.515), 2 (4.592), 0 (4.604)
+Training set size 85:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.4177256971597672)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.652, &#39;crossentropy&#39;: 1.448204905128479}
+Acquiring (label, score)s: 8 (1.527), 8 (3.668), 8 (4.489), 8 (4.592), 8 (4.603)
+Training set size 90:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.253488453105092)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.7597, &#39;crossentropy&#39;: 1.2606028776168823}
+Acquiring (label, score)s: 6 (3.76), 2 (4.575), 6 (4.604), 6 (4.605), 2 (4.605)
+Training set size 95:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.2568991323933005)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.7566, &#39;crossentropy&#39;: 1.2637981262207032}
+Acquiring (label, score)s: 8 (3.551), 8 (4.564), 0 (4.604), 2 (4.605), 8 (4.605)
+Training set size 100:
+RestoringEarlyStopping: 1 / 3
+RestoringEarlyStopping: 2 / 3
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.245158334262669)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.7679, &#39;crossentropy&#39;: 1.2658123697280883}
 Done.
 </pre>
 </div>
@@ -1064,32 +1256,48 @@ Done.
                 <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">1000</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
-                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="n">num_pool_samples</span><span class="p">,</span>
                 <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedical</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbald</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">temperedbaldical</span><span class="p">,</span>
             <span class="p">]</span>
-            <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
         <span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
             <span class="n">Experiment</span><span class="p">(</span>
                 <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
-                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="n">num_pool_samples</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">ical</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">bald</span><span class="p">,</span>
-                <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">,</span>
+                <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">baldical</span><span class="p">,</span>
                 <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">randombald</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span>
+            <span class="n">Experiment</span><span class="p">(</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">,</span>
+                <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
+                <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">acquisition_size</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">AcquisitionFunction</span><span class="o">.</span><span class="n">thompsonbald</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">]</span>
         <span class="o">+</span> <span class="p">[</span>
@@ -1097,7 +1305,7 @@ Done.
                 <span class="n">seed</span><span class="o">=</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">3000</span><span class="p">,</span>
                 <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
                 <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
-                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span>
