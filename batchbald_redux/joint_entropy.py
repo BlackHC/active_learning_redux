@@ -7,7 +7,7 @@ __all__ = ['JointEntropy', 'ExactJointEntropy', 'batch_multi_choices', 'gather_e
 
 import torch
 from toma import toma
-from tqdm.auto import tqdm
+from blackhc.progress_bar import create_progress_bar
 
 # Cell
 
@@ -76,7 +76,8 @@ class ExactJointEntropy(JointEntropy):
         if output_entropies_B is None:
             output_entropies_B = torch.empty(B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device)
 
-        pbar = tqdm(total=B, desc="ExactJointEntropy.compute_batch", leave=False)
+        pbar = create_progress_bar(B, tqdm_args=dict(desc="ExactJointEntropy.compute_batch", leave=False))
+        pbar.start()
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
@@ -101,7 +102,7 @@ class ExactJointEntropy(JointEntropy):
 
             pbar.update(end - start)
 
-        pbar.close()
+        pbar.finish()
 
         return output_entropies_B
 
@@ -211,7 +212,8 @@ class SampledJointEntropy(JointEntropy):
         if output_entropies_B is None:
             output_entropies_B = torch.empty(B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device)
 
-        pbar = tqdm(total=B, desc="SampledJointEntropy.compute_batch", leave=False)
+        pbar = create_progress_bar(B, tqdm_args=dict(desc="SampledJointEntropy.compute_batch", leave=False))
+        pbar.start()
 
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
@@ -239,7 +241,7 @@ class SampledJointEntropy(JointEntropy):
 
             pbar.update(end - start)
 
-        pbar.close()
+        pbar.finish()
 
         return output_entropies_B
 

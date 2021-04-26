@@ -15,7 +15,7 @@ from typing import List
 import numpy as np
 import torch
 from toma import toma
-from tqdm.auto import tqdm
+from blackhc.progress_bar import with_progress_bar, create_progress_bar
 
 from batchbald_redux import joint_entropy
 
@@ -27,7 +27,8 @@ def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
 
     entropies_N = torch.empty(N, dtype=torch.double)
 
-    pbar = tqdm(total=N, desc="Conditional Entropy", leave=False)
+    pbar = create_progress_bar(N, tqdm_args=dict(desc="Conditional Entropy", leave=False))
+    pbar.start()
 
     @toma.execute.chunked(log_probs_N_K_C, 1024)
     def compute(log_probs_n_K_C, start: int, end: int):
@@ -36,7 +37,7 @@ def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
         entropies_N[start:end].copy_(-torch.sum(nats_n_K_C, dim=(1, 2)) / K)
         pbar.update(end - start)
 
-    pbar.close()
+    pbar.finish()
 
     return entropies_N
 
@@ -46,7 +47,8 @@ def compute_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
 
     entropies_N = torch.empty(N, dtype=torch.double)
 
-    pbar = tqdm(total=N, desc="Entropy", leave=False)
+    pbar = create_progress_bar(N, tqdm_args=dict(desc="Entropy", leave=False))
+    pbar.start()
 
     @toma.execute.chunked(log_probs_N_K_C, 1024)
     def compute(log_probs_n_K_C, start: int, end: int):
@@ -56,7 +58,7 @@ def compute_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
         entropies_N[start:end].copy_(-torch.sum(nats_n_C, dim=1))
         pbar.update(end - start)
 
-    pbar.close()
+    pbar.finish()
 
     return entropies_N
 
@@ -133,7 +135,7 @@ def get_batchbald_batch(
     # We always keep these on the CPU.
     scores_N = batchbald_scorer.alloc_scores()
 
-    for i in tqdm(range(batch_size), desc="BatchBALD", leave=False):
+    for i in with_progress_bar(range(batch_size), tqdm_args=dict(desc="BatchBALD", leave=False)):
         if i > 0:
             latest_index = candidate_indices[-1]
             batchbald_scorer.append_to_batch(latest_index)
@@ -221,7 +223,7 @@ def get_batchbaldical_batch(
     training_scores_N = training_batchbald_scorer.alloc_scores()
     pool_scores_N = pool_batchbald_scorer.alloc_scores()
 
-    for i in tqdm(range(batch_size), desc="BatchBALD", leave=False):
+    for i in with_progress_bar(range(batch_size), tqdm_args=dict(desc="BatchBALD", leave=False)):
         if i > 0:
             latest_index = candidate_indices[-1]
             training_batchbald_scorer.append_to_batch(latest_index)
@@ -248,7 +250,8 @@ def compute_each_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Ten
 
     entropies_N_K = torch.empty((N, K), dtype=torch.double)
 
-    pbar = tqdm(total=N, desc="Entropy", leave=False)
+    pbar = create_progress_bar(N, tqdm_args=dict(desc="Entropy", leave=False))
+    pbar.start()
 
     @toma.execute.chunked(log_probs_N_K_C, 1024)
     def compute(log_probs_n_K_C, start: int, end: int):
@@ -257,7 +260,7 @@ def compute_each_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Ten
         entropies_N_K[start:end].copy_(-torch.sum(nats_n_K_C, dim=2))
         pbar.update(end - start)
 
-    pbar.close()
+    pbar.finish()
 
     return entropies_N_K
 
@@ -436,7 +439,7 @@ def get_batchical_batch(
         pin_memory=torch.cuda.is_available(),
     )
 
-    for i in tqdm(range(batch_size), desc="BatchBALD", leave=False):
+    for i in with_progress_bar(range(batch_size), tqdm_args=dict(desc="BatchBALD", leave=False)):
         if i > 0:
             latest_index = candidate_indices[-1]
             training_joint_entropy.add_variables(training_log_probs_N_K_C[latest_index : latest_index + 1])
@@ -501,7 +504,7 @@ def get_batch_coreset_bald_batch(
     # p((y)_{B-1}|(x)_{B-1}, \omega)
     log_probs_join_batch_K = torch.zeros_like(log_probs_N_K[0], dtype=dtype, device=device)
 
-    for i in tqdm(range(batch_size), desc="BatchCoreSetBALD", leave=False):
+    for i in with_progress_bar(range(batch_size), tqdm_args=dict(desc="BatchCoreSetBALD", leave=False)):
         # p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) * p((y)_{B-1}|(x)_{B-1}, \omega)
         log_prob_joint_N_K = log_probs_N_K + log_probs_join_batch_K[None, :]
 

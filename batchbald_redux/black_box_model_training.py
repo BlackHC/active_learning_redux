@@ -16,7 +16,7 @@ from ignite.engine import Events, create_supervised_evaluator, create_supervised
 from ignite.metrics import Accuracy, Loss, RunningAverage
 from toma import toma
 from torch import nn
-from tqdm.auto import tqdm
+from blackhc.progress_bar import create_progress_bar
 
 from .consistent_mc_dropout import (
     GeometricMeanPrediction,
@@ -86,11 +86,12 @@ def train(
 
     setup_common_training_handlers(trainer, with_gpu_stats=torch.cuda.is_available(), log_every_iters=LOG_INTERVAL)
 
-    ProgressBar(persist=False).attach(
-        validation_evaluator,
-        metric_names="all",
-        event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
-    )
+    if is_run_from_ipython():
+        ProgressBar(persist=False).attach(
+            validation_evaluator,
+            metric_names="all",
+            event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
+        )
 
     training_log["epochs"] = []
     epochs_log = training_log["epochs"]
@@ -100,6 +101,9 @@ def train(
     def log_training_results(engine):
         metrics = dict(engine.state.metrics)
         epochs_log.append(metrics)
+
+        if is_run_from_ipython():
+            print(f"Epoch metrics: {metrics}")
 
     # Add early stopping
     if patience is not None:
@@ -160,7 +164,8 @@ def get_predictions_labels(*, model, num_samples, num_classes, loader, device: s
     predictions = torch.empty((N, num_samples, num_classes), dtype=torch.float, device="cpu")
     labels = torch.empty(N, dtype=torch.long, device="cpu")
 
-    pbar = tqdm(total=N * num_samples, desc="get_predictions_labels", leave=False)
+    pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
+    pbar.start()
 
     @toma.execute.range(0, num_samples, 128)
     def get_prediction_batch(start, end):
@@ -190,7 +195,7 @@ def get_predictions_labels(*, model, num_samples, num_classes, loader, device: s
 
             pbar.update(batch_size * (end - start))
 
-    pbar.close()
+    pbar.finish()
 
     return predictions, labels
 

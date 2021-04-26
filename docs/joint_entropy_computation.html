@@ -75,7 +75,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">toma</span> <span class="kn">import</span> <span class="n">toma</span>
-<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">blackhc.progress_bar</span> <span class="kn">import</span> <span class="n">create_progress_bar</span>
 </pre></div>
 
     </div>
@@ -311,7 +311,8 @@ nb_path: "02_joint_entropy_computation.ipynb"
         <span class="k">if</span> <span class="n">output_entropies_B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_entropies_B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">log_probs_B_K_C</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">log_probs_B_K_C</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;ExactJointEntropy.compute_batch&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;ExactJointEntropy.compute_batch&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_B_K_C</span><span class="p">,</span> <span class="n">initial_step</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">chunked_joint_entropy</span><span class="p">(</span><span class="n">chunked_log_probs_b_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -336,7 +337,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
 
-        <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">output_entropies_B</span>
 </pre></div>
@@ -508,13 +509,6 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>                                                                              </pre>
-</div>
-</div>
-
-<div class="output_area">
-
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -563,7 +557,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="batch_multi_choices" class="doc_header"><code>batch_multi_choices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L109" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>batch_multi_choices</code>(<strong><code>probs_b_C</code></strong>, <strong><code>M</code></strong>:<code>int</code>)</p>
+<h4 id="batch_multi_choices" class="doc_header"><code>batch_multi_choices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L110" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>batch_multi_choices</code>(<strong><code>probs_b_C</code></strong>, <strong><code>M</code></strong>:<code>int</code>)</p>
 </blockquote>
 <p>probs_b_C: Ni... x C</p>
 <p>Returns:
@@ -590,7 +584,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="gather_expand" class="doc_header"><code>gather_expand</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L125" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>gather_expand</code>(<strong><code>data</code></strong>, <strong><code>dim</code></strong>, <strong><code>index</code></strong>)</p>
+<h4 id="gather_expand" class="doc_header"><code>gather_expand</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L126" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>gather_expand</code>(<strong><code>data</code></strong>, <strong><code>dim</code></strong>, <strong><code>index</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -678,7 +672,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SampledJointEntropy" class="doc_header"><code>class</code> <code>SampledJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L148" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SampledJointEntropy</code>(<strong><code>sampled_joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+<h2 id="SampledJointEntropy" class="doc_header"><code>class</code> <code>SampledJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L149" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SampledJointEntropy</code>(<strong><code>sampled_joint_probs_M_K</code></strong>:<code>Tensor</code>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
 </blockquote>
 <p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy.add_variables"><code>SampledJointEntropy.add_variables</code></a>.</p>
 <p><a href="/batchbald_redux/joint_entropy_computation.html#SampledJointEntropy.compute"><code>SampledJointEntropy.compute</code></a> computes the joint entropy.</p>
@@ -767,7 +761,8 @@ nb_path: "02_joint_entropy_computation.ipynb"
         <span class="k">if</span> <span class="n">output_entropies_B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output_entropies_B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">log_probs_B_K_C</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">log_probs_B_K_C</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;SampledJointEntropy.compute_batch&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;SampledJointEntropy.compute_batch&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_B_K_C</span><span class="p">,</span> <span class="n">initial_step</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">chunked_joint_entropy</span><span class="p">(</span><span class="n">chunked_log_probs_b_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -795,7 +790,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
 
-        <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">output_entropies_B</span>
 </pre></div>
@@ -818,7 +813,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="SampledJointEntropy.empty" class="doc_header"><code>SampledJointEntropy.empty</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L160" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.empty</code>(<strong><code>K</code></strong>:<code>int</code>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="SampledJointEntropy.empty" class="doc_header"><code>SampledJointEntropy.empty</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L161" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.empty</code>(<strong><code>K</code></strong>:<code>int</code>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>dtype</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -829,7 +824,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="SampledJointEntropy.sample" class="doc_header"><code>SampledJointEntropy.sample</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L164" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.sample</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M</code></strong>:<code>int</code>)</p>
+<h4 id="SampledJointEntropy.sample" class="doc_header"><code>SampledJointEntropy.sample</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L165" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.sample</code>(<strong><code>probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M</code></strong>:<code>int</code>)</p>
 </blockquote>
 
 </div>
@@ -840,7 +835,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="SampledJointEntropy.compute" class="doc_header"><code>SampledJointEntropy.compute</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L184" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute</code>()</p>
+<h4 id="SampledJointEntropy.compute" class="doc_header"><code>SampledJointEntropy.compute</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L185" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute</code>()</p>
 </blockquote>
 <p>Computes the entropy of this joint entropy.</p>
 
@@ -852,7 +847,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="SampledJointEntropy.add_variables" class="doc_header"><code>SampledJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L190" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M2</code></strong>:<code>int</code>)</p>
+<h4 id="SampledJointEntropy.add_variables" class="doc_header"><code>SampledJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L191" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>M2</code></strong>:<code>int</code>)</p>
 </blockquote>
 <p>Expands the joint entropy to include more terms.</p>
 
@@ -864,7 +859,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="SampledJointEntropy.compute_batch" class="doc_header"><code>SampledJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L205" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="SampledJointEntropy.compute_batch" class="doc_header"><code>SampledJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>SampledJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
 
@@ -908,7 +903,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor(4.6480, dtype=torch.float64)
+<pre>tensor(4.6481, dtype=torch.float64)
 </pre>
 </div>
 </div>
@@ -943,7 +938,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor(4.6423, dtype=torch.float64)
+<pre>tensor(4.6402, dtype=torch.float64)
 </pre>
 </div>
 </div>
@@ -977,24 +972,10 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>                                                                        </pre>
-</div>
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([5.9869, 5.6502, 5.9869, 5.6502, 5.9869, 5.6502, 5.9869, 5.6502],
+<pre>tensor([5.9760, 5.6389, 5.9760, 5.6389, 5.9760, 5.6389, 5.9760, 5.6389],
        dtype=torch.float64)
 </pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre></pre>
 </div>
 </div>
 
@@ -1022,7 +1003,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L249" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
+<h2 id="DynamicJointEntropy" class="doc_header"><code>class</code> <code>DynamicJointEntropy</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L251" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DynamicJointEntropy</code>(<strong><code>M</code></strong>:<code>int</code>, <strong><code>max_N</code></strong>:<code>int</code>, <strong><code>K</code></strong>:<code>int</code>, <strong><code>C</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>) :: <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy"><code>JointEntropy</code></a></p>
 </blockquote>
 <p>Random variables (all with the same # of categories $C$) can be added via <a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.add_variables"><code>JointEntropy.add_variables</code></a>.</p>
 <p><a href="/batchbald_redux/joint_entropy_computation.html#JointEntropy.compute"><code>JointEntropy.compute</code></a> computes the joint entropy.</p>
@@ -1103,7 +1084,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="DynamicJointEntropy.add_variables" class="doc_header"><code>DynamicJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L263" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
+<h4 id="DynamicJointEntropy.add_variables" class="doc_header"><code>DynamicJointEntropy.add_variables</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L265" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.add_variables</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>)</p>
 </blockquote>
 <p>Expands the joint entropy to include more terms.</p>
 
@@ -1115,7 +1096,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="DynamicJointEntropy.compute_batch" class="doc_header"><code>DynamicJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L284" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="DynamicJointEntropy.compute_batch" class="doc_header"><code>DynamicJointEntropy.compute_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/joint_entropy.py#L286" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>DynamicJointEntropy.compute_batch</code>(<strong><code>log_probs_B_K_C</code></strong>:<code>Tensor</code>, <strong><code>output_entropies_B</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>Computes the joint entropy of the added variables together with the batch (one by one).</p>
 
@@ -1210,7 +1191,7 @@ nb_path: "02_joint_entropy_computation.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor(9.2132, dtype=torch.float64)
+<pre>tensor(9.2141, dtype=torch.float64)
 </pre>
 </div>
 </div>
