@@ -19,8 +19,11 @@ from torch.utils.data import Dataset
 from .active_learning import (
     ActiveLearningData,
     RandomFixedLengthSampler,
+)
+from .dataset_challenges import (
+    create_repeated_MNIST_dataset,
     get_balanced_sample_indices,
-    get_base_indices,
+    get_base_index,
 )
 from .batchbald import (
     CandidateBatch,
@@ -39,7 +42,6 @@ from .batchbald import (
 from .black_box_model_training import evaluate, get_predictions, get_predictions_labels, train
 from .consistent_mc_dropout import SamplerModel
 from .example_models import BayesianMNISTCNN
-from .repeated_mnist import create_repeated_MNIST_dataset
 
 # Cell
 
@@ -503,7 +505,7 @@ class Experiment:
             else:
                 raise f"Unknown acquisition function {self.acquisition_function}!"
 
-            candidate_global_indices = get_base_indices(active_learning_data.pool_dataset, candidate_batch.indices)
+            candidate_global_indices = [get_base_index(active_learning_data.pool_dataset, index) for index in candidate_batch.indices]
             candidate_labels = [active_learning_data.dataset[index][1].item() for index in candidate_global_indices]
 
             iteration_log["acquisition"] = dict(

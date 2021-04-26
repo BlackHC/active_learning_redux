@@ -16,6 +16,7 @@ from ignite.engine import Events, create_supervised_evaluator, create_supervised
 from ignite.metrics import Accuracy, Loss, RunningAverage
 from toma import toma
 from torch import nn
+from blackhc.project import is_run_from_ipython
 from blackhc.progress_bar import create_progress_bar
 
 from .consistent_mc_dropout import (
