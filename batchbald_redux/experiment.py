@@ -19,8 +19,11 @@ from torch.utils.data import Dataset
 from .active_learning import (
     ActiveLearningData,
     RandomFixedLengthSampler,
+)
+from .dataset_challenges import (
+    create_repeated_MNIST_dataset,
     get_balanced_sample_indices,
-    get_base_indices,
+    get_base_index,
 )
 from .batchbald import (
     CandidateBatch,
@@ -28,16 +31,17 @@ from .batchbald import (
     get_bald_scores,
     get_batchbald_batch,
     get_batchbaldical_batch,
+    get_coreset_bald_scores,
+    get_batch_coreset_bald_batch,
     get_ical_scores,
     get_sampled_tempered_scorers,
     get_thompson_bald_batch,
     get_top_k_scorers,
     get_top_random_scorers,
 )
-from .black_box_model_training import evaluate, get_predictions, train
+from .black_box_model_training import evaluate, get_predictions, get_predictions_labels, train
 from .consistent_mc_dropout import SamplerModel
 from .example_models import BayesianMNISTCNN
-from .repeated_mnist import create_repeated_MNIST_dataset
 
 # Cell
 
@@ -46,14 +50,17 @@ class AcquisitionFunction(Enum):
     random = "Random"
     bald = "BALD"
     batchbald = "BatchBALD"
-    randombald = "RandomBALD"
-    thompsonbald = "ThompsonBALD"
     batchbaldical = "BatchBALD-ICAL"
     baldical = "BALD-ICAL"
-    randombaldical = "RandomBALD-ICAL"
-    temperedbald = "TemperedBALD"
-    temperedbaldical = "TemperedBALD-ICAL"
+    coresetbald = "CoreSetBALD"
+    batchcoresetbald = "BatchCoreSetBALD"
     ical = "ICAL"
+    randombald = "RandomBALD"
+    randombaldical = "RandomBALD-ICAL"
+    thompsonbald = "ThompsonBALD"
+    temperedbald = "TemperedBALD"
+    temperedcoresetbald = "TemperedCoreSetBALD"
+    temperedbaldical = "TemperedBALD-ICAL"
     temperedical = "TemperedICAL"
 
 # Cell
@@ -164,6 +171,22 @@ class Experiment:
         )
         return candidate_batch
 
+    def get_coreset_bald_candidate_batch(self, model, pool_loader, *, get_scorers):
+        # Evaluate pool set
+        log_probs_N_K_C, labels_N = get_predictions_labels(
+            model=model, num_samples=self.num_pool_samples, num_classes=10, loader=pool_loader, device=self.device
+        )
+
+        # Evaluate BALD scores
+        scores_N = get_coreset_bald_scores(log_probs_N_K_C, labels_N, dtype=torch.double, device=self.device)
+
+        if self.save_bald_scores:
+            bald_scores.append(scores_N)
+
+        candidate_batch = get_scorers(scores_N, batch_size=self.acquisition_size)
+
+        return candidate_batch
+
     def get_bald_candidate_batch(self, model, pool_loader, *, get_scorers):
         # Evaluate pool set
         log_probs_N_K_C = get_predictions(
@@ -251,6 +274,22 @@ class Experiment:
         )
         return candidate_batch
 
+    def get_batch_coreset_bald_candidate_batch(self, model, pool_loader):
+        # Evaluate pool set
+        log_probs_N_K_C, labels_N = get_predictions_labels(
+            model=model, num_samples=self.num_pool_samples, num_classes=10, loader=pool_loader, device=self.device
+        )
+
+        # Evaluate BALD scores
+        candidate_batch = get_batch_coreset_bald_batch(
+            log_probs_N_K_C,
+            labels_N,
+            batch_size=self.acquisition_size,
+            dtype=torch.double,
+            device="cpu",
+        )
+        return candidate_batch
+
     def train_pool_model(
         self, *, model, train_pool_dataset, train_pool_loader, validation_loader, num_epochs, training_log
     ):
@@ -315,7 +354,9 @@ class Experiment:
             sampler=RandomFixedLengthSampler(active_learning_data.training_dataset, self.samples_per_epoch),
             drop_last=True,
         )
-        pool_loader = torch.utils.data.DataLoader(active_learning_data.pool_dataset, batch_size=64, drop_last=False)
+        pool_loader = torch.utils.data.DataLoader(
+            active_learning_data.pool_dataset, batch_size=64, drop_last=False, shuffle=False
+        )
 
         validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=64, drop_last=False)
         test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, drop_last=False)
@@ -425,6 +466,10 @@ class Experiment:
                     raise f"Unexpected acquisition function {self.acquisition_function}!"
             elif self.acquisition_function == AcquisitionFunction.bald:
                 candidate_batch = self.get_bald_candidate_batch(model, pool_loader, get_scorers=get_top_k_scorers)
+            elif self.acquisition_function == AcquisitionFunction.coresetbald:
+                candidate_batch = self.get_coreset_bald_candidate_batch(
+                    model, pool_loader, get_scorers=get_top_k_scorers
+                )
             elif self.acquisition_function == AcquisitionFunction.randombald:
                 candidate_batch = self.get_bald_candidate_batch(
                     model,
@@ -441,8 +486,18 @@ class Experiment:
                         scores_N, batch_size=batch_size, temperature=self.temperature
                     ),
                 )
+            elif self.acquisition_function == AcquisitionFunction.temperedcoresetbald:
+                candidate_batch = self.get_coreset_bald_candidate_batch(
+                    model,
+                    pool_loader,
+                    get_scorers=lambda scores_N, batch_size: get_sampled_tempered_scorers(
+                        scores_N, batch_size=batch_size, temperature=self.temperature
+                    ),
+                )
             elif self.acquisition_function == AcquisitionFunction.batchbald:
                 candidate_batch = self.get_batchbald_candidate_batch(model, pool_loader)
+            elif self.acquisition_function == AcquisitionFunction.batchcoresetbald:
+                candidate_batch = self.get_batch_coreset_bald_candidate_batch(model, pool_loader)
             elif self.acquisition_function == AcquisitionFunction.thompsonbald:
                 candidate_batch = self.get_thompson_bald_candidate_batch(model, pool_loader)
             elif self.acquisition_function == AcquisitionFunction.random:
@@ -450,7 +505,7 @@ class Experiment:
             else:
                 raise f"Unknown acquisition function {self.acquisition_function}!"
 
-            candidate_global_indices = get_base_indices(active_learning_data.pool_dataset, candidate_batch.indices)
+            candidate_global_indices = [get_base_index(active_learning_data.pool_dataset, index) for index in candidate_batch.indices]
             candidate_labels = [active_learning_data.dataset[index][1].item() for index in candidate_global_indices]
 
             iteration_log["acquisition"] = dict(
