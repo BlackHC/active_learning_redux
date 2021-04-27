@@ -41,6 +41,7 @@ class BayesianMNISTCNN(BayesianModule):
 
 
 class BayesianMNISTCNN_EBM(BayesianModule):
+    """Without Softmax."""
     def __init__(self, num_classes=10):
         super().__init__()
 

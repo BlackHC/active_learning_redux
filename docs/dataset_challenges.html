@@ -1016,7 +1016,7 @@ This chapter takes care of the other ones.</p>
                 <span class="n">alias</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">~x</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2"> (seed=</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">)&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">subset_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">subset_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
-        
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">alias</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
@@ -1699,7 +1699,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L508" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
+<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L510" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1811,6 +1811,8 @@ This chapter takes care of the other ones.</p>
         <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">SubsetDataset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">RepeatedDataset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">index</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">))</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">OneHotDataset</span><span class="p">):</span>
@@ -1845,6 +1847,8 @@ This chapter takes care of the other ones.</p>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ImbalancedClassSplitDataset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_targets</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">)[</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">SubsetDataset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_targets</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">)[</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Subset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_targets</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">)[</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">indices</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">RepeatedDataset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_targets</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">num_repeats</span><span class="p">)</span>
@@ -1888,7 +1892,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L545" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L549" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1912,7 +1916,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L562" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L566" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>

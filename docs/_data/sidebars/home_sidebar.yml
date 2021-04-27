@@ -47,7 +47,7 @@ entries:
       url: A1_some_models.html
     - output: web,pdf
       title: Results Visualizations
-      url: X_paper_plots.html
+      url: X_arxiv_draft_report_plots.html
     output: web
     title: batchbald_redux
   output: web

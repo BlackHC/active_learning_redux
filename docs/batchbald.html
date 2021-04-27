@@ -314,7 +314,7 @@ Then, we will implement BatchBALD and BALD.</p>
 
     <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Conditional Entropy&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    
+
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">nats_n_K_C</span> <span class="o">=</span> <span class="n">log_probs_n_K_C</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">)</span>
@@ -334,7 +334,7 @@ Then, we will implement BatchBALD and BALD.</p>
 
     <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Entropy&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    
+
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">mean_log_probs_n_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
@@ -1216,7 +1216,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
     <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Entropy&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    
+
     <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">chunked</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">nats_n_K_C</span> <span class="o">=</span> <span class="n">log_probs_n_K_C</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_probs_n_K_C</span><span class="p">)</span>
@@ -1989,12 +1989,12 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
     <span class="n">labels_N_1_1</span> <span class="o">=</span> <span class="n">labels_N</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">log_probs_N_K</span> <span class="o">=</span> <span class="n">joint_entropy</span><span class="o">.</span><span class="n">gather_expand</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">labels_N_1_1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    
+
     <span class="n">log_prob_mean_N</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">log_probs_N_K</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
-    
+
     <span class="n">lhs</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_prob_mean_N</span>
     <span class="n">rhs</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_probs_N_K</span> <span class="o">*</span> <span class="n">log_probs_N_K</span><span class="o">.</span><span class="n">exp</span><span class="p">(),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">log_prob_mean_N</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
-   
+
     <span class="n">coreset_infogain</span> <span class="o">=</span> <span class="n">lhs</span> <span class="o">-</span> <span class="n">rhs</span>
 
     <span class="k">return</span> <span class="n">coreset_infogain</span>
@@ -2123,7 +2123,7 @@ $$p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) \; p((y)_{B-1}|(x)_{B-1}, \omega).
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">with_progress_bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;BatchCoreSetBALD&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
         <span class="c1"># p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) * p((y)_{B-1}|(x)_{B-1}, \omega)</span>
         <span class="n">log_prob_joint_N_K</span> <span class="o">=</span> <span class="n">log_probs_N_K</span> <span class="o">+</span> <span class="n">log_probs_join_batch_K</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-        
+
         <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
             <span class="c1"># Marginalize over \omega (but using sum not mean):</span>
             <span class="c1"># + np.log(K) compared to actual joint log prob</span>
@@ -2139,12 +2139,12 @@ $$p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) \; p((y)_{B-1}|(x)_{B-1}, \omega).
             <span class="c1"># + np.log(K) compared to actual joint log prob</span>
             <span class="n">prob_joint_sum_N</span> <span class="o">=</span> <span class="n">log_prob_joint_N_K</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="c1"># p(\omega) cancels out in:</span>
-            <span class="c1"># p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }            </span>
+            <span class="c1"># p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }</span>
             <span class="n">conditional_entropy_joint_N</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">log_prob_joint_N_K</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">*</span> <span class="n">log_prob_joint_N_K</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">prob_joint_sum_N</span>
             <span class="n">entropy_joint_N</span> <span class="o">=</span> <span class="o">-</span><span class="n">prob_joint_sum_N</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
             <span class="n">scores_N</span> <span class="o">=</span> <span class="n">entropy_joint_N</span> <span class="o">-</span> <span class="n">conditional_entropy_joint_N</span>
-            
-        
+
+
         <span class="c1"># Select candidate</span>
         <span class="n">scores_N</span><span class="p">[</span><span class="n">candidate_indices</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
