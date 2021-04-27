@@ -77,6 +77,7 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "mnist_initial_samples": "09_experiment.ipynb",
          "Experiment": "09_experiment.ipynb",
          "bald_scores": "09_experiment.ipynb",
+         "configs": "09_experiment.ipynb",
          "BayesianMNISTCNN": "A1_some_models.ipynb",
          "BayesianMNISTCNN_EBM": "A1_some_models.ipynb"}
 
