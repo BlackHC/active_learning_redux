@@ -33,9 +33,11 @@ from .consistent_mc_dropout import SamplerModel
 from .dataset_challenges import (
     create_repeated_MNIST_dataset,
     get_balanced_sample_indices,
-    get_base_index,
+    get_base_dataset_index, get_target,
 )
 from .example_models import BayesianMNISTCNN
+
+from batchbald_redux import dataset_challenges
 
 from .di import DependencyInjection
 
@@ -267,9 +269,9 @@ class Experiment:
                 raise ValueError(f"Unknown acquisition function {acquisition_function}!")
 
             candidate_global_indices = [
-                get_base_index(active_learning_data.pool_dataset, index) for index in candidate_batch.indices
+                get_base_dataset_index(active_learning_data.pool_dataset, index)[0] for index in candidate_batch.indices
             ]
-            candidate_labels = [active_learning_data.dataset[index][1].item() for index in candidate_global_indices]
+            candidate_labels = [get_target(active_learning_data.dataset, index).item() for index in candidate_global_indices]
 
             iteration_log["acquisition"] = dict(
                 indices=candidate_global_indices, labels=candidate_labels, scores=candidate_batch.scores
