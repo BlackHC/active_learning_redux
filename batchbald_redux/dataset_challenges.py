@@ -2,10 +2,10 @@
 
 __all__ = ['get_base_dataset_index', 'get_num_classes', 'get_target', 'get_targets', 'NamedDataset',
            'OverridenTargetDataset', 'CorruptedLabelsDataset', 'RandomLabelsDataset', 'get_class_indices',
-           'get_balanced_sample_indices', 'ImbalancedDataset', 'ImbalancedClassSplitDataset', 'OneHotDataset',
-           'RepeatedDataset', 'SubsetDataset', 'ConstantTargetDataset', 'UniformTargetDataset', 'AdditiveGaussianNoise',
-           'dataset_to_tensors', 'get_dataset_state_dict', 'ImportedDataset', 'save_dataset', 'load_dataset',
-           'create_repeated_MNIST_dataset', 'create_MNIST_dataset']
+           'get_balanced_sample_indices', 'ImbalancedDataset', 'ImbalancedClassSplitDataset', 'NewTargetsDataset',
+           'OneHotDataset', 'RepeatedDataset', 'SubsetDataset', 'ConstantTargetDataset', 'UniformTargetDataset',
+           'AdditiveGaussianNoise', 'dataset_to_tensors', 'get_dataset_state_dict', 'ImportedDataset', 'save_dataset',
+           'load_dataset', 'create_repeated_MNIST_dataset', 'create_MNIST_dataset']
 
 # Cell
 
@@ -408,6 +408,14 @@ class ImbalancedClassSplitDataset(_SubsetAliasDataset):
         )
 
 # Cell
+
+class NewTargetsDataset(_NewTargetsDataset):
+
+    def __init__(self, dataset: data.Dataset, targets: torch.Tensor, num_classes: int=None):
+        num_classes = num_classes or get_num_classes(dataset)
+
+        super().__init__(dataset, targets, num_classes, f"{self.dataset} | new_targets{dict(targets=targets, num_classes=num_classes)}")
+
 
 # Convert label dataset to one hot
 class OneHotDataset(_NewTargetsDataset):
