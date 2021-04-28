@@ -87,7 +87,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NamedDataset" class="doc_header"><code>class</code> <code>NamedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L70" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NamedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="NamedDataset" class="doc_header"><code>class</code> <code>NamedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L72" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NamedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -114,6 +114,8 @@ This chapter takes care of the other ones.</p>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2">)&quot;</span>
 
+
+<span class="c1"># TODO: add get_num_classes()</span>
 
 <span class="k">class</span> <span class="nc">_AliasDataset</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -214,7 +216,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OverridenTargetDataset" class="doc_header"><code>class</code> <code>OverridenTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L77" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OverridenTargetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="OverridenTargetDataset" class="doc_header"><code>class</code> <code>OverridenTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L79" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OverridenTargetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -240,7 +242,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="CorruptedLabelsDataset" class="doc_header"><code>class</code> <code>CorruptedLabelsDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L98" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CorruptedLabelsDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="CorruptedLabelsDataset" class="doc_header"><code>class</code> <code>CorruptedLabelsDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L100" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CorruptedLabelsDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -266,7 +268,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RandomLabelsDataset" class="doc_header"><code>class</code> <code>RandomLabelsDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L133" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomLabelsDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="RandomLabelsDataset" class="doc_header"><code>class</code> <code>RandomLabelsDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L135" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomLabelsDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -492,7 +494,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_class_indices" class="doc_header"><code>get_class_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L155" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_class_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>class_counts</code></strong>:<code>list</code>, <strong><code>generator</code></strong>:<code>Generator</code>)</p>
+<h4 id="get_class_indices" class="doc_header"><code>get_class_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L157" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_class_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>class_counts</code></strong>:<code>list</code>, <strong><code>generator</code></strong>:<code>Generator</code>)</p>
 </blockquote>
 
 </div>
@@ -516,7 +518,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_balanced_sample_indices" class="doc_header"><code>get_balanced_sample_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L177" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_balanced_sample_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>num_classes</code></strong>, <strong><code>samples_per_class</code></strong>, <strong><code>seed</code></strong>:<code>int</code>)</p>
+<h4 id="get_balanced_sample_indices" class="doc_header"><code>get_balanced_sample_indices</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L179" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_balanced_sample_indices</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>num_classes</code></strong>, <strong><code>samples_per_class</code></strong>, <strong><code>seed</code></strong>:<code>int</code>)</p>
 </blockquote>
 
 </div>
@@ -583,7 +585,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ImbalancedDataset" class="doc_header"><code>class</code> <code>ImbalancedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L186" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImbalancedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="ImbalancedDataset" class="doc_header"><code>class</code> <code>ImbalancedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L188" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImbalancedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -609,7 +611,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ImbalancedClassSplitDataset" class="doc_header"><code>class</code> <code>ImbalancedClassSplitDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L205" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImbalancedClassSplitDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="ImbalancedClassSplitDataset" class="doc_header"><code>class</code> <code>ImbalancedClassSplitDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L207" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImbalancedClassSplitDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -827,7 +829,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OneHotDataset" class="doc_header"><code>class</code> <code>OneHotDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L242" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneHotDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="OneHotDataset" class="doc_header"><code>class</code> <code>OneHotDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L244" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneHotDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -853,7 +855,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RepeatedDataset" class="doc_header"><code>class</code> <code>RepeatedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L265" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RepeatedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="RepeatedDataset" class="doc_header"><code>class</code> <code>RepeatedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L267" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RepeatedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -879,7 +881,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SubsetDataset" class="doc_header"><code>class</code> <code>SubsetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L281" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SubsetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="SubsetDataset" class="doc_header"><code>class</code> <code>SubsetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L283" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SubsetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -905,7 +907,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConstantTargetDataset" class="doc_header"><code>class</code> <code>ConstantTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L316" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConstantTargetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="ConstantTargetDataset" class="doc_header"><code>class</code> <code>ConstantTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L318" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConstantTargetDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -931,7 +933,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="UniformTargetDataset" class="doc_header"><code>UniformTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L328" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>UniformTargetDataset</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>num_classes</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="UniformTargetDataset" class="doc_header"><code>UniformTargetDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L330" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>UniformTargetDataset</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>num_classes</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1241,7 +1243,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="AdditiveGaussianNoise" class="doc_header"><code>class</code> <code>AdditiveGaussianNoise</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L338" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AdditiveGaussianNoise</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="AdditiveGaussianNoise" class="doc_header"><code>class</code> <code>AdditiveGaussianNoise</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L340" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AdditiveGaussianNoise</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -1358,7 +1360,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="dataset_to_tensors" class="doc_header"><code>dataset_to_tensors</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L356" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>dataset_to_tensors</code>(<strong><code>dataset</code></strong>)</p>
+<h4 id="dataset_to_tensors" class="doc_header"><code>dataset_to_tensors</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L358" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>dataset_to_tensors</code>(<strong><code>dataset</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1382,7 +1384,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_dataset_state_dict" class="doc_header"><code>get_dataset_state_dict</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L370" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_dataset_state_dict</code>(<strong><code>dataset</code></strong>)</p>
+<h4 id="get_dataset_state_dict" class="doc_header"><code>get_dataset_state_dict</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L372" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_dataset_state_dict</code>(<strong><code>dataset</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1406,7 +1408,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ImportedDataset" class="doc_header"><code>class</code> <code>ImportedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L380" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImportedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
+<h2 id="ImportedDataset" class="doc_header"><code>class</code> <code>ImportedDataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L382" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ImportedDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>_AliasDataset</code></p>
 </blockquote>
 <p>A dataset with an easier to understand alias.</p>
 <p>And convenience operators.</p>
@@ -1432,7 +1434,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_dataset" class="doc_header"><code>save_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L386" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_dataset</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>f</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_dataset" class="doc_header"><code>save_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L388" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_dataset</code>(<strong><code>dataset</code></strong>:<code>Dataset</code>, <strong><code>f</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1456,7 +1458,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_dataset" class="doc_header"><code>load_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L390" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_dataset</code>(<strong><code>f</code></strong>, <strong><code>map_location</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="load_dataset" class="doc_header"><code>load_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L392" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_dataset</code>(<strong><code>f</code></strong>, <strong><code>map_location</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1627,7 +1629,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_base_dataset" class="doc_header"><code>get_base_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L398" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_dataset</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
+<h4 id="get_base_dataset" class="doc_header"><code>get_base_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L400" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_dataset</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1651,7 +1653,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_base_index" class="doc_header"><code>get_base_index</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L427" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_index</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
+<h4 id="get_base_index" class="doc_header"><code>get_base_index</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L429" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_base_index</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1675,7 +1677,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_target" class="doc_header"><code>get_target</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L461" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_target</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
+<h4 id="get_target" class="doc_header"><code>get_target</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L463" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_target</code>(<strong><code>dataset</code></strong>, <strong><code>index</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1699,7 +1701,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L510" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
+<h4 id="get_targets" class="doc_header"><code>get_targets</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L512" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_targets</code>(<strong><code>dataset</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1892,7 +1894,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L549" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+<h4 id="create_repeated_MNIST_dataset" class="doc_header"><code>create_repeated_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L551" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_repeated_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>num_repetitions</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>add_noise</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1916,7 +1918,7 @@ This chapter takes care of the other ones.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L566" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="create_MNIST_dataset" class="doc_header"><code>create_MNIST_dataset</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/dataset_challenges.py#L568" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_MNIST_dataset</code>(<strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>

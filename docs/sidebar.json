@@ -13,6 +13,7 @@
     "Semi-Supervised Learning": "SSL.html",
     "Experiment": "experiment.html",
     "Some Models": "A1_some_models.html",
-    "Results Visualizations": "X_arxiv_draft_report_plots.html"
+    "Results Visualizations": "X_arxiv_draft_report_plots.html",
+    "Dependency Injection": "Z_dependency_injection.html"
   }
 }

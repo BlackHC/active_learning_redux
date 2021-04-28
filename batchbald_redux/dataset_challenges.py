@@ -28,6 +28,8 @@ def _wrap_alias(dataset: data.Dataset):
     return f"({dataset.alias})"
 
 
+# TODO: add get_num_classes()
+
 class _AliasDataset(data.Dataset):
     """
     A dataset with an easier to understand alias.

@@ -48,6 +48,9 @@ entries:
     - output: web,pdf
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html
+    - output: web,pdf
+      title: Dependency Injection
+      url: Z_dependency_injection.html
     output: web
     title: batchbald_redux
   output: web
