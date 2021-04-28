@@ -53,13 +53,13 @@ nb_path: "09a_acquisition_functions.ipynb"
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.batchbald</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CandidateBatch</span><span class="p">,</span>
-    <span class="n">get_bald_ical_scores</span><span class="p">,</span>
+    <span class="n">get_eval_bald_scores</span><span class="p">,</span>
     <span class="n">get_bald_scores</span><span class="p">,</span>
     <span class="n">get_batch_coreset_bald_batch</span><span class="p">,</span>
-    <span class="n">get_batchbald_batch</span><span class="p">,</span>
-    <span class="n">get_batchbaldical_batch</span><span class="p">,</span>
+    <span class="n">get_batch_bald_batch</span><span class="p">,</span>
+    <span class="n">get_batch_eval_bald_batch</span><span class="p">,</span>
     <span class="n">get_coreset_bald_scores</span><span class="p">,</span>
-    <span class="n">get_ical_scores</span><span class="p">,</span>
+    <span class="n">get_eig_scores</span><span class="p">,</span>
     <span class="n">get_sampled_tempered_scorers</span><span class="p">,</span>
     <span class="n">get_thompson_bald_batch</span><span class="p">,</span>
     <span class="n">get_top_k_scorers</span><span class="p">,</span>
@@ -519,7 +519,7 @@ nb_path: "09a_acquisition_functions.ipynb"
 
     <span class="k">def</span> <span class="nf">get_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
         <span class="c1"># Evaluate BALD scores</span>
-        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batchbald_batch</span><span class="p">(</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batch_bald_batch</span><span class="p">(</span>
             <span class="n">log_probs_N_K_C</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
             <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">,</span>
@@ -891,7 +891,7 @@ nb_path: "09a_acquisition_functions.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">_EvalBALD</span><span class="p">(</span><span class="n">EvalCandidateBatchComputer</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">get_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
-        <span class="n">scores_N</span> <span class="o">=</span> <span class="n">get_bald_ical_scores</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">scores_N</span> <span class="o">=</span> <span class="n">get_eval_bald_scores</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_candidates</span><span class="p">(</span><span class="n">scores_N</span><span class="p">)</span>
 
@@ -959,7 +959,7 @@ nb_path: "09a_acquisition_functions.ipynb"
     <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span>
 
     <span class="k">def</span> <span class="nf">get_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
-        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batchbaldical_batch</span><span class="p">(</span>
+        <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">get_batch_eval_bald_batch</span><span class="p">(</span>
             <span class="n">log_probs_N_K_C</span><span class="p">,</span>
             <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_size</span><span class="p">,</span>
@@ -1037,7 +1037,7 @@ nb_path: "09a_acquisition_functions.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">_EIG</span><span class="p">(</span><span class="n">EvalCandidateBatchComputer</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">get_candidate_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
-        <span class="n">scores_N</span> <span class="o">=</span> <span class="n">get_ical_scores</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">scores_N</span> <span class="o">=</span> <span class="n">get_eig_scores</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">log_eval_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">candidate_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_candidates</span><span class="p">(</span><span class="n">scores_N</span><span class="p">)</span>
 

@@ -18,6 +18,7 @@ from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 from torch.utils.data import Dataset
 
+import batchbald_redux.acquisition_functions as acquisition_functions
 from .acquisition_functions import CandidateBatchComputer, \
     EvalCandidateBatchComputer, CoreSetPoolPredictions, PoolPredictions
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
@@ -104,7 +105,7 @@ class Experiment:
     samples_per_epoch: int = 5056
     repeated_mnist_repetitions: int = 1
     add_dataset_noise: bool = False
-    acquisition_function: AcquisitionFunctionType = AcquisitionFunctionType.bald
+    acquisition_function: object = acquisition_functions.BALD
     acquisition_function_args: dict = None
     save_bald_scores: bool = False
     temperature: float = 0.0
@@ -203,7 +204,7 @@ class Experiment:
             training_set_size = len(active_learning_data.training_dataset)
             print(f"Training set size {training_set_size}:")
 
-            # iteration_log = dict(training={}, pool_training={}, evalution_metrics=None, acquisition=None)
+            # iteration_log = dict(training={}, pool_training={}, evaluation_metrics=None, acquisition=None)
             active_learning_steps.append({})
             iteration_log = active_learning_steps[-1]
 
@@ -227,7 +228,7 @@ class Experiment:
             evaluation_metrics = evaluate(
                 model=model, num_samples=self.num_eval_samples, loader=test_loader, device=self.device
             )
-            iteration_log["evalution_metrics"] = evaluation_metrics
+            iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
 
             if training_set_size >= self.max_training_set:
@@ -284,7 +285,7 @@ class Experiment:
 configs = [
     Experiment(
         seed=seed,
-        acquisition_function=AcquisitionFunctionType.bald,
+        acquisition_function=acquisition_functions.BALD,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
     )
@@ -294,7 +295,7 @@ configs = [
 ] + [
     Experiment(
         seed=seed,
-        acquisition_function=AcquisitionFunctionType.random,
+        acquisition_function=acquisition_functions.Random,
         acquisition_size=5,
         num_pool_samples=20,
     )

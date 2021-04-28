@@ -529,7 +529,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbald_batch" class="doc_header"><code>get_batchbald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L114" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batch_bald_batch" class="doc_header"><code>get_batch_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L114" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batch_bald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -587,7 +587,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
         <span class="k">return</span> <span class="n">out_scores_N</span>
 
 
-<span class="k">def</span> <span class="nf">get_batchbald_batch</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">get_batch_bald_batch</span><span class="p">(</span>
     <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
@@ -708,7 +708,7 @@ $H[(y_b)_{B-1}, y_i] - H[y_i|w]$ for each pool element $y_i$ and add the highest
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batchbald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batch_bald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -980,7 +980,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchbaldical_batch" class="doc_header"><code>get_batchbaldical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L186" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchbaldical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batch_eval_bald_batch" class="doc_header"><code>get_batch_eval_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L186" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batch_eval_bald_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>eval_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1000,16 +1000,16 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_batchbaldical_batch</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_batch_eval_bald_batch</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">eval_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="n">training_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">pool_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">training_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">eval_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">training_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -1029,7 +1029,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
     <span class="p">)</span>
 
     <span class="n">pool_batchbald_scorer</span> <span class="o">=</span> <span class="n">BatchBALDScorer</span><span class="p">(</span>
-        <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span>
+        <span class="n">eval_log_probs_N_K_C</span><span class="p">,</span>
         <span class="n">max_size</span><span class="o">=</span><span class="n">batch_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
@@ -1086,7 +1086,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batchbaldical_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batch_eval_bald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -1119,7 +1119,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batchbaldical_batch</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batch_eval_bald_batch</span><span class="p">(</span>
     <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ys_ws</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span>
 <span class="p">)</span>
 </pre></div>
@@ -1435,7 +1435,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_bald_ical_scores" class="doc_header"><code>get_bald_ical_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L318" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_ical_scores</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_eval_bald_scores" class="doc_header"><code>get_eval_bald_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L318" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_eval_bald_scores</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>eval_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1459,7 +1459,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_bald_ical_batch" class="doc_header"><code>get_bald_ical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L335" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_bald_ical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_eval_bald_batch" class="doc_header"><code>get_eval_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L335" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_eval_bald_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1483,7 +1483,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_top_random_bald_ical_batch" class="doc_header"><code>get_top_random_bald_ical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L349" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_top_random_bald_ical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_classes</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_top_random_eval_bald_batch" class="doc_header"><code>get_top_random_eval_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L349" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_top_random_eval_bald_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_classes</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1503,24 +1503,24 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_bald_ical_scores</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_eval_bald_scores</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">eval_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="n">training_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">pool_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">training_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">eval_log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="n">training_scores_N</span> <span class="o">=</span> <span class="n">get_bald_scores</span><span class="p">(</span><span class="n">training_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">pool_scores_N</span> <span class="o">=</span> <span class="n">get_bald_scores</span><span class="p">(</span><span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">pool_scores_N</span> <span class="o">=</span> <span class="n">get_bald_scores</span><span class="p">(</span><span class="n">eval_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">scores_N</span> <span class="o">=</span> <span class="n">training_scores_N</span> <span class="o">-</span> <span class="n">pool_scores_N</span>
 
     <span class="k">return</span> <span class="n">scores_N</span>
 
 
-<span class="k">def</span> <span class="nf">get_bald_ical_batch</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">get_eval_bald_batch</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1529,12 +1529,12 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
     <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">get_top_k_scorers</span><span class="p">(</span>
-        <span class="n">get_bald_ical_scores</span><span class="p">(</span><span class="n">training_log_probs_N_K_C</span><span class="p">,</span> <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
+        <span class="n">get_eval_bald_scores</span><span class="p">(</span><span class="n">training_log_probs_N_K_C</span><span class="p">,</span> <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_top_random_bald_ical_batch</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">get_top_random_eval_bald_batch</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1544,7 +1544,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
     <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CandidateBatch</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">get_top_random_scorers</span><span class="p">(</span>
-        <span class="n">get_bald_ical_scores</span><span class="p">(</span><span class="n">training_log_probs_N_K_C</span><span class="p">,</span> <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
+        <span class="n">get_eval_bald_scores</span><span class="p">(</span><span class="n">training_log_probs_N_K_C</span><span class="p">,</span> <span class="n">pool_log_probs_N_K_C</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1564,7 +1564,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_bald_ical_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_eval_bald_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -1597,7 +1597,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_top_random_bald_ical_batch</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_top_random_eval_bald_batch</span><span class="p">(</span>
     <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span>
 <span class="p">)</span>
 </pre></div>
@@ -1736,7 +1736,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_ical_scores" class="doc_header"><code>get_ical_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L384" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_ical_scores</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_eig_scores" class="doc_header"><code>get_eig_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L384" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_eig_scores</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1756,7 +1756,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_ical_scores</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_eig_scores</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1786,7 +1786,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_ical_scores</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">())</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_eig_scores</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -1823,7 +1823,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batchical_batch" class="doc_header"><code>get_batchical_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L403" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batchical_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batch_eig_batch" class="doc_header"><code>get_batch_eig_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L403" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batch_eig_batch</code>(<strong><code>training_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>pool_log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>num_samples</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1844,7 +1844,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: refactor the BatchBALDScorer to deduplicate some of this?</span>
-<span class="k">def</span> <span class="nf">get_batchical_batch</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">get_batch_eig_batch</span><span class="p">(</span>
     <span class="n">training_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pool_log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1917,7 +1917,7 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batchical_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_batch_eig_batch</span><span class="p">(</span><span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">ys_ws</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">double</span><span class="p">(),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 </pre></div>
 
     </div>

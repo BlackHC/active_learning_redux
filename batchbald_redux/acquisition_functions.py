@@ -18,13 +18,13 @@ import torch.utils.data
 
 from .batchbald import (
     CandidateBatch,
-    get_bald_ical_scores,
+    get_eval_bald_scores,
     get_bald_scores,
     get_batch_coreset_bald_batch,
-    get_batchbald_batch,
-    get_batchbaldical_batch,
+    get_batch_bald_batch,
+    get_batch_eval_bald_batch,
     get_coreset_bald_scores,
-    get_ical_scores,
+    get_eig_scores,
     get_sampled_tempered_scorers,
     get_thompson_bald_batch,
     get_top_k_scorers,
@@ -162,7 +162,7 @@ class BatchBALD(PoolScorerCandidateBatchComputer):
 
     def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
         # Evaluate BALD scores
-        candidate_batch = get_batchbald_batch(
+        candidate_batch = get_batch_bald_batch(
             log_probs_N_K_C,
             batch_size=self.acquisition_size,
             num_samples=self.num_samples,
@@ -262,7 +262,7 @@ class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
 @dataclass
 class _EvalBALD(EvalCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
-        scores_N = get_bald_ical_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
+        scores_N = get_eval_bald_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
 
         candidate_batch = self.extract_candidates(scores_N)
 
@@ -293,7 +293,7 @@ class BatchEvalBALD(EvalCandidateBatchComputer):
     num_samples: int = 1000000
 
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
-        candidate_batch = get_batchbaldical_batch(
+        candidate_batch = get_batch_eval_bald_batch(
             log_probs_N_K_C,
             log_eval_probs_N_K_C,
             batch_size=self.acquisition_size,
@@ -309,7 +309,7 @@ class BatchEvalBALD(EvalCandidateBatchComputer):
 @dataclass
 class _EIG(EvalCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
-        scores_N = get_ical_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
+        scores_N = get_eig_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
 
         candidate_batch = self.extract_candidates(scores_N)
 
