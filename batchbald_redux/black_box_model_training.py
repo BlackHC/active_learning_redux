@@ -8,6 +8,7 @@ from typing import Optional
 
 import torch
 from blackhc.project import is_run_from_ipython
+from blackhc.project.utils.ignite_progress_bar import ignite_progress_bar
 from ignite.contrib.engines.common import (
     setup_common_training_handlers,
 )
@@ -81,14 +82,18 @@ def train(
     # Only to look nicer.
     RunningAverage(output_transform=lambda x: x).attach(trainer, "crossentropy")
 
-    setup_common_training_handlers(trainer, with_gpu_stats=torch.cuda.is_available(), log_every_iters=LOG_INTERVAL)
+    enable_tqdm_pbars = is_run_from_ipython()
 
-    if is_run_from_ipython():
+    setup_common_training_handlers(trainer, with_pbars=enable_tqdm_pbars, with_gpu_stats=torch.cuda.is_available(), log_every_iters=LOG_INTERVAL)
+
+    if enable_tqdm_pbars:
         ProgressBar(persist=False).attach(
             validation_evaluator,
             metric_names="all",
             event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
         )
+    else:
+        ignite_progress_bar(trainer, desc="Training", log_interval=LOG_INTERVAL)
 
     training_log["epochs"] = []
     epochs_log = training_log["epochs"]
@@ -126,6 +131,10 @@ def train(
 
 
 def evaluate(*, model, num_samples, loader, device, loss=None):
+    # TODO: rewrite this on top of TrainedModel?
+    # Add "get_log_prob_predictions" which returns the mean?
+    # Compute accuracy etc based on that?
+
     evaluation_model = GeometricMeanPrediction(SamplerModel(model, num_samples))
 
     if loss is None:
