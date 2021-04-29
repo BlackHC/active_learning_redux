@@ -83,7 +83,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">create_repeated_MNIST_dataset</span><span class="p">,</span>
     <span class="n">get_base_dataset_index</span><span class="p">,</span> <span class="n">get_target</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.example_models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span><span class="p">,</span> <span class="n">MnistOptimizerFactory</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.models</span> <span class="kn">import</span> <span class="n">MnistOptimizerFactory</span><span class="p">,</span> <span class="n">ModelOptimizerFactory</span>
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.di</span> <span class="kn">import</span> <span class="n">DependencyInjection</span>
 </pre></div>
@@ -148,9 +148,9 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L67" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>30</code></em>, <strong><code>training_batch_size</code></strong>:<code>int</code>=<em><code>64</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>acquisition_function</code></strong>:<code>Union</code>[<code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#CandidateBatchComputer"><code>CandidateBatchComputer</code></a>], <code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#EvalCandidateBatchComputer"><code>EvalCandidateBatchComputer</code></a>]]=<em><code>BALD</code></em>, <strong><code>train_eval_model</code></strong>:<a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a>=<em><code>TrainSelfDistillationPoolModel</code></em>, <strong><code>acquisition_function_args</code></strong>:<code>dict</code>=<em><code>None</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
+<h2 id="Experiment" class="doc_header"><code>class</code> <code>Experiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/experiment.py#L67" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Experiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>300</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>30</code></em>, <strong><code>training_batch_size</code></strong>:<code>int</code>=<em><code>64</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>initial_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>acquisition_function</code></strong>:<code>Union</code>[<code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#CandidateBatchComputer"><code>CandidateBatchComputer</code></a>], <code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#EvalCandidateBatchComputer"><code>EvalCandidateBatchComputer</code></a>]]=<em><code>BALD</code></em>, <strong><code>train_eval_model</code></strong>:<a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a>=<em><code>TrainSelfDistillationPoolModel</code></em>, <strong><code>model_optimizer_factory</code></strong>:<code>Type</code>[<a href="/batchbald_redux/models.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>]=<em><code>MnistOptimizerFactory</code></em>, <strong><code>acquisition_function_args</code></strong>:<code>dict</code>=<em><code>None</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
 </blockquote>
-<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 30, training_batch_size: int = 64, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 5056, repeated_mnist_repetitions: int = 1, add_dataset_noise: bool = False, acquisition_function: Union[Type[batchbald_redux.acquisition_functions.CandidateBatchComputer], Type[batchbald_redux.acquisition_functions.EvalCandidateBatchComputer]] = &lt;class 'batchbald_redux.acquisition_functions.BALD'&gt;, train_eval_model: batchbald_redux.train_eval_model.TrainEvalModel = &lt;class 'batchbald_redux.train_eval_model.TrainSelfDistillationPoolModel'&gt;, acquisition_function_args: dict = None, temperature: float = 0.0)</p>
+<p>Experiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 300, num_pool_samples: int = 20, num_eval_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 30, training_batch_size: int = 64, validation_set_size: int = 1024, initial_set_size: int = 20, samples_per_epoch: int = 5056, repeated_mnist_repetitions: int = 1, add_dataset_noise: bool = False, acquisition_function: Union[Type[batchbald_redux.acquisition_functions.CandidateBatchComputer], Type[batchbald_redux.acquisition_functions.EvalCandidateBatchComputer]] = &lt;class 'batchbald_redux.acquisition_functions.BALD'&gt;, train_eval_model: batchbald_redux.train_eval_model.TrainEvalModel = &lt;class 'batchbald_redux.train_eval_model.TrainSelfDistillationPoolModel'&gt;, model_optimizer_factory: Type[batchbald_redux.models.ModelOptimizerFactory] = &lt;class 'batchbald_redux.models.MnistOptimizerFactory'&gt;, acquisition_function_args: dict = None, temperature: float = 0.0)</p>
 
 </div>
 
@@ -188,7 +188,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">add_dataset_noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">acquisition_function</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">CandidateBatchComputer</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">EvalCandidateBatchComputer</span><span class="p">]]</span> <span class="o">=</span> <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">BALD</span>
     <span class="n">train_eval_model</span><span class="p">:</span> <span class="n">TrainEvalModel</span> <span class="o">=</span> <span class="n">TrainSelfDistillationPoolModel</span>
-    <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">OptimizerFactory</span><span class="p">]</span> <span class="o">=</span> <span class="n">MnistOptimizerFactory</span>
+    <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ModelOptimizerFactory</span><span class="p">]</span> <span class="o">=</span> <span class="n">MnistOptimizerFactory</span>
     <span class="n">acquisition_function_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 
@@ -259,11 +259,11 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-            <span class="n">model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="p">()</span>
-            
+            <span class="n">model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="p">()</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
+
             <span class="n">train</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
                 <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
                 <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
                 <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span>
@@ -275,7 +275,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
             <span class="p">)</span>
 
             <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
             <span class="p">)</span>
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;evaluation_metrics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluation_metrics</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Perf after training </span><span class="si">{</span><span class="n">evaluation_metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -284,7 +284,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
-            <span class="n">trained_model</span> <span class="o">=</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">trained_model</span> <span class="o">=</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_function</span><span class="p">,</span> <span class="n">CandidateBatchComputer</span><span class="p">):</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">acquisition_function</span><span class="o">.</span><span class="n">compute_candidate_batch</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
@@ -300,8 +300,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                 <span class="p">))</span>
 
                 <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;eval_training&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-                <span class="n">trained_eval_model</span> <span class="o">=</span> <span class="n">train_eval_model</span><span class="p">(</span><span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;pool_training&quot;</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">trained_eval_model</span> <span class="o">=</span> <span class="n">train_eval_model</span><span class="p">(</span><span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;eval_training&quot;</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">acquisition_function</span><span class="o">.</span><span class="n">compute_candidate_batch</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span> <span class="n">trained_eval_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -366,18 +365,18 @@ Creating: PoolPredictions(num_pool_samples=10)
 Resolved: EvalBALD with {&#39;acquisition_size&#39;: 5, &#39;pool_scorer&#39;: PoolPredictions(num_pool_samples=10)}
 Creating: EvalBALD(acquisition_size=5,pool_scorer=PoolPredictions(num_pool_samples=10))
 Training set size 20:
-Epoch metrics: {&#39;accuracy&#39;: 0.6171875, &#39;crossentropy&#39;: 2.6826097071170807}
-Epoch metrics: {&#39;accuracy&#39;: 0.6396484375, &#39;crossentropy&#39;: 2.7781448662281036}
+Epoch metrics: {&#39;accuracy&#39;: 0.6220703125, &#39;crossentropy&#39;: 2.689535826444626}
+Epoch metrics: {&#39;accuracy&#39;: 0.638671875, &#39;crossentropy&#39;: 2.759561240673065}
 RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.6533203125, &#39;crossentropy&#39;: 2.996957242488861}
+Epoch metrics: {&#39;accuracy&#39;: 0.6396484375, &#39;crossentropy&#39;: 3.0484785437583923}
 RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.6396484375, &#39;crossentropy&#39;: 3.264936715364456}
+Epoch metrics: {&#39;accuracy&#39;: 0.6416015625, &#39;crossentropy&#39;: 3.127019852399826}
 RestoringEarlyStopping: 3 / 3
 RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.6826097071170807)
+RestoringEarlyStopping: Restoring best parameters. (Score: -2.689535826444626)
 RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.6284, &#39;crossentropy&#39;: 2.656679871368408}
-Resolved: TrainSelfDistillationPoolModel with {&#39;num_pool_samples&#39;: 10, &#39;num_training_samples&#39;: 1, &#39;num_eval_samples&#39;: 20, &#39;num_patience_epochs&#39;: 3, &#39;max_epochs&#39;: 1, &#39;training_dataset&#39;: &lt;torch.utils.data.dataset.Subset object at 0x7fed9f2a75b0&gt;, &#39;pool_dataset&#39;: &lt;torch.utils.data.dataset.Subset object at 0x7fed9cf4b1f0&gt;, &#39;validation_loader&#39;: &lt;torch.utils.data.dataloader.DataLoader object at 0x7fed9cf4bb50&gt;, &#39;training_batch_size&#39;: 64, &#39;trained_model&#39;: TrainedMCDropoutModel(num_pool_samples=10, model=BayesianMNISTCNN(
+Perf after training {&#39;accuracy&#39;: 0.6312, &#39;crossentropy&#39;: 2.6634248794555666}
+Resolved: TrainSelfDistillationPoolModel with {&#39;num_pool_samples&#39;: 10, &#39;num_training_samples&#39;: 1, &#39;num_eval_samples&#39;: 20, &#39;num_patience_epochs&#39;: 3, &#39;max_epochs&#39;: 1, &#39;training_dataset&#39;: &lt;torch.utils.data.dataset.Subset object at 0x7f5e19c9ab50&gt;, &#39;pool_dataset&#39;: &lt;torch.utils.data.dataset.Subset object at 0x7f5e19c9ac70&gt;, &#39;validation_loader&#39;: &lt;torch.utils.data.dataloader.DataLoader object at 0x7f5e19c9ac40&gt;, &#39;training_batch_size&#39;: 64, &#39;model_optimizer_factory&#39;: &lt;class &#39;batchbald_redux.example_models.MnistOptimizerFactory&#39;&gt;, &#39;trained_model&#39;: TrainedMCDropoutModel(num_pool_samples=10, model=BayesianMNISTCNN(
   (conv1): Conv2d(1, 32, kernel_size=(5, 5), stride=(1, 1))
   (conv1_drop): ConsistentMCDropout2d(p=0.5)
   (conv2): Conv2d(32, 64, kernel_size=(5, 5), stride=(1, 1))
@@ -386,7 +385,7 @@ Resolved: TrainSelfDistillationPoolModel with {&#39;num_pool_samples&#39;: 10, &
   (fc1_drop): ConsistentMCDropout(p=0.5)
   (fc2): Linear(in_features=128, out_features=10, bias=True)
 ))}
-Creating: TrainSelfDistillationPoolModel(num_pool_samples=10,num_training_samples=1,num_eval_samples=20,num_patience_epochs=3,max_epochs=1,training_dataset=&lt;torch.utils.data.dataset.Subset object at 0x7fed9f2a75b0&gt;,pool_dataset=&lt;torch.utils.data.dataset.Subset object at 0x7fed9cf4b1f0&gt;,validation_loader=&lt;torch.utils.data.dataloader.DataLoader object at 0x7fed9cf4bb50&gt;,training_batch_size=64,trained_model=TrainedMCDropoutModel(num_pool_samples=10, model=BayesianMNISTCNN(
+Creating: TrainSelfDistillationPoolModel(num_pool_samples=10,num_training_samples=1,num_eval_samples=20,num_patience_epochs=3,max_epochs=1,training_dataset=&lt;torch.utils.data.dataset.Subset object at 0x7f5e19c9ab50&gt;,pool_dataset=&lt;torch.utils.data.dataset.Subset object at 0x7f5e19c9ac70&gt;,validation_loader=&lt;torch.utils.data.dataloader.DataLoader object at 0x7f5e19c9ac40&gt;,training_batch_size=64,model_optimizer_factory=&lt;class &#39;batchbald_redux.example_models.MnistOptimizerFactory&#39;&gt;,trained_model=TrainedMCDropoutModel(num_pool_samples=10, model=BayesianMNISTCNN(
   (conv1): Conv2d(1, 32, kernel_size=(5, 5), stride=(1, 1))
   (conv1_drop): ConsistentMCDropout2d(p=0.5)
   (conv2): Conv2d(32, 64, kernel_size=(5, 5), stride=(1, 1))
@@ -395,43 +394,24 @@ Creating: TrainSelfDistillationPoolModel(num_pool_samples=10,num_training_sample
   (fc1_drop): ConsistentMCDropout(p=0.5)
   (fc2): Linear(in_features=128, out_features=10, bias=True)
 )))
+Epoch metrics: {&#39;accuracy&#39;: 0.6494140625, &#39;crossentropy&#39;: 1.299349308013916}
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.299349308013916)
+RestoringEarlyStopping: Restoring optimizer.
+Acquiring (label, score)s: 8 (1.097), 8 (1.075), 8 (1.06), 5 (1.046), 3 (1.035)
+Training set size 25:
+Epoch metrics: {&#39;accuracy&#39;: 0.7138671875, &#39;crossentropy&#39;: 1.83877794444561}
+Epoch metrics: {&#39;accuracy&#39;: 0.68359375, &#39;crossentropy&#39;: 2.499198794364929}
+RestoringEarlyStopping: 1 / 3
+Epoch metrics: {&#39;accuracy&#39;: 0.712890625, &#39;crossentropy&#39;: 2.2145942598581314}
+RestoringEarlyStopping: 2 / 3
+Epoch metrics: {&#39;accuracy&#39;: 0.7060546875, &#39;crossentropy&#39;: 2.710658013820648}
+RestoringEarlyStopping: 3 / 3
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: -1.83877794444561)
+RestoringEarlyStopping: Restoring optimizer.
+Perf after training {&#39;accuracy&#39;: 0.716, &#39;crossentropy&#39;: 1.8976135944366455}
+Done.
 </pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-8-9539ab592aa8&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-intense-fg ansi-bold">     10</span> 
-<span class="ansi-green-intense-fg ansi-bold">     11</span> results <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
-<span class="ansi-green-fg">---&gt; 12</span><span class="ansi-red-fg"> </span>experiment<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-4-4a70cb7d44e1&gt;</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, store)</span>
-<span class="ansi-green-intense-fg ansi-bold">    130</span>                 current_max_epochs <span class="ansi-blue-fg">=</span> iteration_log<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;training&#34;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;best_epoch&#34;</span><span class="ansi-blue-fg">]</span>
-<span class="ansi-green-intense-fg ansi-bold">    131</span> 
-<span class="ansi-green-fg">--&gt; 132</span><span class="ansi-red-fg">                 train_eval_model = self.create_train_eval_model(dict(
-</span><span class="ansi-green-intense-fg ansi-bold">    133</span>                     max_epochs<span class="ansi-blue-fg">=</span>current_max_epochs<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    134</span>                     training_dataset<span class="ansi-blue-fg">=</span>active_learning_data<span class="ansi-blue-fg">.</span>training_dataset<span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">&lt;ipython-input-4-4a70cb7d44e1&gt;</span> in <span class="ansi-cyan-fg">create_train_eval_model</span><span class="ansi-blue-fg">(self, runtime_config)</span>
-<span class="ansi-green-intense-fg ansi-bold">     52</span>         config <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">**</span>vars<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>runtime_config<span class="ansi-blue-fg">}</span>
-<span class="ansi-green-intense-fg ansi-bold">     53</span>         di <span class="ansi-blue-fg">=</span> DependencyInjection<span class="ansi-blue-fg">(</span>config<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 54</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> di<span class="ansi-blue-fg">.</span>create_dataclass_type<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>train_eval_model<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     55</span> 
-<span class="ansi-green-intense-fg ansi-bold">     56</span>     <span class="ansi-green-fg">def</span> run<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> store<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/di.py</span> in <span class="ansi-cyan-fg">create_dataclass_type</span><span class="ansi-blue-fg">(self, dataclass_type, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     21</span>         args_str <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">&#39;,&#39;</span><span class="ansi-blue-fg">.</span>join<span class="ansi-blue-fg">(</span>list<span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">+</span> <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f&#39;{key}={value}&#39;</span> <span class="ansi-green-fg">for</span> key<span class="ansi-blue-fg">,</span> value <span class="ansi-green-fg">in</span> final_args<span class="ansi-blue-fg">.</span>items<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     22</span>         print<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Creating: {dataclass_type.__qualname__}({args_str})&#34;</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 23</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> dataclass_type<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>final_args<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     24</span> 
-<span class="ansi-green-intense-fg ansi-bold">     25</span>     <span class="ansi-green-fg">def</span> resolve_dataclass_args<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> dataclass_type<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-red-fg">TypeError</span>: __init__() missing 1 required positional argument: &#39;model_optimizer_factory&#39;</pre>
 </div>
 </div>
 

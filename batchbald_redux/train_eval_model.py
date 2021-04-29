@@ -16,7 +16,7 @@ from .dataset_challenges import (
     RandomLabelsDataset,
     ReplaceTargetsDataset,
 )
-from .example_models import ModelOptimizerFactory
+from .models import ModelOptimizerFactory
 from .trained_model import TrainedMCDropoutModel, TrainedModel
 
 # Cell

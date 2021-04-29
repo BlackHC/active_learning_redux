@@ -31,6 +31,9 @@ entries:
       title: Restoring Early Stopping
       url: restoring_early_stopping.html
     - output: web,pdf
+      title: Some Models
+      url: models.html
+    - output: web,pdf
       title: Black Box Model Training
       url: black_box_training.html
     - output: web,pdf
@@ -42,9 +45,6 @@ entries:
     - output: web,pdf
       title: Experiment
       url: experiment.html
-    - output: web,pdf
-      title: Some Models
-      url: A1_some_models.html
     - output: web,pdf
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html

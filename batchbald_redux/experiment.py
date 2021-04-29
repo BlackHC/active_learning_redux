@@ -27,7 +27,7 @@ from .dataset_challenges import (
     create_repeated_MNIST_dataset,
     get_base_dataset_index, get_target
 )
-from .example_models import MnistOptimizerFactory, ModelOptimizerFactory
+from .models import MnistOptimizerFactory, ModelOptimizerFactory
 
 from .di import DependencyInjection
 

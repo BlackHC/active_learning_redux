@@ -741,7 +741,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_log_mean_probs" class="doc_header"><code>get_log_mean_probs</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L361" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_log_mean_probs</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_log_mean_probs" class="doc_header"><code>get_log_mean_probs</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L361" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_log_mean_probs</code>(<strong><code>log_probs_N_K_C</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -765,7 +765,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_module_predictions_labels" class="doc_header"><code>get_module_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L371" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_module_predictions_labels</code>(<strong><code>module</code></strong>:<code>Module</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
+<h4 id="get_module_predictions_labels" class="doc_header"><code>get_module_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L366" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_module_predictions_labels</code>(<strong><code>module</code></strong>:<code>Module</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -789,7 +789,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_ensemble_predictions_labels" class="doc_header"><code>get_ensemble_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L405" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_ensemble_predictions_labels</code>(<strong><code>modules</code></strong>:<code>Module'&gt;]</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
+<h4 id="get_ensemble_predictions_labels" class="doc_header"><code>get_ensemble_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L400" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_ensemble_predictions_labels</code>(<strong><code>modules</code></strong>:<code>Module'&gt;]</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -901,14 +901,9 @@ feature maps and should be used instead.</p>
     <span class="k">return</span> <span class="n">predictions</span>
 
 
-<span class="k">def</span> <span class="nf">get_log_mean_probs</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="c1"># TODO: this is the wrong solution (uses too much memory!)</span>
-    <span class="n">log_probs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
-
-    <span class="n">log_mean_probs</span> <span class="o">=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">log_mean_probs</span>
+<span class="k">def</span> <span class="nf">get_log_mean_probs</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">):</span>
+    <span class="n">log_mean_probs_N_C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">log_mean_probs_N_C</span>
 
 
 <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
