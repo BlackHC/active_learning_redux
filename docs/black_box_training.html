@@ -58,7 +58,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L37" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L31" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>:param model:
 :param train_loader:
@@ -91,7 +91,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L134" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L128" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -115,7 +115,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L156" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L150" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -395,141 +395,11 @@ RestoringEarlyStopping: Restoring optimizer.
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions_labels" class="doc_header"><code>get_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L162" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions_labels</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_log_mean_probs" class="doc_header"><code>get_log_mean_probs</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L214" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_log_mean_probs</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_predictions_labels</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-
-    <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;get_predictions_labels&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-    <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-    <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_prediction_batch</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">pbar</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-
-        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-
-        <span class="n">prediction_model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
-
-        <span class="n">data_start</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_labels</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
-            <span class="n">batch_x</span> <span class="o">=</span> <span class="n">batch_x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-
-            <span class="n">batch_predictions</span> <span class="o">=</span> <span class="n">prediction_model</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
-
-            <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_predictions</span><span class="p">)</span>
-            <span class="n">data_end</span> <span class="o">=</span> <span class="n">data_start</span> <span class="o">+</span> <span class="n">batch_size</span>
-
-            <span class="n">predictions</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_predictions</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span> <span class="o">==</span> <span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
-
-            <span class="n">data_start</span> <span class="o">=</span> <span class="n">data_end</span>
-
-            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
-
-    <span class="n">pbar</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span>
-
-
-<span class="k">def</span> <span class="nf">get_predictions</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">predictions</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">predictions</span>
-
-
-<span class="k">def</span> <span class="nf">get_log_mean_probs</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">log_probs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_predictions_labels</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
-
-    <span class="n">log_mean_probs</span> <span class="o">=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">log_mean_probs</span>
+<div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
     </div>

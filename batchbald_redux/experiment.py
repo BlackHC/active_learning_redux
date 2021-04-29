@@ -7,11 +7,8 @@ __all__ = ['mnist_initial_samples', 'Experiment', 'configs']
 import dataclasses
 import traceback
 from dataclasses import dataclass
-from enum import Enum
 from typing import Union, Type
 
-import blackhc.project.script
-import numpy as np
 import torch
 import torch.utils.data
 from blackhc.project import is_run_from_ipython
@@ -24,26 +21,21 @@ from .acquisition_functions import CandidateBatchComputer, \
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import (
     evaluate,
-    get_log_mean_probs,
-    get_predictions,
-    get_predictions_labels,
     train,
 )
-from .consistent_mc_dropout import SamplerModel
 from .dataset_challenges import (
     create_repeated_MNIST_dataset,
-    get_balanced_sample_indices,
-    get_base_dataset_index, get_target, ReplaceTargetsDataset
+    get_base_dataset_index, get_target
 )
-from .example_models import BayesianMNISTCNN
-
-from batchbald_redux import dataset_challenges
+from .example_models import MnistOptimizerFactory, ModelOptimizerFactory
 
 from .di import DependencyInjection
 
 # Cell
 
 # From the BatchBALD Repo
+from .train_eval_model import TrainEvalModel, TrainSelfDistillationPoolModel
+from .trained_model import TrainedMCDropoutModel
 
 mnist_initial_samples = [
     38043,
@@ -81,6 +73,7 @@ class Experiment:
     num_training_samples: int = 1
     num_patience_epochs: int = 3
     max_training_epochs: int = 30
+    training_batch_size: int = 64
     device = "cuda"
     validation_set_size: int = 1024
     initial_set_size: int = 20
@@ -88,8 +81,9 @@ class Experiment:
     repeated_mnist_repetitions: int = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]] = acquisition_functions.BALD
+    train_eval_model: TrainEvalModel = TrainSelfDistillationPoolModel
+    model_optimizer_factory: Type[ModelOptimizerFactory] = MnistOptimizerFactory
     acquisition_function_args: dict = None
-    save_bald_scores: bool = False
     temperature: float = 0.0
 
 
@@ -105,46 +99,15 @@ class Experiment:
 
         return active_learning_data, validation_dataset, test_dataset
 
-    def new_model(self):
-        return BayesianMNISTCNN()
-
-    def new_optimizer(self, model):
-        return torch.optim.Adam(model.parameters(), weight_decay=5e-4)
-
     # Simple Dependency Injection
     def create_acquisition_function(self):
         di = DependencyInjection(vars(self), [PoolPredictions, CoreSetPoolPredictions])
         return di.create_dataclass_type(self.acquisition_function)
 
-    def train_eval_model(
-        self, *, eval_dataset, eval_log_probs_N_C, validation_loader, num_epochs, training_log
-    ):
-        train_pool_prediction_dataset = ReplaceTargetsDataset(dataset=eval_dataset, targets=eval_log_probs_N_C)
-        train_pool_prediction_loader = torch.utils.data.DataLoader(
-            train_pool_prediction_dataset, batch_size=64, drop_last=True, shuffle=True
-        )
-
-        eval_model = self.new_model()
-        eval_optimizer = self.new_optimizer(eval_model)
-
-        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
-
-        train(
-            model=eval_model,
-            optimizer=eval_optimizer,
-            loss=loss,
-            validation_loss=torch.nn.NLLLoss(),
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_eval_samples,
-            train_loader=train_pool_prediction_loader,
-            validation_loader=validation_loader,
-            patience=self.num_patience_epochs,
-            max_epochs=num_epochs,
-            device=self.device,
-            training_log=training_log,
-        )
-
-        return eval_model
+    def create_train_eval_model(self, runtime_config) -> TrainEvalModel:
+        config = {**vars(self), **runtime_config}
+        di = DependencyInjection(config, [])
+        return di.create_dataclass_type(self.train_eval_model)
 
     def run(self, store):
         torch.manual_seed(self.seed)
@@ -190,11 +153,11 @@ class Experiment:
 
             iteration_log["training"] = {}
 
-            model = self.new_model()
-            optimizer = self.new_optimizer(model)
+            model_optimizer = self.model_optimizer_factory().create_model_optimizer()
+
             train(
-                model=model,
-                optimizer=optimizer,
+                model=model_optimizer.model,
+                optimizer=model_optimizer.optimizer,
                 training_samples=self.num_training_samples,
                 validation_samples=self.num_eval_samples,
                 train_loader=train_loader,
@@ -206,7 +169,7 @@ class Experiment:
             )
 
             evaluation_metrics = evaluate(
-                model=model, num_samples=self.num_eval_samples, loader=test_loader, device=self.device
+                model=model_optimizer.model, num_samples=self.num_eval_samples, loader=test_loader, device=self.device
             )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
@@ -215,34 +178,25 @@ class Experiment:
                 print("Done.")
                 break
 
+            trained_model = TrainedMCDropoutModel(num_pool_samples=self.num_pool_samples, model=model_optimizer.model)
+
             if isinstance(acquisition_function, CandidateBatchComputer):
-                candidate_batch = acquisition_function.compute_candidate_batch(model, pool_loader, self.device)
+                candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
             elif isinstance(acquisition_function, EvalCandidateBatchComputer):
-                eval_dataset = torch.utils.data.ConcatDataset(
-                    [active_learning_data.training_dataset, active_learning_data.pool_dataset]
-                )
-                eval_loader = torch.utils.data.DataLoader(eval_dataset, batch_size=64, drop_last=False)
+                current_max_epochs = iteration_log["training"]["best_epoch"]
 
-                eval_log_probs_N_C = get_log_mean_probs(
-                    model=model,
-                    num_samples=self.num_eval_samples,
-                    num_classes=10,
-                    loader=eval_loader,
-                    device=self.device,
-                )
-
-                num_epochs = iteration_log["training"]["best_epoch"]
-
-                iteration_log["pool_training"] = {}
-                eval_model = self.train_eval_model(
-                    eval_dataset=eval_dataset,
-                    eval_log_probs_N_C=eval_log_probs_N_C,
+                train_eval_model = self.create_train_eval_model(dict(
+                    max_epochs=current_max_epochs,
+                    training_dataset=active_learning_data.training_dataset,
+                    pool_dataset=active_learning_data.pool_dataset,
                     validation_loader=validation_loader,
-                    num_epochs=num_epochs,
-                    training_log=iteration_log["pool_training"],
-                )
+                    trained_model=trained_model,
+                ))
 
-                candidate_batch = acquisition_function.compute_candidate_batch(model, eval_model, pool_loader, device=self.device)
+                iteration_log["eval_training"] = {}
+                trained_eval_model = train_eval_model(training_log=iteration_log["eval_training"], device=self.device)
+
+                candidate_batch = acquisition_function.compute_candidate_batch(trained_model, trained_eval_model, pool_loader, device=self.device)
             else:
                 raise ValueError(f"Unknown acquisition function {acquisition_function}!")
 

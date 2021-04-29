@@ -30,12 +30,10 @@ from .batchbald import (
     get_top_k_scorers,
     get_top_random_scorers,
 )
-from .black_box_model_training import (
-    get_predictions,
-    get_predictions_labels,
-)
+from .consistent_mc_dropout import get_predictions_labels, get_predictions
 
 # Cell
+from .trained_model import TrainedModel
 
 
 @dataclass
@@ -76,7 +74,7 @@ class CoreSetPoolPredictions:
 class CandidateBatchComputer:
     acquisition_size: int
 
-    def compute_candidate_batch(self, model, pool_loader, device) -> CandidateBatch:
+    def compute_candidate_batch(self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
         pass
 
 # Cell
@@ -84,7 +82,7 @@ class CandidateBatchComputer:
 
 @dataclass
 class Random(CandidateBatchComputer):
-    def compute_candidate_batch(self, model, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
+    def compute_candidate_batch(self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
         num_pool_samples = len(pool_loader.dataset)
         indices = np.random.choice(num_pool_samples, size=self.acquisition_size, replace=False)
         candidate_batch = CandidateBatch([0.0] * self.acquisition_size, indices)
@@ -95,10 +93,8 @@ class Random(CandidateBatchComputer):
 
 @dataclass
 class PoolScorerCandidateBatchComputer(CandidateBatchComputer):
-    pool_scorer: PoolPredictions
-
-    def compute_candidate_batch(self, model, pool_loader, device) -> CandidateBatch:
-        log_probs_N_K_C = self.pool_scorer.get_log_probs_N_K_C(model, pool_loader, device)
+    def compute_candidate_batch(self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, device)
 
@@ -178,8 +174,8 @@ class BatchBALD(PoolScorerCandidateBatchComputer):
 class CoreSetPoolScorerCandidateBatchComputer(CandidateBatchComputer):
     core_set_pool_scorer: CoreSetPoolPredictions
 
-    def compute_candidate_batch(self, model, pool_loader, device) -> CandidateBatch:
-        log_probs_N_K_C, labels_N = self.core_set_pool_scorer.get_log_probs_N_K_C_labels_N(model, pool_loader, device)
+    def compute_candidate_batch(self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
+        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, labels_N, device)
 
@@ -237,7 +233,7 @@ class BatchCoreSetBALD(CoreSetPoolScorerCandidateBatchComputer):
 class EvalCandidateBatchComputer:
     acquisition_size: int
 
-    def compute_candidate_batch(self, model, eval_model, pool_loader, device) -> CandidateBatch:
+    def compute_candidate_batch(self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
         pass
 
 # Cell
@@ -247,9 +243,9 @@ class EvalCandidateBatchComputer:
 class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
     pool_scorer: PoolPredictions
 
-    def compute_candidate_batch(self, model, eval_model, pool_loader, device) -> CandidateBatch:
-        log_probs_N_K_C = self.pool_scorer.get_log_probs_N_K_C(model, pool_loader, device)
-        log_eval_probs_N_K_C = self.pool_scorer.get_log_probs_N_K_C(eval_model, pool_loader, device)
+    def compute_candidate_batch(self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device) -> CandidateBatch:
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, device)
+        log_eval_probs_N_K_C = eval_model.get_log_probs_N_K_C(pool_loader, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, log_eval_probs_N_K_C, device)
 

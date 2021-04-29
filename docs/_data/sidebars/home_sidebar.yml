@@ -34,8 +34,8 @@ entries:
       title: Black Box Model Training
       url: black_box_training.html
     - output: web,pdf
-      title: Analysis of BALD scores during Training
-      url: BALD_score_analysis.html
+      title: Trained Model Interface
+      url: train_eval_model.html
     - output: web,pdf
       title: Semi-Supervised Learning
       url: SSL.html
@@ -48,6 +48,9 @@ entries:
     - output: web,pdf
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html
+    - output: web,pdf
+      title: Analysis of BALD scores during Training
+      url: U_BALD_score_analysis.html
     - output: web,pdf
       title: Dependency Injection
       url: Z_dependency_injection.html

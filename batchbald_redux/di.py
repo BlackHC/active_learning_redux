@@ -14,13 +14,32 @@ class DependencyInjection:
     config: dict
     supported_types: list = None
 
-    def create_dataclass_type(self, dataclass_type, *args, **kwargs):
+    def create_dataclass_type(self, dataclass_type, **kwargs):
         resolved_args = self.resolve_dataclass_args(dataclass_type)
         final_args = {**resolved_args, **kwargs}
 
-        args_str = ','.join(list(args) + [f'{key}={value}' for key, value in final_args.items()])
+        args_str = ",".join([f"{key}={value}" for key, value in final_args.items()])
+        self.check_missing_fields(dataclass_type, final_args)
+
         print(f"Creating: {dataclass_type.__qualname__}({args_str})")
-        return dataclass_type(*args, **final_args)
+        return dataclass_type(**final_args)
+
+    def check_missing_fields(self, dataclass_type, args):
+        missing_fields = []
+
+        fields = dataclasses.fields(dataclass_type)
+        field: dataclasses.Field
+        for field in fields:
+            if (
+                field.name not in args
+                and field.default is dataclasses.MISSING
+                and field.default_factory is dataclasses.MISSING
+            ):
+                missing_fields += [field.name]
+
+        if missing_fields:
+            raise ValueError(f"Unresolved fields for {dataclass_type.__qualname__}: {', '.join(missing_fields)}")
+
 
     def resolve_dataclass_args(self, dataclass_type):
         fields = dataclasses.fields(dataclass_type)

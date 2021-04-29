@@ -84,13 +84,32 @@ nb_path: "Z_dependency_injection.ipynb"
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supported_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">create_dataclass_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_dataclass_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">resolved_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_dataclass_args</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
         <span class="n">final_args</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">resolved_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
 
-        <span class="n">args_str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">final_args</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">args_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">final_args</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_missing_fields</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">,</span> <span class="n">final_args</span><span class="p">)</span>
+        
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating: </span><span class="si">{</span><span class="n">dataclass_type</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">args_str</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dataclass_type</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">final_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataclass_type</span><span class="p">(</span><span class="o">**</span><span class="n">final_args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">check_missing_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
+        <span class="n">field</span><span class="p">:</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">Field</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span>
+                <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span>
+                <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">MISSING</span>
+            <span class="p">):</span>
+                <span class="n">missing_fields</span> <span class="o">+=</span> <span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">missing_fields</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unresolved fields for </span><span class="si">{</span><span class="n">dataclass_type</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">resolve_dataclass_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">):</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
@@ -267,6 +286,74 @@ Creating: ComplexTypeC(simple_type_b=SimpleTypeB(a_config_variable=10))
 <pre>ComplexTypeC(simple_type_b=SimpleTypeB(a_config_variable=10))</pre>
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ComplexTypeC</span><span class="p">:</span>
+    <span class="n">simple_type_b</span><span class="p">:</span> <span class="n">SimpleTypeB</span>
+
+
+<span class="c1"># Trigger a missing fields error</span>
+<span class="n">di</span> <span class="o">=</span> <span class="n">DependencyInjection</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">a_config_variable</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">SimpleTypeB__a_config_variable</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span> <span class="p">[])</span>
+
+<span class="n">di</span><span class="o">.</span><span class="n">create_dataclass_type</span><span class="p">(</span><span class="n">ComplexTypeC</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Resolved: ComplexTypeC with {}
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-28-3e9e163f50c5&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> di <span class="ansi-blue-fg">=</span> DependencyInjection<span class="ansi-blue-fg">(</span>dict<span class="ansi-blue-fg">(</span>a_config_variable<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">5</span><span class="ansi-blue-fg">,</span> SimpleTypeB__a_config_variable<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">10</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span> 
+<span class="ansi-green-fg">----&gt; 9</span><span class="ansi-red-fg"> </span>di<span class="ansi-blue-fg">.</span>create_dataclass_type<span class="ansi-blue-fg">(</span>ComplexTypeC<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-24-c067e60da0fd&gt;</span> in <span class="ansi-cyan-fg">create_dataclass_type</span><span class="ansi-blue-fg">(self, dataclass_type, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     12</span> 
+<span class="ansi-green-intense-fg ansi-bold">     13</span>         args_str <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">&#34;,&#34;</span><span class="ansi-blue-fg">.</span>join<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f&#34;{key}={value}&#34;</span> <span class="ansi-green-fg">for</span> key<span class="ansi-blue-fg">,</span> value <span class="ansi-green-fg">in</span> final_args<span class="ansi-blue-fg">.</span>items<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">---&gt; 14</span><span class="ansi-red-fg">         </span>self<span class="ansi-blue-fg">.</span>check_missing_fields<span class="ansi-blue-fg">(</span>dataclass_type<span class="ansi-blue-fg">,</span> final_args<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     15</span> 
+<span class="ansi-green-intense-fg ansi-bold">     16</span>         print<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Creating: {dataclass_type.__qualname__}({args_str})&#34;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-24-c067e60da0fd&gt;</span> in <span class="ansi-cyan-fg">check_missing_fields</span><span class="ansi-blue-fg">(self, dataclass_type, args)</span>
+<span class="ansi-green-intense-fg ansi-bold">     31</span> 
+<span class="ansi-green-intense-fg ansi-bold">     32</span>         <span class="ansi-green-fg">if</span> missing_fields<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 33</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> ValueError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Unresolved fields for {dataclass_type.__qualname__}: {&#39;, &#39;.join(missing_fields)}&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     34</span> 
+<span class="ansi-green-intense-fg ansi-bold">     35</span> 
+
+<span class="ansi-red-fg">ValueError</span>: Unresolved fields for ComplexTypeC: simple_type_b</pre>
+</div>
 </div>
 
 </div>
