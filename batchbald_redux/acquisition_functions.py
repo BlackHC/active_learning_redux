@@ -260,7 +260,7 @@ class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
 
 
 @dataclass
-class _EvalBALD(EvalCandidateBatchComputer):
+class _EvalBALD(EvaluationPoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
         scores_N = get_eval_bald_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
 
@@ -289,7 +289,7 @@ class TemperedEvalBALD(_EvalBALD):
 
 
 @dataclass
-class BatchEvalBALD(EvalCandidateBatchComputer):
+class BatchEvalBALD(EvaluationPoolScorerCandidateBatchComputer):
     num_samples: int = 1000000
 
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
@@ -307,7 +307,7 @@ class BatchEvalBALD(EvalCandidateBatchComputer):
 
 
 @dataclass
-class _EIG(EvalCandidateBatchComputer):
+class _EIG(EvaluationPoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
         scores_N = get_eig_scores(log_probs_N_K_C, log_eval_probs_N_K_C, dtype=torch.double, device=device)
 
