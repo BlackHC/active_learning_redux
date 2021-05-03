@@ -76,6 +76,7 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "ConstantTargetDataset": "05b_dataset_challenges.ipynb",
          "AliasDataset.constant_target": "05b_dataset_challenges.ipynb",
          "UniformTargetDataset": "05b_dataset_challenges.ipynb",
+         "AliasDataset.uniform_target": "05b_dataset_challenges.ipynb",
          "AdditiveGaussianNoise": "05b_dataset_challenges.ipynb",
          "dataset_to_tensors": "05b_dataset_challenges.ipynb",
          "get_dataset_state_dict": "05b_dataset_challenges.ipynb",
@@ -144,9 +145,10 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "TemperedEIG": "09a_acquisition_functions.ipynb",
          "mnist_initial_samples": "09b_experiment.ipynb",
          "Experiment": "09b_experiment.ipynb",
-         "configs": "09c_rejection_ood_experiment.ipynb",
-         "ExperimentDatasets": "09c_rejection_ood_experiment.ipynb",
+         "configs": "09d_uniform_target_ood_experiment.ipynb",
          "RejectionOodExperiment": "09c_rejection_ood_experiment.ipynb",
+         "ExperimentDatasets": "09d_uniform_target_ood_experiment.ipynb",
+         "UniformTargetOodExperiment": "09d_uniform_target_ood_experiment.ipynb",
          "DependencyInjection": "Z_dependency_injection.ipynb"}
 
 modules = ["batchbald.py",
@@ -166,6 +168,7 @@ modules = ["batchbald.py",
            "acquisition_functions.py",
            "experiment.py",
            "rejection_ood_experiment.py",
+           "uniform_target_ood_experiment.py",
            "di.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"

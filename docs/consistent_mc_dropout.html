@@ -140,13 +140,15 @@ nb_path: "03_consistent_mc_dropout.ipynb"
         <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
         <span class="n">num_classes</span> <span class="o">=</span> <span class="n">get_num_classes</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-
+        <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span>
+        
         <span class="n">pbar</span> <span class="o">=</span> <span class="n">create_progress_bar</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">tqdm_args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;get_predictions_labels&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="nd">@toma</span><span class="o">.</span><span class="n">execute</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">get_prediction_batch</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">labels</span>
+            
             <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">pbar</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
@@ -156,6 +158,11 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
             <span class="n">data_start</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_labels</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+                <span class="c1"># TODO: implement this in all the get_predictions variants?</span>
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">labels_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="o">*</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> 
+                        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">labels_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                        
                 <span class="n">batch_x</span> <span class="o">=</span> <span class="n">batch_x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
                 <span class="n">batch_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">batch_x</span><span class="p">,</span> <span class="n">num_sub_samples</span><span class="p">)</span>
@@ -165,7 +172,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
                 <span class="n">predictions</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_predictions</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">(),</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">batch_labels</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="n">labels</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_end</span><span class="p">]</span> <span class="o">==</span> <span class="n">batch_labels</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
 
@@ -269,7 +276,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L166" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout" class="doc_header"><code>class</code> <code>ConsistentMCDropout</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L173" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes some of the elements of the input
 tensor with probability :attr:<code>p</code> using samples from a Bernoulli
@@ -322,7 +329,7 @@ identity function.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L202" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
+<h2 id="ConsistentMCDropout2d" class="doc_header"><code>class</code> <code>ConsistentMCDropout2d</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L209" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ConsistentMCDropout2d</code>(<strong><code>p</code></strong>=<em><code>0.5</code></em>) :: <code>_ConsistentMCDropout</code></p>
 </blockquote>
 <p>Randomly zeroes whole channels of the input tensor.
 The channels to zero-out are randomized on every forward call.</p>
@@ -467,7 +474,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SamplerModel" class="doc_header"><code>class</code> <code>SamplerModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L245" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplerModel</code>(<strong><code>bayesian_module</code></strong>:<a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a>, <strong><code>k</code></strong>:<code>int</code>) :: <code>Module</code></p>
+<h2 id="SamplerModel" class="doc_header"><code>class</code> <code>SamplerModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L252" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplerModel</code>(<strong><code>bayesian_module</code></strong>:<a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a>, <strong><code>k</code></strong>:<code>int</code>) :: <code>Module</code></p>
 </blockquote>
 <p>Wrap a <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a> to sample k MC dropout samples consistently.</p>
 
@@ -525,7 +532,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="multi_sample_loss" class="doc_header"><code>multi_sample_loss</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L259" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>multi_sample_loss</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="multi_sample_loss" class="doc_header"><code>multi_sample_loss</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L266" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>multi_sample_loss</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -622,7 +629,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="geometric_mean_loss" class="doc_header"><code>geometric_mean_loss</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L273" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>geometric_mean_loss</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="geometric_mean_loss" class="doc_header"><code>geometric_mean_loss</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L280" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>geometric_mean_loss</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -646,7 +653,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="GeometricMeanPrediction" class="doc_header"><code>class</code> <code>GeometricMeanPrediction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L281" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GeometricMeanPrediction</code>(<strong><code>module</code></strong>:<code>Module</code>) :: <code>Module</code></p>
+<h2 id="GeometricMeanPrediction" class="doc_header"><code>class</code> <code>GeometricMeanPrediction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L288" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GeometricMeanPrediction</code>(<strong><code>module</code></strong>:<code>Module</code>) :: <code>Module</code></p>
 </blockquote>
 <p>Use a eg. SamplerModel and compute the geometric mean as "ensemble" prediction.</p>
 <p>We assume we receive log probs (so after Softmax).</p>
@@ -672,7 +679,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="LogProbMeanPrediction" class="doc_header"><code>class</code> <code>LogProbMeanPrediction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L296" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>LogProbMeanPrediction</code>(<strong><code>module</code></strong>:<code>Module</code>) :: <code>Module</code></p>
+<h2 id="LogProbMeanPrediction" class="doc_header"><code>class</code> <code>LogProbMeanPrediction</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L303" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>LogProbMeanPrediction</code>(<strong><code>module</code></strong>:<code>Module</code>) :: <code>Module</code></p>
 </blockquote>
 <p>Use a eg. SamplerModel and compute the geometric mean as "ensemble" prediction.</p>
 
@@ -697,7 +704,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions_labels" class="doc_header"><code>get_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L310" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions_labels</code>(<strong><code>model</code></strong>:<a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_predictions_labels" class="doc_header"><code>get_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L317" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions_labels</code>(<strong><code>model</code></strong>:<a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
 </blockquote>
 
 </div>
@@ -721,7 +728,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L356" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
+<h4 id="get_predictions" class="doc_header"><code>get_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L363" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_predictions</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>num_classes</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>:<code>str</code>)</p>
 </blockquote>
 
 </div>
@@ -745,7 +752,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_log_mean_probs" class="doc_header"><code>get_log_mean_probs</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L365" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_log_mean_probs</code>(<strong><code>log_probs_N_K_C</code></strong>)</p>
+<h4 id="get_log_mean_probs" class="doc_header"><code>get_log_mean_probs</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L372" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_log_mean_probs</code>(<strong><code>log_probs_N_K_C</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -769,7 +776,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_module_predictions_labels" class="doc_header"><code>get_module_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L370" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_module_predictions_labels</code>(<strong><code>module</code></strong>:<code>Module</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
+<h4 id="get_module_predictions_labels" class="doc_header"><code>get_module_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L377" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_module_predictions_labels</code>(<strong><code>module</code></strong>:<code>Module</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -793,7 +800,7 @@ feature maps and should be used instead.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_ensemble_predictions_labels" class="doc_header"><code>get_ensemble_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L404" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_ensemble_predictions_labels</code>(<strong><code>modules</code></strong>:<code>Module'&gt;]</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
+<h4 id="get_ensemble_predictions_labels" class="doc_header"><code>get_ensemble_predictions_labels</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/consistent_mc_dropout.py#L411" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_ensemble_predictions_labels</code>(<strong><code>modules</code></strong>:<code>Module'&gt;]</code>, <strong><code>loader</code></strong>:<code>DataLoader</code>, <strong><code>device</code></strong>)</p>
 </blockquote>
 
 </div>

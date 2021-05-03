@@ -584,10 +584,14 @@ def constant_target(self: AliasDataset, target: torch.Tensor, *, num_classes=Non
 def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtype=None, device=None):
     num_classes = num_classes or get_num_classes(dataset)
     target = torch.ones(num_classes, dtype=dtype, device=device) / num_classes
-    result = ConstantTargetDataset(dataset, target)
+    result = ConstantTargetDataset(dataset, target, num_classes=num_classes)
     result.options = dict(num_classes=num_classes)
     result.alias = f"{dataset} | uniform_targets{result.options}"
     return result
+
+@patch
+def uniform_target(self: AliasDataset, *, num_classes=None, dtype=None, device=None):
+    return UniformTargetDataset(self, num_classes=num_classes, dtype=dtype, device=device)
 
 # Cell
 

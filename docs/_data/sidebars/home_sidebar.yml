@@ -50,7 +50,7 @@ entries:
       url: SSL.html
     - output: web,pdf
       title: Experiment
-      url: rejection_ood_experiment.html
+      url: uniform_target_ood_experiment.html
     - output: web,pdf
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html

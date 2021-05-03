@@ -88,6 +88,7 @@ class TrainRandomLabelPoolModel(TrainEvalModel):
     model_optimizer_factory: ModelOptimizerFactory
 
     def __call__(self, *, training_log, device):
+        # TODO: support one_hot!
         # TODO: different seed needed!
         eval_dataset = torch.utils.data.ConcatDataset(
             [self.training_dataset, RandomLabelsDataset(self.pool_dataset, seed=0)]
@@ -132,6 +133,7 @@ class TrainExplicitEvalModel(TrainEvalModel):
     model_optimizer_factory: ModelOptimizerFactory
 
     def __call__(self, *, training_log, device):
+        # TODO: support one_hot!
         # TODO: different seed needed!
         eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
         train_eval_loader = torch.utils.data.DataLoader(

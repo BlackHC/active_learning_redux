@@ -68,13 +68,15 @@ class BayesianModule(Module):
         N = len(loader.dataset)
         num_classes = get_num_classes(loader.dataset)
         predictions = torch.empty((N, num_samples, num_classes), dtype=torch.float, device="cpu")
-        labels = torch.empty(N, dtype=torch.long, device="cpu")
+        labels = None
 
         pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
         pbar.start()
 
         @toma.execute.range(0, num_samples, 128)
         def get_prediction_batch(start, end):
+            nonlocal labels
+
             if start == 0:
                 pbar.reset()
 
@@ -84,6 +86,11 @@ class BayesianModule(Module):
 
             data_start = 0
             for batch_x, batch_labels in loader:
+                # TODO: implement this in all the get_predictions variants?
+                if labels is None:
+                        labels_shape = (N, *batch_labels.shape[1:])
+                        labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
+
                 batch_x = batch_x.to(device=device)
 
                 batch_predictions = self(batch_x, num_sub_samples)
@@ -93,7 +100,7 @@ class BayesianModule(Module):
 
                 predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
                 if start == 0:
-                    labels[data_start:data_end].copy_(batch_labels.long(), non_blocking=True)
+                    labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
                 else:
                     assert labels[data_start:data_end] == batch_labels.long()
 
