@@ -158,5 +158,3 @@ def evaluate(*, model, num_samples, loader, device, loss=None):
 
 def create_metrics(loss):
     return {"accuracy": Accuracy(), "crossentropy": Loss(loss)}
-
-# Cell

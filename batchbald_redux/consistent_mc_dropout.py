@@ -35,13 +35,17 @@ class BayesianModule(Module):
     def forward(self, input_B: torch.Tensor, k: int):
         BayesianModule.k = k
 
-        mc_input_BK = BayesianModule.mc_tensor(input_B, k)
-        mc_output_BK = self.mc_forward_impl(mc_input_BK)
+        features_B = self.deterministic_forward_impl(input_B)
+        mc_features_BK = BayesianModule.mc_tensor(features_B, k)
+        mc_output_BK = self.mc_forward_impl(mc_features_BK)
         mc_output_B_K = BayesianModule.unflatten_tensor(mc_output_BK, k)
         return mc_output_B_K
 
-    def mc_forward_impl(self, mc_input_BK: torch.Tensor):
-        return mc_input_BK
+    def deterministic_forward_impl(self, input_B: torch.Tensor) -> torch.Tensor:
+        return input_B
+
+    def mc_forward_impl(self, mc_features_BK: torch.Tensor) -> torch.Tensor:
+        return mc_features_BK
 
     @staticmethod
     def unflatten_tensor(input: torch.Tensor, k: int):

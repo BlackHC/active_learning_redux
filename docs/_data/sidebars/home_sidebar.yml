@@ -28,11 +28,17 @@ entries:
       title: Dataset Challenges
       url: dataset_challenges.html
     - output: web,pdf
+      title: Datasets
+      url: more_datasets.html
+    - output: web,pdf
       title: Restoring Early Stopping
       url: restoring_early_stopping.html
     - output: web,pdf
+      title: Thin wrapper to create models and optimizers
+      url: model_optimizer_factory.html
+    - output: web,pdf
       title: Some Models
-      url: models.html
+      url: resnet_models.html
     - output: web,pdf
       title: Black Box Model Training
       url: black_box_training.html
