@@ -50,6 +50,12 @@ entries:
       url: SSL.html
     - output: web,pdf
       title: Experiment
+      url: experiment.html
+    - output: web,pdf
+      title: Rejection OOD Experiment
+      url: rejection_ood_experiment.html
+    - output: web,pdf
+      title: Uniform Target OOD Experiment
       url: uniform_target_ood_experiment.html
     - output: web,pdf
       title: Results Visualizations

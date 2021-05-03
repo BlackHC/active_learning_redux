@@ -489,7 +489,7 @@ class OneHotDataset(ReplaceTargetsDataset):
         options = dict(num_classes=num_classes)
 
         N = len(dataset)
-        targets = torch.zeros(len(dataset), num_classes, dtype=dtype, device=device)
+        targets = torch.zeros(N, num_classes, dtype=dtype, device=device)
         # TODO: use get_targets() here, which will require a refactoring
         for i, (_, label) in enumerate(dataset):
             targets[i, label] = 1.0

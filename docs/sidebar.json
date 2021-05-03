@@ -14,7 +14,9 @@
     "Black Box Model Training": "black_box_training.html",
     "Trained Model Interface": "train_eval_model.html",
     "Semi-Supervised Learning": "SSL.html",
-    "Experiment": "uniform_target_ood_experiment.html",
+    "Experiment": "experiment.html",
+    "Rejection OOD Experiment": "rejection_ood_experiment.html",
+    "Uniform Target OOD Experiment": "uniform_target_ood_experiment.html",
     "Results Visualizations": "X_arxiv_draft_report_plots.html",
     "Analysis of BALD scores during Training": "U_BALD_score_analysis.html",
     "Dependency Injection": "Z_dependency_injection.html"

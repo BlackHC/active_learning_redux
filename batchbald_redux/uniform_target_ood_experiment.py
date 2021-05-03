@@ -18,9 +18,7 @@ from torch.utils.data import Dataset
 import batchbald_redux.acquisition_functions as acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
-    CoreSetPoolPredictions,
     EvalCandidateBatchComputer,
-    PoolPredictions,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate, train
@@ -139,7 +137,7 @@ class UniformTargetOodExperiment:
 
     # Simple Dependency Injection
     def create_acquisition_function(self):
-        di = DependencyInjection(vars(self), [PoolPredictions, CoreSetPoolPredictions])
+        di = DependencyInjection(vars(self))
         return di.create_dataclass_type(self.acquisition_function)
 
     def create_train_eval_model(self, runtime_config) -> TrainEvalModel:
