@@ -122,14 +122,14 @@ def get_num_classes(dataset: data.Dataset) -> int:
         return get_num_classes(dataset.datasets[0])
     elif isinstance(dataset, data.Subset):
         return get_num_classes(dataset.dataset)
-    elif isinstance(dataset, data.TensorDataset):
-        return dataset.tensors[1].shape[1:]
     elif isinstance(dataset, torchvision.datasets.MNIST):
         return len(dataset.classes)
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
         return len(dataset.classes)
     elif isinstance(dataset, AliasDataset):
         return dataset.get_num_classes()
+    elif hasattr(dataset, "num_classes"):
+        return dataset.num_classes
     else:
         raise NotImplementedError(f"Unrecognized dataset {dataset}!")
 
@@ -162,7 +162,7 @@ def get_target(dataset, index: int) -> torch.Tensor:
 
 def get_targets(dataset):
     if isinstance(dataset, data.ConcatDataset):
-        return torch.concat([get_targets(sub_dataset) for sub_dataset in dataset.datasets], device="cpu")
+        return torch.cat([get_targets(sub_dataset).to(device="cpu") for sub_dataset in dataset.datasets])
     elif isinstance(dataset, data.Subset):
         return get_targets(dataset.dataset)[torch.as_tensor(dataset.indices)]
     elif isinstance(dataset, data.TensorDataset):
@@ -216,7 +216,7 @@ class ReplaceTargetsDataset(AliasDataset):
     targets: torch.Tensor
     num_classes: int
 
-    def __init__(self, dataset: data.Dataset, *, targets: torch.Tensor, num_classes: int = None, alias: str = None):
+    def __init__(self, dataset: data.Dataset, targets: torch.Tensor, *, num_classes: int = None, alias: str = None):
         assert len(dataset) == len(targets)
 
         num_classes = num_classes or get_num_classes(dataset)
@@ -377,7 +377,7 @@ class RandomLabelsDataset(ReplaceTargetsDataset):
         N = len(dataset)
         targets = torch.as_tensor(generator.choice(num_classes, size=N, replace=True), device=device)
 
-        super().__init__(dataset, targets, num_classes, f"{dataset} | randomize_labels{options}")
+        super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | randomize_labels{options}")
         self.options = options
 
 
@@ -494,7 +494,7 @@ class OneHotDataset(ReplaceTargetsDataset):
         for i, (_, label) in enumerate(dataset):
             targets[i, label] = 1.0
 
-        super().__init__(dataset, targets, num_classes, f"{dataset} | one_hot_targets{options}")
+        super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | one_hot_targets{options}")
         self.options = options
 
 
@@ -576,6 +576,11 @@ class ConstantTargetDataset(AliasDataset):
         return self.target.expand(len(self), *self.target.shape)
 
 
+@patch
+def constant_target(self: AliasDataset, target: torch.Tensor, *, num_classes=None):
+    return ConstantTargetDataset(dataset=self, target=target, num_classes=num_classes)
+
+
 def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtype=None, device=None):
     num_classes = num_classes or get_num_classes(dataset)
     target = torch.ones(num_classes, dtype=dtype, device=device) / num_classes
@@ -624,7 +629,9 @@ def get_dataset_state_dict(dataset):
 
     samples, targets = dataset_to_tensors(dataset)
 
-    state_dict = dict(alias=dataset_alias, samples=samples, targets=targets)
+    num_classes = get_num_classes(dataset)
+
+    state_dict = dict(alias=dataset_alias, samples=samples, targets=targets, num_classes=num_classes)
 
     return state_dict
 
@@ -633,6 +640,10 @@ class ImportedDataset(AliasDataset):
     def __init__(self, state_dict):
         tensor_dataset = data.TensorDataset(state_dict["samples"], state_dict["targets"])
         super().__init__(tensor_dataset, state_dict["alias"])
+        self.num_classes = state_dict["num_classes"]
+
+    def get_num_classes(self):
+        return self.num_classes
 
 
 def save_dataset(dataset: data.Dataset, f, **kwargs):

@@ -94,7 +94,7 @@ nb_path: "04_active_learning.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ActiveLearningData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Splits `dataset` into an active dataset and an available dataset.&quot;&quot;&quot;</span>
 
-    <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">base_dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">training_dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">pool_dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">training_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
@@ -102,12 +102,12 @@ nb_path: "04_active_learning.ipynb"
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),),</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pool_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),),</span> <span class="kc">True</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pool_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_indices</span><span class="p">()</span>
 
@@ -160,7 +160,7 @@ nb_path: "04_active_learning.ipynb"
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset_indices</span><span class="p">(</span><span class="n">pool_indices</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_from_pool</span><span class="p">(</span><span class="n">pool_indices</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">Subset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="p">)</span>
 </pre></div>
 
     </div>

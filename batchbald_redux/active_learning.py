@@ -17,7 +17,7 @@ import torch.utils.data as data
 class ActiveLearningData:
     """Splits `dataset` into an active dataset and an available dataset."""
 
-    dataset: data.Dataset
+    base_dataset: data.Dataset
     training_dataset: data.Dataset
     pool_dataset: data.Dataset
     training_mask: np.ndarray
@@ -25,12 +25,12 @@ class ActiveLearningData:
 
     def __init__(self, dataset: data.Dataset):
         super().__init__()
-        self.dataset = dataset
+        self.base_dataset = dataset
         self.training_mask = np.full((len(dataset),), False)
         self.pool_mask = np.full((len(dataset),), True)
 
-        self.training_dataset = data.Subset(self.dataset, None)
-        self.pool_dataset = data.Subset(self.dataset, None)
+        self.training_dataset = data.Subset(self.base_dataset, None)
+        self.pool_dataset = data.Subset(self.base_dataset, None)
 
         self._update_indices()
 
@@ -83,7 +83,7 @@ class ActiveLearningData:
         dataset_indices = self.get_dataset_indices(pool_indices)
 
         self.remove_from_pool(pool_indices)
-        return data.Subset(self.dataset, dataset_indices)
+        return data.Subset(self.base_dataset, dataset_indices)
 
 # Cell
 

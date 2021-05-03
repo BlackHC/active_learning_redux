@@ -112,7 +112,7 @@ nb_path: "03_consistent_mc_dropout.ipynb"
         <span class="n">mc_output_BK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_forward_impl</span><span class="p">(</span><span class="n">mc_features_BK</span><span class="p">)</span>
         <span class="n">mc_output_B_K</span> <span class="o">=</span> <span class="n">BayesianModule</span><span class="o">.</span><span class="n">unflatten_tensor</span><span class="p">(</span><span class="n">mc_output_BK</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mc_output_B_K</span>
-    
+
     <span class="k">def</span> <span class="nf">deterministic_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_B</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">input_B</span>
 
