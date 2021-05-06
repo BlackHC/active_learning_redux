@@ -60,7 +60,7 @@ class RejectionOodExperiment:
     validation_split_random_state: int = 0
     initial_training_set_size: int = 20
     samples_per_epoch: int = 5056
-    repeated_mnist_repetitions: int = 1
+    mnist_repetitions: float = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
@@ -72,16 +72,16 @@ class RejectionOodExperiment:
 
     def load_dataset(self, initial_training_set_size) -> (ActiveLearningData, Dataset, Dataset):
         # num_classes = 10, input_size = 28
-        train_dataset = NamedDataset(
+        full_train_dataset = NamedDataset(
             FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
         )
         ood_dataset = FastFashionMNIST("data", train=True, download=True, device=self.device)
         ood_dataset = NamedDataset(ood_dataset, f"OoD Dataset ({len(ood_dataset)} samples)")
 
         train_dataset, validation_dataset = train_validation_split(
-            full_train_dataset=train_dataset,
-            full_validation_dataset=train_dataset,
-            train_labels=train_dataset.get_targets().cpu(),
+            full_train_dataset=full_train_dataset,
+            full_validation_dataset=full_train_dataset,
+            train_labels=full_train_dataset.get_targets().cpu(),
             validation_set_size=self.validation_set_size,
             validation_split_random_state=self.validation_split_random_state,
         )
@@ -90,6 +90,10 @@ class RejectionOodExperiment:
         validation_dataset = AliasDataset(
             validation_dataset, f"FastMNIST (validation; {len(validation_dataset)} samples)"
         )
+
+        # If we reduce the train set, we need to do so before picking the initial train set.
+        if self.mnist_repetitions < 1:
+            train_dataset = train_dataset * self.mnist_repetitions
 
         num_classes = train_dataset.get_num_classes()
         samples_per_class = initial_training_set_size / num_classes
@@ -100,8 +104,9 @@ class RejectionOodExperiment:
             seed=self.validation_split_random_state,
         )
 
-        if self.repeated_mnist_repetitions > 1:
-            train_dataset = train_dataset * self.repeated_mnist_repetitions
+        # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.
+        if self.mnist_repetitions > 1:
+            train_dataset = train_dataset * self.mnist_repetitions
 
         train_dataset = train_dataset + ood_dataset.constant_target(
             target=torch.tensor(-1, device=self.device), num_classes=train_dataset.get_num_classes()
@@ -229,7 +234,7 @@ class RejectionOodExperiment:
                 for index in candidate_batch.indices
             ]
             candidate_labels = [
-                get_target(active_learning_data.base_dataset, index).item() for index in candidate_global_indices
+                get_target(active_learning_data.pool_dataset, index).item() for index in candidate_batch.indices
             ]
 
             iteration_log["acquisition"] = dict(
@@ -262,7 +267,7 @@ configs = [
     )
     for seed in range(5)
     for acquisition_size in [5, 10, 20, 50]
-    for num_pool_samples in [50]
+    for num_pool_samples in [100]
 ] + [
     RejectionOodExperiment(
         seed=seed,

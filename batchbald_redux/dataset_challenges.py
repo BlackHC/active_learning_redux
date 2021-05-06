@@ -61,14 +61,12 @@ class AliasDataset(data.Dataset):
     def __mul__(self, factor):
         if int(factor) == factor:
             return RepeatedDataset(self, num_repeats=factor)
-
-        return RandomSubsetDataset(self, factor=factor, seed=0)
+        if factor < 1:
+            return RandomSubsetDataset(self, factor=factor, seed=0)
+        return RepeatedDataset(self, num_repeats=int(factor)) + RandomSubsetDataset(self, factor=factor % 1, seed=0)
 
     def __rmul__(self, factor):
-        if int(factor) == factor:
-            return RepeatedDataset(self, num_repeats=factor)
-
-        return RandomSubsetDataset(self, factor=factor, seed=0)
+        return self * factor
 
     def get_base_dataset_index(self, index):
         return get_base_dataset_index(self.dataset, index)
@@ -546,8 +544,11 @@ class RandomSubsetDataset(SubsetAliasDataset):
             else:
                 alias = f"{_wrap_alias(dataset)}~x{factor} (seed={seed})"
 
+        N = len(dataset)
+        assert subset_size < N
+
         generator = np.random.default_rng(seed)
-        indices = generator.choice(len(dataset), size=subset_size, replace=subset_size > len(dataset))
+        indices = generator.choice(N, size=subset_size, replace=False)
 
         super().__init__(dataset, indices, alias)
         self.options = dict(size=size, factor=factor, seed=seed)

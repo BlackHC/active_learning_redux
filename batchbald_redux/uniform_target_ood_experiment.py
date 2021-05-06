@@ -69,8 +69,8 @@ class UniformTargetOodExperiment:
     validation_split_random_state: int = 0
     initial_training_set_size: int = 20
     samples_per_epoch: int = 5056
-    mnist_repetitions: int = 1
-    ood_fmnist_repetitions: int = 1
+    mnist_repetitions: float = 1
+    ood_fmnist_repetitions: float = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
@@ -85,8 +85,6 @@ class UniformTargetOodExperiment:
         train_dataset = NamedDataset(
             FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
         )
-        if self.mnist_repetitions > 1:
-            train_dataset = train_dataset * self.mnist_repetitions
 
         ood_dataset = FastFashionMNIST("data", train=True, download=True, device=self.device)
         ood_dataset = NamedDataset(ood_dataset, f"OoD Dataset ({len(ood_dataset)} samples)")
@@ -106,6 +104,10 @@ class UniformTargetOodExperiment:
             validation_dataset, f"FastMNIST (validation; {len(validation_dataset)} samples)"
         )
 
+        # If we reduce the train set, we need to do so before picking the initial train set.
+        if self.mnist_repetitions < 1:
+            train_dataset = train_dataset * self.mnist_repetitions
+
         num_classes = train_dataset.get_num_classes()
         samples_per_class = initial_training_set_size / num_classes
         initial_training_set_indices = get_balanced_sample_indices(
@@ -114,6 +116,10 @@ class UniformTargetOodExperiment:
             samples_per_class=samples_per_class,
             seed=self.validation_split_random_state,
         )
+
+        # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.
+        if self.mnist_repetitions > 1:
+            train_dataset = train_dataset * self.mnist_repetitions
 
         train_dataset = train_dataset.one_hot(device=self.device) + ood_dataset.uniform_target(device=self.device)
 
@@ -248,7 +254,7 @@ class UniformTargetOodExperiment:
                 base_di = get_base_dataset_index(data.active_learning.pool_dataset, index)
                 dataset_type = "ood" if base_di.dataset == data.ood_dataset else "id"
                 candidate_global_dataset_indices.append((dataset_type, base_di.index))
-                label = get_target(base_di.dataset.dataset, base_di.index)
+                label = get_target(data.active_learning.pool_dataset, index)
                 candidate_labels.append(label)
 
             iteration_log["acquisition"] = dict(
@@ -275,7 +281,7 @@ configs = [
     )
     for seed in range(5)
     for acquisition_size in [5, 10, 20, 50]
-    for num_pool_samples in [50]
+    for num_pool_samples in [100]
 ] + [
     UniformTargetOodExperiment(
         seed=seed,
