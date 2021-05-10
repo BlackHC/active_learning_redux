@@ -93,7 +93,7 @@ def train(
             event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
         )
     else:
-        ignite_progress_bar(trainer, desc="Training", log_interval=LOG_INTERVAL)
+        ignite_progress_bar(trainer, desc=lambda engine: "Training", log_interval=LOG_INTERVAL)
 
     training_log["epochs"] = []
     epochs_log = training_log["epochs"]
