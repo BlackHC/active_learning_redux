@@ -294,22 +294,16 @@ class UniformTargetOodExperiment:
 
 configs = [
     UniformTargetOodExperiment(
-        seed=seed,
+        seed=seed+1234,
         acquisition_function=acquisition_functions.TemperedEvalBALD,
-        acquisition_size=acquisition_size,
+        acquisition_size=10,
         num_pool_samples=num_pool_samples,
+        evaluation_set_size=evaluation_set_size,
         temperature=8,
     )
-    for seed in range(5)
-    for acquisition_size in [5, 10, 20, 50]
+    for seed in range(10)
+    for evaluation_set_size in [100,1000]
     for num_pool_samples in [100]
-] + [
-    UniformTargetOodExperiment(
-        seed=seed,
-        acquisition_function=acquisition_functions.Random,
-        acquisition_size=5,
-    )
-    for seed in range(20)
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":

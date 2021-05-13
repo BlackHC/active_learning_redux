@@ -61,6 +61,9 @@ entries:
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html
     - output: web,pdf
+      title: Results OOD Baselines Visualizations
+      url: B_results_visualization_ood_baselines.html
+    - output: web,pdf
       title: Analysis of BALD scores during Training
       url: U_BALD_score_analysis.html
     - output: web,pdf
