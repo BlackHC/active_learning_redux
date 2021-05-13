@@ -74,13 +74,13 @@ class Experiment:
     num_pool_samples: int = 20
     num_validation_samples: int = 20
     num_training_samples: int = 1
-    num_patience_epochs: int = 3
+    num_patience_epochs: int = 5
     max_training_epochs: int = 30
     training_batch_size: int = 64
     device: str = "cuda"
     validation_set_size: int = 1024
     initial_set_size: int = 20
-    samples_per_epoch: int = 5056
+    min_samples_per_epoch: int = 5056
     repeated_mnist_repetitions: int = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[
@@ -131,7 +131,7 @@ class Experiment:
         train_loader = torch.utils.data.DataLoader(
             active_learning_data.training_dataset,
             batch_size=64,
-            sampler=RandomFixedLengthSampler(active_learning_data.training_dataset, self.samples_per_epoch),
+            sampler=RandomFixedLengthSampler(active_learning_data.training_dataset, self.min_samples_per_epoch),
             drop_last=True,
         )
         pool_loader = torch.utils.data.DataLoader(
@@ -173,7 +173,10 @@ class Experiment:
             )
 
             evaluation_metrics = evaluate(
-                model=model_optimizer.model, num_samples=self.num_validation_samples, loader=test_loader, device=self.device
+                model=model_optimizer.model,
+                num_samples=self.num_validation_samples,
+                loader=test_loader,
+                device=self.device,
             )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")

@@ -389,7 +389,7 @@ def randomize_labels(self: AliasDataset, *, seed: int, num_classes: int = None, 
 
 def get_class_indices_by_class(
     dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator
-) -> Dict[int]:
+) -> Dict[int, int]:
     class_counts = list(class_counts)
 
     subset_indices = {label: [] for label in range(len(class_counts))}
@@ -399,6 +399,7 @@ def get_class_indices_by_class(
     indices = generator.permutation(len(dataset))
     for index in indices:
         _, y = dataset[index]
+        y = y.item()
 
         if class_counts[y] > 0:
             subset_indices[y].append(index)
@@ -425,7 +426,7 @@ def get_balanced_sample_indices(dataset: data.Dataset, *, num_classes, samples_p
 
 def get_balanced_sample_indices_by_class(
     dataset: data.Dataset, *, num_classes, samples_per_class, seed: int
-) -> Dict[int]:
+) -> Dict[int, int]:
     class_counts = [samples_per_class] * num_classes
     generator = np.random.default_rng(seed)
 

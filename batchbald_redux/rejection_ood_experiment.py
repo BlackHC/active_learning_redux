@@ -71,7 +71,7 @@ class RejectionOodExperiment:
     evaluation_set_size: int = 10 * 10
     validation_split_random_state: int = 0
     initial_training_set_size: int = 20
-    samples_per_epoch: int = 5056
+    min_samples_per_epoch: int = 5056
     mnist_repetitions: float = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[
@@ -108,8 +108,8 @@ class RejectionOodExperiment:
             train_dataset = train_dataset * self.mnist_repetitions
 
         num_classes = train_dataset.get_num_classes()
-        initial_samples_per_class = self.initial_training_set_size / num_classes
-        evaluation_set_samples_per_class = self.evaluation_set_size / num_classes
+        initial_samples_per_class = self.initial_training_set_size // num_classes
+        evaluation_set_samples_per_class = self.evaluation_set_size // num_classes
         samples_per_class = initial_samples_per_class + evaluation_set_samples_per_class
         balanced_samples_indices = get_balanced_sample_indices_by_class(
             train_dataset,
@@ -118,10 +118,10 @@ class RejectionOodExperiment:
             seed=self.validation_split_random_state,
         )
         initial_training_set_indices = [
-            idx for by_class in balanced_samples_indices for idx in by_class[:initial_samples_per_class]
+            idx for by_class in balanced_samples_indices.values() for idx in by_class[:initial_samples_per_class]
         ]
         evaluation_set_indices = [
-            idx for by_class in balanced_samples_indices for idx in by_class[initial_samples_per_class:]
+            idx for by_class in balanced_samples_indices.values() for idx in by_class[initial_samples_per_class:]
         ]
 
         # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.
@@ -141,7 +141,10 @@ class RejectionOodExperiment:
         active_learning_data = ActiveLearningData(train_dataset)
 
         active_learning_data.acquire_base_indices(initial_training_set_indices)
-        evaluation_dataset = active_learning_data.extract_dataset_from_base_indices(evaluation_set_indices)
+        evaluation_dataset = AliasDataset(
+            active_learning_data.extract_dataset_from_base_indices(evaluation_set_indices),
+            f"Evaluation Set ({len(evaluation_set_indices)} samples)",
+        )
 
         return ExperimentData(
             active_learning=active_learning_data,
@@ -174,8 +177,8 @@ class RejectionOodExperiment:
 
         train_loader = torch.utils.data.DataLoader(
             data.active_learning.training_dataset,
-            batch_size=64,
-            sampler=RandomFixedLengthSampler(data.active_learning.training_dataset, self.samples_per_epoch),
+            batch_size=self.training_batch_size,
+            sampler=RandomFixedLengthSampler(data.active_learning.training_dataset, self.min_samples_per_epoch),
             drop_last=True,
         )
         pool_loader = torch.utils.data.DataLoader(
@@ -237,13 +240,13 @@ class RejectionOodExperiment:
                 current_max_epochs = iteration_log["training"]["best_epoch"]
 
                 if self.evaluation_set_size:
-                    eval_dataset = data.active_learning.evaluation_dataset
+                    eval_dataset = data.evaluation_dataset
                 else:
                     eval_dataset = data.active_learning.pool_dataset
 
                 train_eval_model = self.create_train_eval_model(
                     dict(
-                        max_epochs=current_max_epochs,
+                        max_epochs=current_max_epochs + 2,
                         training_dataset=data.active_learning.training_dataset,
                         eval_dataset=eval_dataset,
                         validation_loader=validation_loader,

@@ -10,6 +10,7 @@ import torch
 import torch.nn
 import torch.utils.data
 
+from .active_learning import RandomFixedLengthSampler
 from .black_box_model_training import train
 from .consistent_mc_dropout import get_log_mean_probs
 from .dataset_challenges import (
@@ -40,6 +41,7 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
     training_batch_size: int
     model_optimizer_factory: Type[ModelOptimizerFactory]
     trained_model: TrainedModel
+    min_samples_per_epoch: int
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
@@ -51,7 +53,10 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
         eval_self_distillation_dataset = ReplaceTargetsDataset(dataset=train_eval_dataset, targets=eval_log_probs_N_C)
         train_eval_self_distillation_loader = torch.utils.data.DataLoader(
-            eval_self_distillation_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
+            eval_self_distillation_dataset,
+            batch_size=self.training_batch_size,
+            sampler=RandomFixedLengthSampler(eval_self_distillation_dataset, self.min_samples_per_epoch),
+            drop_last=True,
         )
 
         eval_model_optimizer = self.model_optimizer_factory().create_model_optimizer()
@@ -88,6 +93,7 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
     validation_loader: torch.utils.data.DataLoader
     training_batch_size: int
     model_optimizer_factory: ModelOptimizerFactory
+    min_samples_per_epoch: int
 
     def __call__(self, *, training_log, device):
         # TODO: support one_hot!
@@ -96,7 +102,8 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
             [self.training_dataset, RandomLabelsDataset(self.eval_dataset, seed=0)]
         )
         train_eval_loader = torch.utils.data.DataLoader(
-            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
+            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True,
+            sampler=RandomFixedLengthSampler(train_eval_dataset, self.min_samples_per_epoch)
         )
 
         eval_model_optimizer = self.model_optimizer_factory.create_model_optimizer()
@@ -133,13 +140,15 @@ class TrainExplicitEvalModel(TrainEvalModel):
     validation_loader: torch.utils.data.DataLoader
     training_batch_size: int
     model_optimizer_factory: ModelOptimizerFactory
+    min_samples_per_epoch: int
 
     def __call__(self, *, training_log, device):
         # TODO: support one_hot!
         # TODO: different seed needed!
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
         train_eval_loader = torch.utils.data.DataLoader(
-            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
+            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True,
+            sampler=RandomFixedLengthSampler(train_eval_dataset, self.min_samples_per_epoch),
         )
 
         eval_model_optimizer = self.model_optimizer_factory.create_model_optimizer()
