@@ -82,9 +82,9 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
     <span class="n">AdditiveGaussianNoise</span><span class="p">,</span>
     <span class="n">AliasDataset</span><span class="p">,</span>
     <span class="n">NamedDataset</span><span class="p">,</span>
-    <span class="n">get_balanced_sample_indices</span><span class="p">,</span>
     <span class="n">get_base_dataset_index</span><span class="p">,</span>
     <span class="n">get_target</span><span class="p">,</span>
+    <span class="n">get_balanced_sample_indices_by_class</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.datasets</span> <span class="kn">import</span> <span class="n">train_validation_split</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.di</span> <span class="kn">import</span> <span class="n">DependencyInjection</span>
@@ -93,7 +93,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 <span class="kn">from</span> <span class="nn">batchbald_redux.models</span> <span class="kn">import</span> <span class="n">MnistOptimizerFactory</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.train_eval_model</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TrainEvalModel</span><span class="p">,</span>
-    <span class="n">TrainSelfDistillationPoolModel</span><span class="p">,</span>
+    <span class="n">TrainSelfDistillationEvalModel</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.trained_model</span> <span class="kn">import</span> <span class="n">TrainedMCDropoutModel</span>
 </pre></div>
@@ -116,9 +116,34 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RejectionOodExperiment" class="doc_header"><code>class</code> <code>RejectionOodExperiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/rejection_ood_experiment.py#L48" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RejectionOodExperiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>450</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_eval_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>30</code></em>, <strong><code>training_batch_size</code></strong>:<code>int</code>=<em><code>64</code></em>, <strong><code>device</code></strong>:<code>str</code>=<em><code>'cuda'</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>validation_split_random_state</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>initial_training_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>repeated_mnist_repetitions</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>acquisition_function</code></strong>:<code>Union</code>[<code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#CandidateBatchComputer"><code>CandidateBatchComputer</code></a>], <code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#EvalCandidateBatchComputer"><code>EvalCandidateBatchComputer</code></a>]]=<em><code>BALD</code></em>, <strong><code>train_eval_model</code></strong>:<a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a>=<em><code>TrainSelfDistillationPoolModel</code></em>, <strong><code>model_optimizer_factory</code></strong>:<code>Type</code>[<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>]=<em><code>MnistOptimizerFactory</code></em>, <strong><code>acquisition_function_args</code></strong>:<code>dict</code>=<em><code>None</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
+<h2 id="ExperimentData" class="doc_header"><code>class</code> <code>ExperimentData</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/rejection_ood_experiment.py#L48" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ExperimentData</code>(<strong><code>active_learning</code></strong>:<a href="/batchbald_redux/active_learning.html#ActiveLearningData"><code>ActiveLearningData</code></a>, <strong><code>ood_dataset</code></strong>:<a href="/batchbald_redux/dataset_challenges.html#NamedDataset"><code>NamedDataset</code></a>, <strong><code>validation_dataset</code></strong>:<code>Dataset</code>, <strong><code>test_dataset</code></strong>:<code>Dataset</code>, <strong><code>evaluation_dataset</code></strong>:<code>Dataset</code>, <strong><code>initial_training_set_indices</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>evaluation_set_indices</code></strong>:<code>[&lt;class 'int'&gt;]</code>)</p>
 </blockquote>
-<p>RejectionOodExperiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 450, num_pool_samples: int = 20, num_eval_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 30, training_batch_size: int = 64, device: str = 'cuda', validation_set_size: int = 1024, validation_split_random_state: int = 0, initial_training_set_size: int = 20, samples_per_epoch: int = 5056, repeated_mnist_repetitions: int = 1, add_dataset_noise: bool = False, acquisition_function: Union[Type[batchbald_redux.acquisition_functions.CandidateBatchComputer], Type[batchbald_redux.acquisition_functions.EvalCandidateBatchComputer]] = &lt;class 'batchbald_redux.acquisition_functions.BALD'&gt;, train_eval_model: batchbald_redux.train_eval_model.TrainEvalModel = &lt;class 'batchbald_redux.train_eval_model.TrainSelfDistillationPoolModel'&gt;, model_optimizer_factory: Type[batchbald_redux.model_optimizer_factory.ModelOptimizerFactory] = &lt;class 'batchbald_redux.models.MnistOptimizerFactory'&gt;, acquisition_function_args: dict = None, temperature: float = 0.0)</p>
+<p>ExperimentData(active_learning: batchbald_redux.active_learning.ActiveLearningData, ood_dataset: batchbald_redux.dataset_challenges.NamedDataset, validation_dataset: torch.utils.data.dataset.Dataset, test_dataset: torch.utils.data.dataset.Dataset, evaluation_dataset: torch.utils.data.dataset.Dataset, initial_training_set_indices: [&lt;class 'int'&gt;], evaluation_set_indices: [&lt;class 'int'&gt;])</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="RejectionOodExperiment" class="doc_header"><code>class</code> <code>RejectionOodExperiment</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/rejection_ood_experiment.py#L59" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RejectionOodExperiment</code>(<strong><code>seed</code></strong>:<code>int</code>=<em><code>1337</code></em>, <strong><code>acquisition_size</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>max_training_set</code></strong>:<code>int</code>=<em><code>450</code></em>, <strong><code>num_pool_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_validation_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>30</code></em>, <strong><code>training_batch_size</code></strong>:<code>int</code>=<em><code>64</code></em>, <strong><code>device</code></strong>:<code>str</code>=<em><code>'cuda'</code></em>, <strong><code>validation_set_size</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>evaluation_set_size</code></strong>:<code>int</code>=<em><code>100</code></em>, <strong><code>validation_split_random_state</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>initial_training_set_size</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>=<em><code>5056</code></em>, <strong><code>mnist_repetitions</code></strong>:<code>float</code>=<em><code>1</code></em>, <strong><code>add_dataset_noise</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>acquisition_function</code></strong>:<code>Union</code>[<code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#CandidateBatchComputer"><code>CandidateBatchComputer</code></a>], <code>Type</code>[<a href="/batchbald_redux/acquisition_functions.html#EvalCandidateBatchComputer"><code>EvalCandidateBatchComputer</code></a>]]=<em><code>BALD</code></em>, <strong><code>train_eval_model</code></strong>:<a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a>=<em><code>TrainSelfDistillationEvalModel</code></em>, <strong><code>model_optimizer_factory</code></strong>:<code>Type</code>[<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>]=<em><code>MnistOptimizerFactory</code></em>, <strong><code>acquisition_function_args</code></strong>:<code>dict</code>=<em><code>None</code></em>, <strong><code>temperature</code></strong>:<code>float</code>=<em><code>0.0</code></em>)</p>
+</blockquote>
+<p>RejectionOodExperiment(seed: int = 1337, acquisition_size: int = 5, max_training_set: int = 450, num_pool_samples: int = 20, num_validation_samples: int = 20, num_training_samples: int = 1, num_patience_epochs: int = 3, max_training_epochs: int = 30, training_batch_size: int = 64, device: str = 'cuda', validation_set_size: int = 1024, evaluation_set_size: int = 100, validation_split_random_state: int = 0, initial_training_set_size: int = 20, samples_per_epoch: int = 5056, mnist_repetitions: float = 1, add_dataset_noise: bool = False, acquisition_function: Union[Type[batchbald_redux.acquisition_functions.CandidateBatchComputer], Type[batchbald_redux.acquisition_functions.EvalCandidateBatchComputer]] = &lt;class 'batchbald_redux.acquisition_functions.BALD'&gt;, train_eval_model: batchbald_redux.train_eval_model.TrainEvalModel = &lt;class 'batchbald_redux.train_eval_model.TrainSelfDistillationEvalModel'&gt;, model_optimizer_factory: Type[batchbald_redux.model_optimizer_factory.ModelOptimizerFactory] = &lt;class 'batchbald_redux.models.MnistOptimizerFactory'&gt;, acquisition_function_args: dict = None, temperature: float = 0.0)</p>
 
 </div>
 
@@ -138,43 +163,55 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ExperimentData</span><span class="p">:</span>
+    <span class="n">active_learning</span><span class="p">:</span> <span class="n">ActiveLearningData</span>
+    <span class="n">ood_dataset</span><span class="p">:</span> <span class="n">NamedDataset</span>
+    <span class="n">validation_dataset</span><span class="p">:</span> <span class="n">Dataset</span>
+    <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span>
+    <span class="n">evaluation_dataset</span><span class="p">:</span> <span class="n">Dataset</span>
+    <span class="n">initial_training_set_indices</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">evaluation_set_indices</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">RejectionOodExperiment</span><span class="p">:</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1337</span>
     <span class="n">acquisition_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">max_training_set</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">450</span>
     <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
-    <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">num_validation_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="n">training_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span>
     <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span>
     <span class="n">validation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">evaluation_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">10</span>
     <span class="n">validation_split_random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">initial_training_set_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5056</span>
-    <span class="n">repeated_mnist_repetitions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mnist_repetitions</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">add_dataset_noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">acquisition_function</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Type</span><span class="p">[</span><span class="n">CandidateBatchComputer</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">EvalCandidateBatchComputer</span><span class="p">]</span>
     <span class="p">]</span> <span class="o">=</span> <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">BALD</span>
-    <span class="n">train_eval_model</span><span class="p">:</span> <span class="n">TrainEvalModel</span> <span class="o">=</span> <span class="n">TrainSelfDistillationPoolModel</span>
+    <span class="n">train_eval_model</span><span class="p">:</span> <span class="n">TrainEvalModel</span> <span class="o">=</span> <span class="n">TrainSelfDistillationEvalModel</span>
     <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ModelOptimizerFactory</span><span class="p">]</span> <span class="o">=</span> <span class="n">MnistOptimizerFactory</span>
     <span class="n">acquisition_function_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-    <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_training_set_size</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">ActiveLearningData</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_experiment_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExperimentData</span><span class="p">:</span>
         <span class="c1"># num_classes = 10, input_size = 28</span>
-        <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">NamedDataset</span><span class="p">(</span>
+        <span class="n">full_train_dataset</span> <span class="o">=</span> <span class="n">NamedDataset</span><span class="p">(</span>
             <span class="n">FastMNIST</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="s2">&quot;FastMNIST (train)&quot;</span>
         <span class="p">)</span>
         <span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">FastFashionMNIST</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">NamedDataset</span><span class="p">(</span><span class="n">ood_dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;OoD Dataset (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ood_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span><span class="p">)</span>
 
         <span class="n">train_dataset</span><span class="p">,</span> <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">train_validation_split</span><span class="p">(</span>
-            <span class="n">full_train_dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
-            <span class="n">full_validation_dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
-            <span class="n">train_labels</span><span class="o">=</span><span class="n">train_dataset</span><span class="o">.</span><span class="n">get_targets</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+            <span class="n">full_train_dataset</span><span class="o">=</span><span class="n">full_train_dataset</span><span class="p">,</span>
+            <span class="n">full_validation_dataset</span><span class="o">=</span><span class="n">full_train_dataset</span><span class="p">,</span>
+            <span class="n">train_labels</span><span class="o">=</span><span class="n">full_train_dataset</span><span class="o">.</span><span class="n">get_targets</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
             <span class="n">validation_set_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_set_size</span><span class="p">,</span>
             <span class="n">validation_split_random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_split_random_state</span><span class="p">,</span>
         <span class="p">)</span>
@@ -184,17 +221,30 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
             <span class="n">validation_dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;FastMNIST (validation; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span>
         <span class="p">)</span>
 
+        <span class="c1"># If we reduce the train set, we need to do so before picking the initial train set.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_repetitions</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_repetitions</span>
+
         <span class="n">num_classes</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">get_num_classes</span><span class="p">()</span>
-        <span class="n">samples_per_class</span> <span class="o">=</span> <span class="n">initial_training_set_size</span> <span class="o">/</span> <span class="n">num_classes</span>
-        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">get_balanced_sample_indices</span><span class="p">(</span>
+        <span class="n">initial_samples_per_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_training_set_size</span> <span class="o">//</span> <span class="n">num_classes</span>
+        <span class="n">evaluation_set_samples_per_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_set_size</span> <span class="o">//</span> <span class="n">num_classes</span>
+        <span class="n">samples_per_class</span> <span class="o">=</span> <span class="n">initial_samples_per_class</span> <span class="o">+</span> <span class="n">evaluation_set_samples_per_class</span>
+        <span class="n">balanced_samples_indices</span> <span class="o">=</span> <span class="n">get_balanced_sample_indices_by_class</span><span class="p">(</span>
             <span class="n">train_dataset</span><span class="p">,</span>
             <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="n">samples_per_class</span><span class="o">=</span><span class="n">samples_per_class</span><span class="p">,</span>
             <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_split_random_state</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">idx</span> <span class="k">for</span> <span class="n">by_class</span> <span class="ow">in</span> <span class="n">balanced_samples_indices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">by_class</span><span class="p">[:</span><span class="n">initial_samples_per_class</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">evaluation_set_indices</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">idx</span> <span class="k">for</span> <span class="n">by_class</span> <span class="ow">in</span> <span class="n">balanced_samples_indices</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">by_class</span><span class="p">[</span><span class="n">initial_samples_per_class</span><span class="p">:]</span>
+        <span class="p">]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span>
+        <span class="c1"># If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_repetitions</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnist_repetitions</span>
 
         <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span> <span class="o">+</span> <span class="n">ood_dataset</span><span class="o">.</span><span class="n">constant_target</span><span class="p">(</span>
             <span class="n">target</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">train_dataset</span><span class="o">.</span><span class="n">get_num_classes</span><span class="p">()</span>
@@ -208,9 +258,21 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
         <span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
 
-        <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
+        <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire_base_indices</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
+        <span class="n">evaluation_dataset</span> <span class="o">=</span> <span class="n">AliasDataset</span><span class="p">(</span>
+            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_base_indices</span><span class="p">(</span><span class="n">evaluation_set_indices</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;Evaluation Set (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">evaluation_set_indices</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">active_learning_data</span><span class="p">,</span> <span class="n">validation_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">initial_training_set_indices</span>
+        <span class="k">return</span> <span class="n">ExperimentData</span><span class="p">(</span>
+            <span class="n">active_learning</span><span class="o">=</span><span class="n">active_learning_data</span><span class="p">,</span>
+            <span class="n">ood_dataset</span><span class="o">=</span><span class="n">ood_dataset</span><span class="p">,</span>
+            <span class="n">validation_dataset</span><span class="o">=</span><span class="n">validation_dataset</span><span class="p">,</span>
+            <span class="n">test_dataset</span><span class="o">=</span><span class="n">test_dataset</span><span class="p">,</span>
+            <span class="n">evaluation_dataset</span><span class="o">=</span><span class="n">evaluation_dataset</span><span class="p">,</span>
+            <span class="n">initial_training_set_indices</span><span class="o">=</span><span class="n">initial_training_set_indices</span><span class="p">,</span>
+            <span class="n">evaluation_set_indices</span><span class="o">=</span><span class="n">evaluation_set_indices</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># Simple Dependency Injection</span>
     <span class="k">def</span> <span class="nf">create_acquisition_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -226,29 +288,23 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
         <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="c1"># Active Learning setup</span>
-        <span class="n">active_learning_data</span><span class="p">,</span> <span class="n">validation_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">initial_training_set_size</span>
-        <span class="p">)</span>
-        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;dataset_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">training</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">),</span> <span class="n">test</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">))</span>
-        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
-
-        <span class="c1"># initial_training_set_indices = active_learning_data.get_random_pool_indices(self.initial_set_size)</span>
-        <span class="c1"># initial_training_set_indices = get_balanced_sample_indices(</span>
-        <span class="c1">#     active_learning_data.pool_dataset, 10, self.initial_set_size // 10</span>
-        <span class="c1"># )</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_experiment_data</span><span class="p">()</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;dataset_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">training</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">),</span> <span class="n">test</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">))</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">initial_training_set_indices</span>
+        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;evaluation_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">evaluation_set_indices</span>
 
         <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
-            <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
             <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">pool_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
 
-        <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">validation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">active_learning_steps</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;active_learning_steps&quot;</span><span class="p">]</span>
@@ -257,7 +313,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
         <span class="c1"># Active Training Loop</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">training_set_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">)</span>
+            <span class="n">training_set_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set size </span><span class="si">{</span><span class="n">training_set_size</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
 
             <span class="c1"># iteration_log = dict(training={}, pool_training={}, evaluation_metrics=None, acquisition=None)</span>
@@ -272,7 +328,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                 <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
                 <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
                 <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
-                <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
+                <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
                 <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span>
                 <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
                 <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
@@ -282,7 +338,10 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
             <span class="p">)</span>
 
             <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
+                <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;evaluation_metrics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evaluation_metrics</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Perf after training </span><span class="si">{</span><span class="n">evaluation_metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -291,18 +350,23 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
 
-            <span class="n">trained_model</span> <span class="o">=</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">trained_model</span> <span class="o">=</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_function</span><span class="p">,</span> <span class="n">CandidateBatchComputer</span><span class="p">):</span>
                 <span class="n">candidate_batch</span> <span class="o">=</span> <span class="n">acquisition_function</span><span class="o">.</span><span class="n">compute_candidate_batch</span><span class="p">(</span><span class="n">trained_model</span><span class="p">,</span> <span class="n">pool_loader</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquisition_function</span><span class="p">,</span> <span class="n">EvalCandidateBatchComputer</span><span class="p">):</span>
                 <span class="n">current_max_epochs</span> <span class="o">=</span> <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">][</span><span class="s2">&quot;best_epoch&quot;</span><span class="p">]</span>
 
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_set_size</span><span class="p">:</span>
+                    <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">evaluation_dataset</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">pool_dataset</span>
+
                 <span class="n">train_eval_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_train_eval_model</span><span class="p">(</span>
                     <span class="nb">dict</span><span class="p">(</span>
-                        <span class="n">max_epochs</span><span class="o">=</span><span class="n">current_max_epochs</span><span class="p">,</span>
-                        <span class="n">training_dataset</span><span class="o">=</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
-                        <span class="n">pool_dataset</span><span class="o">=</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span>
+                        <span class="n">max_epochs</span><span class="o">=</span><span class="n">current_max_epochs</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="n">training_dataset</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span>
+                        <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
                         <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
                         <span class="n">trained_model</span><span class="o">=</span><span class="n">trained_model</span><span class="p">,</span>
                     <span class="p">)</span>
@@ -318,25 +382,25 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown acquisition function </span><span class="si">{</span><span class="n">acquisition_function</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
 
             <span class="n">candidate_global_indices</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">get_base_dataset_index</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+                <span class="n">get_base_dataset_index</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
                 <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span>
             <span class="p">]</span>
             <span class="n">candidate_labels</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">get_target</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">base_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_global_indices</span>
+                <span class="n">get_target</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span>
             <span class="p">]</span>
 
             <span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;acquisition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">indices</span><span class="o">=</span><span class="n">candidate_global_indices</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">candidate_labels</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">scores</span>
             <span class="p">)</span>
 
-            <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">candidate_labels</span><span class="p">)</span> <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="p">)</span>
 
             <span class="nb">print</span><span class="p">(</span><span class="n">candidate_batch</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">get_base_dataset_index</span><span class="p">(</span><span class="n">active_learning_data</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
+                    <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">get_base_dataset_index</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
                     <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">candidate_batch</span><span class="o">.</span><span class="n">indices</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -359,7 +423,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">RejectionOodExperiment</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="mi">20</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">base_dataset</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">RejectionOodExperiment</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load_experiment_data</span><span class="p">()</span><span class="o">.</span><span class="n">active_learning</span><span class="o">.</span><span class="n">base_dataset</span>
 </pre></div>
 
     </div>
@@ -393,12 +457,28 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">experiment</span> <span class="o">=</span> <span class="n">RejectionOodExperiment</span><span class="p">(</span>
-    <span class="n">seed</span><span class="o">=</span><span class="mi">1120</span><span class="p">,</span>
-    <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">max_training_set</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span>
-    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">TemperedBALD</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_training_set</span><span class="o">=</span><span class="mi">20</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">BALD</span><span class="p">,</span>
+    <span class="n">evaluation_set_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">experiment</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">RejectionOodExperiment</span><span class="p">(</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_training_set</span><span class="o">=</span><span class="mi">20</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">EvalBALD</span><span class="p">,</span>
+    <span class="n">evaluation_set_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -416,134 +496,53 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Resolved: TemperedBALD with {&#39;acquisition_size&#39;: 10, &#39;temperature&#39;: 5}
-Creating: TemperedBALD(acquisition_size=10,temperature=5)
-Training set size 20:
-Epoch metrics: {&#39;accuracy&#39;: 0.6572265625, &#39;crossentropy&#39;: 2.2945398092269897}
-Epoch metrics: {&#39;accuracy&#39;: 0.6416015625, &#39;crossentropy&#39;: 2.777782678604126}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.6484375, &#39;crossentropy&#39;: 2.740150570869446}
-RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.642578125, &#39;crossentropy&#39;: 2.9997478723526}
-RestoringEarlyStopping: 3 / 3
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.2945398092269897)
-RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.6878, &#39;crossentropy&#39;: 1.9129835971832276}
-CandidateBatch(scores=[0.32193589210510254, 0.5513065457344055, 0.5692332983016968, 0.43143993616104126, 0.38846367597579956, 0.6346601247787476, 0.509638637304306, 0.44757550954818726, 0.7795441150665283, 0.4841806888580322], indices=[89078, 98449, 1179, 89102, 73254, 105104, 57734, 43078, 5333, 22445])
-[(89078, DatasetIndex(dataset=&#39;OoD Dataset (60000 samples)&#39;, index=30129)), (98449, DatasetIndex(dataset=&#39;OoD Dataset (60000 samples)&#39;, index=39502)), (1179, DatasetIndex(dataset=&#39;FastMNIST (train)&#39;, index=18586)), (89102, DatasetIndex(dataset=&#39;OoD Dataset (60000 samples)&#39;, index=30154)), (73254, DatasetIndex(dataset=&#39;OoD Dataset (60000 samples)&#39;, index=14304)), (105104, DatasetIndex(dataset=&#39;OoD Dataset (60000 samples)&#39;, index=46158)), (57734, DatasetIndex(dataset=&#39;FastMNIST (train)&#39;, index=55194)), (43078, DatasetIndex(dataset=&#39;FastMNIST (train)&#39;, index=6317)), (5333, DatasetIndex(dataset=&#39;FastMNIST (train)&#39;, index=10159)), (22445, DatasetIndex(dataset=&#39;FastMNIST (train)&#39;, index=18748))]
-Acquiring (label, score)s: 9 (0.3219), 2 (0.5513), 2 (0.5692), 2 (0.4314), 9 (0.3885), 4 (0.6347), 0 (0.5096), 9 (0.4476), 0 (0.7795), 0 (0.4842)
-Training set size 30:
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Current run is terminating due to exception: CUDA error: CUBLAS_STATUS_EXECUTION_FAILED when calling `cublasSgemm( handle, opa, opb, m, n, k, &amp;alpha, a, lda, b, ldb, &amp;beta, c, ldc)`.
-Engine run is terminating due to exception: CUDA error: CUBLAS_STATUS_EXECUTION_FAILED when calling `cublasSgemm( handle, opa, opb, m, n, k, &amp;alpha, a, lda, b, ldb, &amp;beta, c, ldc)`.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_text output_error">
 <pre>
 <span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">RuntimeError</span>                              Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-6-518aa2a07a66&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-intense-fg ansi-bold">     13</span> 
-<span class="ansi-green-intense-fg ansi-bold">     14</span> results <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
-<span class="ansi-green-fg">---&gt; 15</span><span class="ansi-red-fg"> </span>experiment<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">)</span>
+<span class="ansi-red-fg">NotImplementedError</span>                       Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-13-0e3db676a8a9&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">     14</span> 
+<span class="ansi-green-intense-fg ansi-bold">     15</span> results <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
+<span class="ansi-green-fg">---&gt; 16</span><span class="ansi-red-fg"> </span>experiment<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>results<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     17</span> 
+<span class="ansi-green-intense-fg ansi-bold">     18</span> experiment = RejectionOodExperiment(
 
-<span class="ansi-green-fg">&lt;ipython-input-4-a8ed471890e8&gt;</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, store)</span>
-<span class="ansi-green-intense-fg ansi-bold">    117</span>             model_optimizer <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>model_optimizer_factory<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>create_model_optimizer<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    118</span> 
-<span class="ansi-green-fg">--&gt; 119</span><span class="ansi-red-fg">             train(
-</span><span class="ansi-green-intense-fg ansi-bold">    120</span>                 model<span class="ansi-blue-fg">=</span>model_optimizer<span class="ansi-blue-fg">.</span>model<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    121</span>                 optimizer<span class="ansi-blue-fg">=</span>model_optimizer<span class="ansi-blue-fg">.</span>optimizer<span class="ansi-blue-fg">,</span>
-
-<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/black_box_model_training.py</span> in <span class="ansi-cyan-fg">train</span><span class="ansi-blue-fg">(model, training_samples, validation_samples, train_loader, validation_loader, patience, max_epochs, device, training_log, loss, validation_loss, optimizer)</span>
-<span class="ansi-green-intense-fg ansi-bold">    122</span> 
-<span class="ansi-green-intense-fg ansi-bold">    123</span>     <span class="ansi-red-fg"># Kick everything off</span>
-<span class="ansi-green-fg">--&gt; 124</span><span class="ansi-red-fg">     </span>trainer<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>train_loader<span class="ansi-blue-fg">,</span> max_epochs<span class="ansi-blue-fg">=</span>max_epochs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">&lt;ipython-input-9-b6837ab48db9&gt;</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, store)</span>
 <span class="ansi-green-intense-fg ansi-bold">    125</span> 
-<span class="ansi-green-intense-fg ansi-bold">    126</span>     <span class="ansi-green-fg">if</span> early_stopping<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    126</span>         <span class="ansi-red-fg"># Active Learning setup</span>
+<span class="ansi-green-fg">--&gt; 127</span><span class="ansi-red-fg">         </span>data <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>load_experiment_data<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    128</span>         store<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;dataset_info&#34;</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> dict<span class="ansi-blue-fg">(</span>training<span class="ansi-blue-fg">=</span>repr<span class="ansi-blue-fg">(</span>data<span class="ansi-blue-fg">.</span>active_learning<span class="ansi-blue-fg">.</span>base_dataset<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> test<span class="ansi-blue-fg">=</span>repr<span class="ansi-blue-fg">(</span>data<span class="ansi-blue-fg">.</span>test_dataset<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    129</span>         store<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;initial_training_set_indices&#34;</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> data<span class="ansi-blue-fg">.</span>initial_training_set_indices
 
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, data, max_epochs, epoch_length, seed)</span>
-<span class="ansi-green-intense-fg ansi-bold">    689</span> 
-<span class="ansi-green-intense-fg ansi-bold">    690</span>         self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>dataloader <span class="ansi-blue-fg">=</span> data
-<span class="ansi-green-fg">--&gt; 691</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_internal_run<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    692</span> 
-<span class="ansi-green-intense-fg ansi-bold">    693</span>     <span class="ansi-blue-fg">@</span>staticmethod
+<span class="ansi-green-fg">&lt;ipython-input-9-b6837ab48db9&gt;</span> in <span class="ansi-cyan-fg">load_experiment_data</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">     65</span>             train_dataset <span class="ansi-blue-fg">=</span> train_dataset <span class="ansi-blue-fg">*</span> self<span class="ansi-blue-fg">.</span>mnist_repetitions
+<span class="ansi-green-intense-fg ansi-bold">     66</span> 
+<span class="ansi-green-fg">---&gt; 67</span><span class="ansi-red-fg">         </span>num_classes <span class="ansi-blue-fg">=</span> train_dataset<span class="ansi-blue-fg">.</span>get_num_classes<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     68</span>         initial_samples_per_class <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>initial_training_set_size <span class="ansi-blue-fg">//</span> num_classes
+<span class="ansi-green-intense-fg ansi-bold">     69</span>         evaluation_set_samples_per_class <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>evaluation_set_size <span class="ansi-blue-fg">//</span> num_classes
 
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    760</span>             self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
-<span class="ansi-green-intense-fg ansi-bold">    761</span>             self<span class="ansi-blue-fg">.</span>logger<span class="ansi-blue-fg">.</span>error<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Engine run is terminating due to exception: %s.&#34;</span><span class="ansi-blue-fg">,</span> str<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 762</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_handle_exception<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    763</span> 
-<span class="ansi-green-intense-fg ansi-bold">    764</span>         self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/dataset_challenges.py</span> in <span class="ansi-cyan-fg">get_num_classes</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">     74</span> 
+<span class="ansi-green-intense-fg ansi-bold">     75</span>     <span class="ansi-green-fg">def</span> get_num_classes<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 76</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> get_num_classes<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     77</span> 
+<span class="ansi-green-intense-fg ansi-bold">     78</span>     <span class="ansi-green-fg">def</span> get_target<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> index<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
 
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_handle_exception</span><span class="ansi-blue-fg">(self, e)</span>
-<span class="ansi-green-intense-fg ansi-bold">    465</span>             self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>EXCEPTION_RAISED<span class="ansi-blue-fg">,</span> e<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    466</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 467</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> e
-<span class="ansi-green-intense-fg ansi-bold">    468</span> 
-<span class="ansi-green-intense-fg ansi-bold">    469</span>     <span class="ansi-blue-fg">@</span>property
+<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/dataset_challenges.py</span> in <span class="ansi-cyan-fg">get_num_classes</span><span class="ansi-blue-fg">(dataset)</span>
+<span class="ansi-green-intense-fg ansi-bold">    121</span>         <span class="ansi-green-fg">return</span> get_num_classes<span class="ansi-blue-fg">(</span>dataset<span class="ansi-blue-fg">.</span>datasets<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    122</span>     <span class="ansi-green-fg">elif</span> isinstance<span class="ansi-blue-fg">(</span>dataset<span class="ansi-blue-fg">,</span> data<span class="ansi-blue-fg">.</span>Subset<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 123</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> get_num_classes<span class="ansi-blue-fg">(</span>dataset<span class="ansi-blue-fg">.</span>dataset<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    124</span>     <span class="ansi-green-fg">elif</span> isinstance<span class="ansi-blue-fg">(</span>dataset<span class="ansi-blue-fg">,</span> torchvision<span class="ansi-blue-fg">.</span>datasets<span class="ansi-blue-fg">.</span>MNIST<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    125</span>         <span class="ansi-green-fg">return</span> len<span class="ansi-blue-fg">(</span>dataset<span class="ansi-blue-fg">.</span>classes<span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    728</span>                     self<span class="ansi-blue-fg">.</span>_setup_engine<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    729</span> 
-<span class="ansi-green-fg">--&gt; 730</span><span class="ansi-red-fg">                 </span>time_taken <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_run_once_on_dataset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    731</span>                 <span class="ansi-red-fg"># time is available for handlers but must be update after fire</span>
-<span class="ansi-green-intense-fg ansi-bold">    732</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">[</span>Events<span class="ansi-blue-fg">.</span>EPOCH_COMPLETED<span class="ansi-blue-fg">.</span>name<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> time_taken
+<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/dataset_challenges.py</span> in <span class="ansi-cyan-fg">get_num_classes</span><span class="ansi-blue-fg">(dataset)</span>
+<span class="ansi-green-intense-fg ansi-bold">    131</span>         <span class="ansi-green-fg">return</span> dataset<span class="ansi-blue-fg">.</span>num_classes
+<span class="ansi-green-intense-fg ansi-bold">    132</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 133</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">raise</span> NotImplementedError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;Unrecognized dataset {dataset}!&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    134</span> 
+<span class="ansi-green-intense-fg ansi-bold">    135</span> 
 
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_run_once_on_dataset</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    826</span>         <span class="ansi-green-fg">except</span> Exception <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    827</span>             self<span class="ansi-blue-fg">.</span>logger<span class="ansi-blue-fg">.</span>error<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Current run is terminating due to exception: %s.&#34;</span><span class="ansi-blue-fg">,</span> str<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 828</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_handle_exception<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    829</span> 
-<span class="ansi-green-intense-fg ansi-bold">    830</span>         <span class="ansi-green-fg">return</span> time<span class="ansi-blue-fg">.</span>time<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-</span> start_time
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_handle_exception</span><span class="ansi-blue-fg">(self, e)</span>
-<span class="ansi-green-intense-fg ansi-bold">    465</span>             self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>EXCEPTION_RAISED<span class="ansi-blue-fg">,</span> e<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    466</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 467</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> e
-<span class="ansi-green-intense-fg ansi-bold">    468</span> 
-<span class="ansi-green-intense-fg ansi-bold">    469</span>     <span class="ansi-blue-fg">@</span>property
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_run_once_on_dataset</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    809</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>iteration <span class="ansi-blue-fg">+=</span> <span class="ansi-cyan-fg">1</span>
-<span class="ansi-green-intense-fg ansi-bold">    810</span>                 self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_STARTED<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 811</span><span class="ansi-red-fg">                 </span>self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>output <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_process_function<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>batch<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    812</span>                 self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_COMPLETED<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    813</span> 
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/__init__.py</span> in <span class="ansi-cyan-fg">_update</span><span class="ansi-blue-fg">(engine, batch)</span>
-<span class="ansi-green-intense-fg ansi-bold">     99</span>         y_pred <span class="ansi-blue-fg">=</span> model<span class="ansi-blue-fg">(</span>x<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    100</span>         loss <span class="ansi-blue-fg">=</span> loss_fn<span class="ansi-blue-fg">(</span>y_pred<span class="ansi-blue-fg">,</span> y<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">--&gt; 101</span><span class="ansi-red-fg">         </span>loss<span class="ansi-blue-fg">.</span>backward<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    102</span> 
-<span class="ansi-green-intense-fg ansi-bold">    103</span>         <span class="ansi-green-fg">if</span> on_tpu<span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/torch/tensor.py</span> in <span class="ansi-cyan-fg">backward</span><span class="ansi-blue-fg">(self, gradient, retain_graph, create_graph)</span>
-<span class="ansi-green-intense-fg ansi-bold">    219</span>                 retain_graph<span class="ansi-blue-fg">=</span>retain_graph<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    220</span>                 create_graph=create_graph)
-<span class="ansi-green-fg">--&gt; 221</span><span class="ansi-red-fg">         </span>torch<span class="ansi-blue-fg">.</span>autograd<span class="ansi-blue-fg">.</span>backward<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> gradient<span class="ansi-blue-fg">,</span> retain_graph<span class="ansi-blue-fg">,</span> create_graph<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    222</span> 
-<span class="ansi-green-intense-fg ansi-bold">    223</span>     <span class="ansi-green-fg">def</span> register_hook<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> hook<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/torch/autograd/__init__.py</span> in <span class="ansi-cyan-fg">backward</span><span class="ansi-blue-fg">(tensors, grad_tensors, retain_graph, create_graph, grad_variables)</span>
-<span class="ansi-green-intense-fg ansi-bold">    128</span>         retain_graph <span class="ansi-blue-fg">=</span> create_graph
-<span class="ansi-green-intense-fg ansi-bold">    129</span> 
-<span class="ansi-green-fg">--&gt; 130</span><span class="ansi-red-fg">     Variable._execution_engine.run_backward(
-</span><span class="ansi-green-intense-fg ansi-bold">    131</span>         tensors<span class="ansi-blue-fg">,</span> grad_tensors_<span class="ansi-blue-fg">,</span> retain_graph<span class="ansi-blue-fg">,</span> create_graph<span class="ansi-blue-fg">,</span>
-<span class="ansi-green-intense-fg ansi-bold">    132</span>         allow_unreachable=True)  # allow_unreachable flag
-
-<span class="ansi-red-fg">RuntimeError</span>: CUDA error: CUBLAS_STATUS_EXECUTION_FAILED when calling `cublasSgemm( handle, opa, opb, m, n, k, &amp;alpha, a, lda, b, ldb, &amp;beta, c, ldc)`</pre>
+<span class="ansi-red-fg">NotImplementedError</span>: Unrecognized dataset &#39;FastMNIST (train)&#39;!</pre>
 </div>
 </div>
 
@@ -564,44 +563,6 @@ Engine run is terminating due to exception: CUDA error: CUBLAS_STATUS_EXECUTION_
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;initial_training_set_indices&#39;: [38043,
-  40091,
-  17418,
-  2094,
-  39879,
-  3133,
-  5011,
-  40683,
-  54379,
-  24287,
-  9849,
-  59305,
-  39508,
-  39356,
-  8758,
-  52579,
-  13655,
-  7636,
-  21562,
-  41329],
- &#39;dataset_info&#39;: {&#39;training&#39;: &#34;(FastMNIST (train; 58976 samples)) + (&#39;OoD Dataset (60000 samples)&#39; | constant_target{&#39;target&#39;: tensor(-1, device=&#39;cuda:0&#39;), &#39;num_classes&#39;: 10})&#34;,
-  &#39;test&#39;: &#34;&#39;FastMNIST (test, 10000 samples)&#39;&#34;},
- &#39;active_learning_steps&#39;: [{&#39;training&#39;: {&#39;epochs&#39;: []}}]}</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -629,80 +590,6 @@ Engine run is terminating due to exception: CUDA error: CUBLAS_STATUS_EXECUTION_
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Training set size 20:
-RestoringEarlyStopping: Restoring best parameters. (Score: -6.529030114412308)
-RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.5367, &#39;crossentropy&#39;: 6.438035237884521}
-RestoringEarlyStopping: Restoring best parameters. (Score: -5.1637596152722836)
-RestoringEarlyStopping: Restoring optimizer.
-Acquiring (label, score)s: 8 (0.8711), 8 (0.8687), 3 (0.876), 3 (0.8465), 3 (0.8811)
-Training set size 25:
-RestoringEarlyStopping: Restoring best parameters. (Score: -4.6851686127483845)
-RestoringEarlyStopping: Restoring optimizer.
-Perf after training {&#39;accuracy&#39;: 0.6256, &#39;crossentropy&#39;: 4.484497045135498}
-Done.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;initial_training_set_indices&#39;: [38043,
-  40091,
-  17418,
-  2094,
-  39879,
-  3133,
-  5011,
-  40683,
-  54379,
-  24287,
-  9849,
-  59305,
-  39508,
-  39356,
-  8758,
-  52579,
-  13655,
-  7636,
-  21562,
-  41329],
- &#39;active_learning_steps&#39;: [{&#39;training&#39;: {&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.538818359375,
-      &#39;crossentropy&#39;: 6.529030114412308}],
-    &#39;best_epoch&#39;: 1},
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.5367,
-    &#39;crossentropy&#39;: 6.438035237884521},
-   &#39;pool_training&#39;: {&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.531005859375,
-      &#39;crossentropy&#39;: 5.1637596152722836}],
-    &#39;best_epoch&#39;: 1},
-   &#39;acquisition&#39;: {&#39;indices&#39;: [63338, 10856, 63452, 81864, 109287],
-    &#39;labels&#39;: [8, 8, 3, 3, 3],
-    &#39;scores&#39;: [0.8710822958846325,
-     0.8687216999221631,
-     0.8759664372823723,
-     0.8464646732511746,
-     0.8810812784952251]}},
-  {&#39;training&#39;: {&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.62255859375,
-      &#39;crossentropy&#39;: 4.6851686127483845}],
-    &#39;best_epoch&#39;: 1},
-   &#39;evalution_metrics&#39;: {&#39;accuracy&#39;: 0.6256,
-    &#39;crossentropy&#39;: 4.484497045135498}}]}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -716,13 +603,14 @@ Done.
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">RejectionOodExperiment</span><span class="p">(</span>
         <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-        <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">BALD</span><span class="p">,</span>
+        <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">TemperedEvalBALD</span><span class="p">,</span>
         <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
         <span class="n">num_pool_samples</span><span class="o">=</span><span class="n">num_pool_samples</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">]</span>
 <span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
     <span class="n">RejectionOodExperiment</span><span class="p">(</span>
         <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
@@ -765,22 +653,6 @@ Done.
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>40</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 

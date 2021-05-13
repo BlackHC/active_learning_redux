@@ -18,6 +18,7 @@
     "Rejection OOD Experiment": "rejection_ood_experiment.html",
     "Uniform Target OOD Experiment": "uniform_target_ood_experiment.html",
     "Results Visualizations": "X_arxiv_draft_report_plots.html",
+    "Results OOD Baselines Visualizations": "B_results_visualization_ood_baselines.html",
     "Analysis of BALD scores during Training": "U_BALD_score_analysis.html",
     "Dependency Injection": "Z_dependency_injection.html"
   }

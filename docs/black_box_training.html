@@ -58,7 +58,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L32" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L33" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>:param model:
 :param train_loader:
@@ -91,7 +91,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L133" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L136" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -115,7 +115,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L159" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L162" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -193,7 +193,9 @@ nb_path: "07_black_box_training.ipynb"
 
     <span class="n">enable_tqdm_pbars</span> <span class="o">=</span> <span class="n">is_run_from_ipython</span><span class="p">()</span>
 
-    <span class="n">setup_common_training_handlers</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">with_pbars</span><span class="o">=</span><span class="n">enable_tqdm_pbars</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
+    <span class="n">setup_common_training_handlers</span><span class="p">(</span>
+        <span class="n">trainer</span><span class="p">,</span> <span class="n">with_pbars</span><span class="o">=</span><span class="n">enable_tqdm_pbars</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">enable_tqdm_pbars</span><span class="p">:</span>
         <span class="n">ProgressBar</span><span class="p">(</span><span class="n">persist</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span>
@@ -202,7 +204,7 @@ nb_path: "07_black_box_training.ipynb"
             <span class="n">event_name</span><span class="o">=</span><span class="n">Events</span><span class="o">.</span><span class="n">ITERATION_COMPLETED</span><span class="p">(</span><span class="n">every</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ignite_progress_bar</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Training&quot;</span><span class="p">,</span> <span class="n">log_interval</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
+        <span class="n">ignite_progress_bar</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="k">lambda</span> <span class="n">engine</span><span class="p">:</span> <span class="s2">&quot;Training&quot;</span><span class="p">,</span> <span class="n">log_interval</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
 
     <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">epochs_log</span> <span class="o">=</span> <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>

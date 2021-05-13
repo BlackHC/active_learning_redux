@@ -43,6 +43,7 @@ nb_path: "07c_train_eval_model.ipynb"
 <span class="kn">import</span> <span class="nn">torch.nn</span>
 <span class="kn">import</span> <span class="nn">torch.utils.data</span>
 
+<span class="kn">from</span> <span class="nn">batchbald_redux.active_learning</span> <span class="kn">import</span> <span class="n">RandomFixedLengthSampler</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">train</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">get_log_mean_probs</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.dataset_challenges</span> <span class="kn">import</span> <span class="p">(</span>
@@ -71,7 +72,7 @@ nb_path: "07c_train_eval_model.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TrainEvalModel" class="doc_header"><code>class</code> <code>TrainEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L25" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainEvalModel</code>()</p>
+<h2 id="TrainEvalModel" class="doc_header"><code>class</code> <code>TrainEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L26" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainEvalModel</code>()</p>
 </blockquote>
 
 </div>
@@ -95,9 +96,9 @@ nb_path: "07c_train_eval_model.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TrainSelfDistillationPoolModel" class="doc_header"><code>class</code> <code>TrainSelfDistillationPoolModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L31" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainSelfDistillationPoolModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_eval_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>pool_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<code>Type</code>[<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>], <strong><code>trained_model</code></strong>:<a href="/batchbald_redux/trained_model.html#TrainedModel"><code>TrainedModel</code></a>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
+<h2 id="TrainSelfDistillationEvalModel" class="doc_header"><code>class</code> <code>TrainSelfDistillationEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L32" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainSelfDistillationEvalModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_validation_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>eval_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<code>Type</code>[<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>], <strong><code>trained_model</code></strong>:<a href="/batchbald_redux/trained_model.html#TrainedModel"><code>TrainedModel</code></a>, <strong><code>samples_per_epoch</code></strong>:<code>int</code>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
 </blockquote>
-<p>TrainSelfDistillationPoolModel(num_pool_samples: int, num_training_samples: int, num_eval_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, pool_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: Type[batchbald_redux.model_optimizer_factory.ModelOptimizerFactory], trained_model: batchbald_redux.trained_model.TrainedModel)</p>
+<p>TrainSelfDistillationEvalModel(num_pool_samples: int, num_training_samples: int, num_validation_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, eval_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: Type[batchbald_redux.model_optimizer_factory.ModelOptimizerFactory], trained_model: batchbald_redux.trained_model.TrainedModel, samples_per_epoch: int)</p>
 
 </div>
 
@@ -120,9 +121,9 @@ nb_path: "07c_train_eval_model.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TrainRandomLabelPoolModel" class="doc_header"><code>class</code> <code>TrainRandomLabelPoolModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L78" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainRandomLabelPoolModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_eval_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>pool_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
+<h2 id="TrainRandomLabelEvalModel" class="doc_header"><code>class</code> <code>TrainRandomLabelEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L86" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainRandomLabelEvalModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_validation_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>eval_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
 </blockquote>
-<p>TrainRandomLabelPoolModel(num_pool_samples: int, num_training_samples: int, num_eval_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, pool_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: batchbald_redux.model_optimizer_factory.ModelOptimizerFactory)</p>
+<p>TrainRandomLabelEvalModel(num_pool_samples: int, num_training_samples: int, num_validation_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, eval_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: batchbald_redux.model_optimizer_factory.ModelOptimizerFactory)</p>
 
 </div>
 
@@ -145,9 +146,9 @@ nb_path: "07c_train_eval_model.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TrainExplicitEvalModel" class="doc_header"><code>class</code> <code>TrainExplicitEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainExplicitEvalModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_eval_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>eval_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
+<h2 id="TrainExplicitEvalModel" class="doc_header"><code>class</code> <code>TrainExplicitEvalModel</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/train_eval_model.py#L131" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TrainExplicitEvalModel</code>(<strong><code>num_pool_samples</code></strong>:<code>int</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>, <strong><code>num_validation_samples</code></strong>:<code>int</code>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>training_dataset</code></strong>:<code>Dataset</code>, <strong><code>eval_dataset</code></strong>:<code>Dataset</code>, <strong><code>validation_loader</code></strong>:<code>DataLoader</code>, <strong><code>training_batch_size</code></strong>:<code>int</code>, <strong><code>model_optimizer_factory</code></strong>:<a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a>) :: <a href="/batchbald_redux/train_eval_model.html#TrainEvalModel"><code>TrainEvalModel</code></a></p>
 </blockquote>
-<p>TrainExplicitEvalModel(num_pool_samples: int, num_training_samples: int, num_eval_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, eval_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: batchbald_redux.model_optimizer_factory.ModelOptimizerFactory)</p>
+<p>TrainExplicitEvalModel(num_pool_samples: int, num_training_samples: int, num_validation_samples: int, num_patience_epochs: int, max_epochs: int, training_dataset: torch.utils.data.dataset.Dataset, eval_dataset: torch.utils.data.dataset.Dataset, validation_loader: torch.utils.data.dataloader.DataLoader, training_batch_size: int, model_optimizer_factory: batchbald_redux.model_optimizer_factory.ModelOptimizerFactory)</p>
 
 </div>
 
@@ -172,28 +173,35 @@ nb_path: "07c_train_eval_model.ipynb"
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TrainSelfDistillationPoolModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TrainSelfDistillationEvalModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
     <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_validation_samples</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">training_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
-    <span class="n">pool_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
     <span class="n">validation_loader</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span>
     <span class="n">training_batch_size</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ModelOptimizerFactory</span><span class="p">]</span>
     <span class="n">trained_model</span><span class="p">:</span> <span class="n">TrainedModel</span>
+    <span class="c1"># TODO: rename this to min_samples_per_epoch!</span>
+    <span class="n">samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">training_log</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
-        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">])</span>
-        <span class="n">eval_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">train_eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="p">])</span>
+        <span class="n">train_eval_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="n">eval_log_probs_N_C</span> <span class="o">=</span> <span class="n">get_log_mean_probs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trained_model</span><span class="o">.</span><span class="n">get_log_probs_N_K_C</span><span class="p">(</span><span class="n">eval_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">eval_log_probs_N_C</span> <span class="o">=</span> <span class="n">get_log_mean_probs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trained_model</span><span class="o">.</span><span class="n">get_log_probs_N_K_C</span><span class="p">(</span><span class="n">train_eval_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="n">eval_self_distillation_dataset</span> <span class="o">=</span> <span class="n">ReplaceTargetsDataset</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">eval_log_probs_N_C</span><span class="p">)</span>
+        <span class="n">eval_self_distillation_dataset</span> <span class="o">=</span> <span class="n">ReplaceTargetsDataset</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">train_eval_dataset</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="n">eval_log_probs_N_C</span><span class="p">)</span>
         <span class="n">train_eval_self_distillation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">eval_self_distillation_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">eval_self_distillation_dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">eval_self_distillation_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_epoch</span><span class="p">),</span>
+            <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">eval_model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="p">()</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
@@ -206,7 +214,7 @@ nb_path: "07c_train_eval_model.ipynb"
             <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">validation_loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">(),</span>
             <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
-            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
             <span class="n">train_loader</span><span class="o">=</span><span class="n">train_eval_self_distillation_loader</span><span class="p">,</span>
             <span class="n">validation_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_loader</span><span class="p">,</span>
             <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
@@ -215,59 +223,14 @@ nb_path: "07c_train_eval_model.ipynb"
             <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TrainRandomLabelPoolModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TrainRandomLabelEvalModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
     <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">training_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
-    <span class="n">pool_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
-    <span class="n">validation_loader</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span>
-    <span class="n">training_batch_size</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">ModelOptimizerFactory</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">training_log</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
-        <span class="c1"># TODO: support one_hot!</span>
-        <span class="c1"># TODO: different seed needed!</span>
-        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">(</span>
-            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">RandomLabelsDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pool_dataset</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
-        <span class="p">)</span>
-        <span class="n">train_eval_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
-
-        <span class="n">eval_model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
-
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
-
-        <span class="n">train</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-            <span class="n">optimizer</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
-            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-            <span class="n">validation_loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-            <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
-            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
-            <span class="n">train_loader</span><span class="o">=</span><span class="n">train_eval_loader</span><span class="p">,</span>
-            <span class="n">validation_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_loader</span><span class="p">,</span>
-            <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
-            <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_epochs</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-            <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-
-
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TrainExplicitEvalModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
-    <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">num_eval_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_validation_samples</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">training_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
@@ -279,9 +242,11 @@ nb_path: "07c_train_eval_model.ipynb"
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">training_log</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="c1"># TODO: support one_hot!</span>
         <span class="c1"># TODO: different seed needed!</span>
-        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="p">])</span>
+        <span class="n">train_eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="n">RandomLabelsDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="p">)</span>
         <span class="n">train_eval_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">train_eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="n">eval_model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
@@ -294,7 +259,7 @@ nb_path: "07c_train_eval_model.ipynb"
             <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">validation_loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
-            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_eval_samples</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
             <span class="n">train_loader</span><span class="o">=</span><span class="n">train_eval_loader</span><span class="p">,</span>
             <span class="n">validation_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_loader</span><span class="p">,</span>
             <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
@@ -303,7 +268,50 @@ nb_path: "07c_train_eval_model.ipynb"
             <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_pool_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TrainExplicitEvalModel</span><span class="p">(</span><span class="n">TrainEvalModel</span><span class="p">):</span>
+    <span class="n">num_pool_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_validation_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">training_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="n">validation_loader</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span>
+    <span class="n">training_batch_size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">model_optimizer_factory</span><span class="p">:</span> <span class="n">ModelOptimizerFactory</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">training_log</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="c1"># TODO: support one_hot!</span>
+        <span class="c1"># TODO: different seed needed!</span>
+        <span class="n">train_eval_dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ConcatDataset</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">training_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="p">])</span>
+        <span class="n">train_eval_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">train_eval_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">eval_model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer_factory</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+
+        <span class="n">train</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">validation_loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
+            <span class="n">train_loader</span><span class="o">=</span><span class="n">train_eval_loader</span><span class="p">,</span>
+            <span class="n">validation_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_loader</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
+            <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_epochs</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TrainedMCDropoutModel</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pool_samples</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">eval_model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 
     </div>
