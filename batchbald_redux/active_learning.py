@@ -18,8 +18,8 @@ class ActiveLearningData:
     """Splits `dataset` into an active dataset and an available dataset."""
 
     base_dataset: data.Dataset
-    training_dataset: data.Dataset
-    pool_dataset: data.Dataset
+    training_dataset: data.Subset
+    pool_dataset: data.Subset
     training_mask: np.ndarray
     pool_mask: np.ndarray
 
@@ -38,7 +38,7 @@ class ActiveLearningData:
         self.training_dataset.indices = np.nonzero(self.training_mask)[0]
         self.pool_dataset.indices = np.nonzero(self.pool_mask)[0]
 
-    def get_dataset_indices(self, pool_indices: List[int]) -> List[int]:
+    def get_base_indices(self, pool_indices: List[int]) -> List[int]:
         """Transform indices (in `pool_dataset`) to indices in the original `dataset`."""
         indices = self.pool_dataset.indices[pool_indices]
         return indices
@@ -49,16 +49,21 @@ class ActiveLearningData:
 
         Add them to training dataset & remove them from the pool dataset.
         """
-        indices = self.get_dataset_indices(pool_indices)
+        base_indices = self.get_base_indices(pool_indices)
+        self.acquire_base_indices(base_indices)
 
-        self.training_mask[indices] = True
-        self.pool_mask[indices] = False
+    def acquire_base_indices(self, base_indices):
+        self.training_mask[base_indices] = True
+        self.pool_mask[base_indices] = False
         self._update_indices()
 
     def remove_from_pool(self, pool_indices):
-        indices = self.get_dataset_indices(pool_indices)
+        base_indices = self.get_base_indices(pool_indices)
 
-        self.pool_mask[indices] = False
+        self.remove_base_indices(base_indices)
+
+    def remove_base_indices(self, dataset_indices):
+        self.pool_mask[dataset_indices] = False
         self._update_indices()
 
     def get_random_pool_indices(self, size) -> torch.LongTensor:
@@ -80,10 +85,13 @@ class ActiveLearningData:
 
         Useful for extracting a validation set.
         """
-        dataset_indices = self.get_dataset_indices(pool_indices)
+        dataset_indices = self.get_base_indices(pool_indices)
 
-        self.remove_from_pool(pool_indices)
-        return data.Subset(self.base_dataset, dataset_indices)
+        return self.extract_dataset_from_base_indices(dataset_indices)
+
+    def extract_dataset_from_base_indices(self, base_indices) -> data.Dataset:
+        self.remove_base_indices(base_indices)
+        return data.Subset(self.base_dataset, base_indices)
 
 # Cell
 

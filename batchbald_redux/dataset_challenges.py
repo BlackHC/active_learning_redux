@@ -2,17 +2,18 @@
 
 __all__ = ['AliasDataset', 'DatasetIndex', 'get_base_dataset_index', 'get_num_classes', 'get_target', 'get_targets',
            'SubsetAliasDataset', 'ReplaceTargetsDataset', 'NamedDataset', 'OverrideTargetsDataset',
-           'CorruptedLabelsDataset', 'RandomLabelsDataset', 'get_class_indices', 'get_balanced_sample_indices',
-           'ImbalancedDataset', 'ImbalancedClassSplitDataset', 'OneHotDataset', 'RepeatedDataset',
-           'RandomSubsetDataset', 'ConstantTargetDataset', 'UniformTargetDataset', 'AdditiveGaussianNoise',
-           'dataset_to_tensors', 'get_dataset_state_dict', 'ImportedDataset', 'save_dataset', 'load_dataset',
-           'create_repeated_MNIST_dataset', 'create_MNIST_dataset']
+           'CorruptedLabelsDataset', 'RandomLabelsDataset', 'get_class_indices_by_class', 'get_class_indices',
+           'get_balanced_sample_indices', 'get_balanced_sample_indices_by_class', 'ImbalancedDataset',
+           'ImbalancedClassSplitDataset', 'OneHotDataset', 'RepeatedDataset', 'RandomSubsetDataset',
+           'ConstantTargetDataset', 'UniformTargetDataset', 'AdditiveGaussianNoise', 'dataset_to_tensors',
+           'get_dataset_state_dict', 'ImportedDataset', 'save_dataset', 'load_dataset', 'create_repeated_MNIST_dataset',
+           'create_MNIST_dataset']
 
 # Cell
 
 import bisect
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
 
 import numpy as np
 import torch
@@ -386,10 +387,12 @@ def randomize_labels(self: AliasDataset, *, seed: int, num_classes: int = None, 
 # Cell
 
 
-def get_class_indices(dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator):
+def get_class_indices_by_class(
+    dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator
+) -> Dict[int]:
     class_counts = list(class_counts)
 
-    subset_indices = []
+    subset_indices = {label: [] for label in range(len(class_counts))}
 
     remaining_samples = sum(class_counts)
 
@@ -398,7 +401,7 @@ def get_class_indices(dataset: data.Dataset, *, class_counts: list, generator: n
         _, y = dataset[index]
 
         if class_counts[y] > 0:
-            subset_indices.append(index)
+            subset_indices[y].append(index)
             class_counts[y] -= 1
             remaining_samples -= 1
 
@@ -408,11 +411,25 @@ def get_class_indices(dataset: data.Dataset, *, class_counts: list, generator: n
     return subset_indices
 
 
+def get_class_indices(dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator) -> List[int]:
+    indices_by_class = get_class_indices_by_class(dataset=dataset, class_counts=class_counts, generator=generator)
+    return [index for by_class in indices_by_class.values() for index in by_class]
+
+
 def get_balanced_sample_indices(dataset: data.Dataset, *, num_classes, samples_per_class, seed: int) -> List[int]:
     class_counts = [samples_per_class] * num_classes
     generator = np.random.default_rng(seed)
 
     return get_class_indices(dataset, class_counts=class_counts, generator=generator)
+
+
+def get_balanced_sample_indices_by_class(
+    dataset: data.Dataset, *, num_classes, samples_per_class, seed: int
+) -> Dict[int]:
+    class_counts = [samples_per_class] * num_classes
+    generator = np.random.default_rng(seed)
+
+    return get_class_indices_by_class(dataset, class_counts=class_counts, generator=generator)
 
 # Cell
 
@@ -589,6 +606,7 @@ def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtyp
     result.options = dict(num_classes=num_classes)
     result.alias = f"{dataset} | uniform_targets{result.options}"
     return result
+
 
 @patch
 def uniform_target(self: AliasDataset, *, num_classes=None, dtype=None, device=None):

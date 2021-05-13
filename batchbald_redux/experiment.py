@@ -36,7 +36,7 @@ from .models import MnistOptimizerFactory
 # From the BatchBALD Repo
 from .train_eval_model import (
     TrainEvalModel,
-    TrainSelfDistillationPoolModel,
+    TrainSelfDistillationEvalModel,
 )
 from .trained_model import TrainedMCDropoutModel
 
@@ -72,7 +72,7 @@ class Experiment:
     acquisition_size: int = 5
     max_training_set: int = 300
     num_pool_samples: int = 20
-    num_eval_samples: int = 20
+    num_validation_samples: int = 20
     num_training_samples: int = 1
     num_patience_epochs: int = 3
     max_training_epochs: int = 30
@@ -86,7 +86,7 @@ class Experiment:
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
     ] = acquisition_functions.BALD
-    train_eval_model: TrainEvalModel = TrainSelfDistillationPoolModel
+    train_eval_model: TrainEvalModel = TrainSelfDistillationEvalModel
     model_optimizer_factory: Type[ModelOptimizerFactory] = MnistOptimizerFactory
     acquisition_function_args: dict = None
     temperature: float = 0.0
@@ -163,7 +163,7 @@ class Experiment:
                 model=model_optimizer.model,
                 optimizer=model_optimizer.optimizer,
                 training_samples=self.num_training_samples,
-                validation_samples=self.num_eval_samples,
+                validation_samples=self.num_validation_samples,
                 train_loader=train_loader,
                 validation_loader=validation_loader,
                 patience=self.num_patience_epochs,
@@ -173,7 +173,7 @@ class Experiment:
             )
 
             evaluation_metrics = evaluate(
-                model=model_optimizer.model, num_samples=self.num_eval_samples, loader=test_loader, device=self.device
+                model=model_optimizer.model, num_samples=self.num_validation_samples, loader=test_loader, device=self.device
             )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
@@ -182,7 +182,7 @@ class Experiment:
                 print("Done.")
                 break
 
-            trained_model = TrainedMCDropoutModel(num_pool_samples=self.num_pool_samples, model=model_optimizer.model)
+            trained_model = TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=model_optimizer.model)
 
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
@@ -193,7 +193,7 @@ class Experiment:
                     dict(
                         max_epochs=current_max_epochs,
                         training_dataset=active_learning_data.training_dataset,
-                        pool_dataset=active_learning_data.pool_dataset,
+                        eval_dataset=active_learning_data.pool_dataset,
                         validation_loader=validation_loader,
                         trained_model=trained_model,
                     )

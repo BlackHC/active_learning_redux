@@ -8,13 +8,16 @@ from dataclasses import dataclass
 import torch.nn
 
 from .consistent_mc_dropout import (
-    BayesianModule, get_ensemble_predictions_labels, )
+    BayesianModule,
+    get_ensemble_predictions_labels,
+)
 
 # Cell
 
 
 class TrainedModel:
     """Evaluate a trained model."""
+
     def get_log_probs_N_K_C_labels_N(self, pool_loader, device):
         raise NotImplementedError()
 
@@ -24,12 +27,12 @@ class TrainedModel:
 
 @dataclass
 class TrainedMCDropoutModel(TrainedModel):
-    num_pool_samples: int
+    num_samples: int
     model: BayesianModule
 
     def get_log_probs_N_K_C_labels_N(self, loader, device):
         log_probs_N_K_C, labels_B = self.model.get_predictions_labels(
-            num_samples=self.num_pool_samples,
+            num_samples=self.num_samples,
             loader=loader,
             device=device,
         )
@@ -42,5 +45,7 @@ class TrainedEnsemble(TrainedModel):
     models: [torch.nn.Module]
 
     def get_log_probs_N_K_C_labels_N(self, pool_loader, device):
-        log_probs_N_K_C, labels_B = get_ensemble_predictions_labels(modules=self.models, loader=pool_loader, device=device)
+        log_probs_N_K_C, labels_B = get_ensemble_predictions_labels(
+            modules=self.models, loader=pool_loader, device=device
+        )
         return log_probs_N_K_C, labels_B
