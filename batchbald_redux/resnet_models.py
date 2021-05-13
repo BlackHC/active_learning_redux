@@ -189,7 +189,7 @@ class BayesianResNet(BayesianModule):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
-        #self.fc = nn.Linear(512 * block.expansion, num_classes)
+        # self.fc = nn.Linear(512 * block.expansion, num_classes)
         self.fc = nn.Sequential(
             ConsistentMCDropout(),
             nn.Linear(512 * block.expansion, 256 * block.expansion),
@@ -198,7 +198,6 @@ class BayesianResNet(BayesianModule):
             nn.Linear(256 * block.expansion, 256 * block.expansion),
             nn.Linear(256, num_classes),
         )
-
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -306,6 +305,7 @@ def bayesian_resnet34(*, cifar_mod=False, pretrained=False, progress=True, **kwa
     return _bayesian_resnet("resnet34", BasicBlock, [3, 4, 6, 3], cifar_mod, pretrained, progress, **kwargs)
 
 # Cell
+
 
 @dataclass
 class Cifar10BayesianResnetFactory(ModelOptimizerFactory):

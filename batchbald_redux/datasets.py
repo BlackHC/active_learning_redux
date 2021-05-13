@@ -18,6 +18,7 @@ from .dataset_challenges import NamedDataset
 
 # Cell
 
+
 @dataclass
 class SplitDataset:
     input_size: int
@@ -96,8 +97,13 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
             normalize_like_cifar10=normalize_like_cifar10,
             train_augmentation=False,
         ),
-        NamedDataset(train_dataset, f"SVHN (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"),
-        NamedDataset(validation_dataset, f"SVHN (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)"),
+        NamedDataset(
+            train_dataset, f"SVHN (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
+        ),
+        NamedDataset(
+            validation_dataset,
+            f"SVHN (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
+        ),
         NamedDataset(test_dataset, "SVHN (Test)"),
     )
 
@@ -148,8 +154,13 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
             normalize_like_cifar10=True,
             train_augmentation=train_augmentation,
         ),
-        NamedDataset(train_dataset, f"CIFAR-10 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"),
-        NamedDataset(validation_dataset, f"CIFAR-10 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)"),
+        NamedDataset(
+            train_dataset, f"CIFAR-10 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
+        ),
+        NamedDataset(
+            validation_dataset,
+            f"CIFAR-10 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
+        ),
         NamedDataset(test_dataset, "CIFAR-10 (Test)"),
     )
 
@@ -206,8 +217,13 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
             normalize_like_cifar10=normalize_like_cifar10,
             train_augmentation=train_augmentation,
         ),
-        NamedDataset(train_dataset, f"CIFAR-100 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"),
-        NamedDataset(validation_dataset, f"CIFAR-100 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)"),
+        NamedDataset(
+            train_dataset, f"CIFAR-100 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
+        ),
+        NamedDataset(
+            validation_dataset,
+            f"CIFAR-100 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
+        ),
         NamedDataset(test_dataset, "CIFAR-100 (Test)"),
     )
 

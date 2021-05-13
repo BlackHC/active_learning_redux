@@ -40,7 +40,6 @@ class FastMNIST(MNIST):
         return img, target
 
 
-
 class FastFashionMNIST(FashionMNIST):
     def __init__(self, *args, device, **kwargs):
         super().__init__(*args, **kwargs)

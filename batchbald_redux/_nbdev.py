@@ -63,8 +63,10 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "AliasDataset.corrupt_labels": "05b_dataset_challenges.ipynb",
          "RandomLabelsDataset": "05b_dataset_challenges.ipynb",
          "AliasDataset.randomize_labels": "05b_dataset_challenges.ipynb",
+         "get_class_indices_by_class": "05b_dataset_challenges.ipynb",
          "get_class_indices": "05b_dataset_challenges.ipynb",
          "get_balanced_sample_indices": "05b_dataset_challenges.ipynb",
+         "get_balanced_sample_indices_by_class": "05b_dataset_challenges.ipynb",
          "ImbalancedDataset": "05b_dataset_challenges.ipynb",
          "AliasDataset.imbalance": "05b_dataset_challenges.ipynb",
          "ImbalancedClassSplitDataset": "05b_dataset_challenges.ipynb",
@@ -119,8 +121,8 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "TrainedMCDropoutModel": "07a_trained_model.ipynb",
          "TrainedEnsemble": "07a_trained_model.ipynb",
          "TrainEvalModel": "07c_train_eval_model.ipynb",
-         "TrainSelfDistillationPoolModel": "07c_train_eval_model.ipynb",
-         "TrainRandomLabelPoolModel": "07c_train_eval_model.ipynb",
+         "TrainSelfDistillationEvalModel": "07c_train_eval_model.ipynb",
+         "TrainRandomLabelEvalModel": "07c_train_eval_model.ipynb",
          "TrainExplicitEvalModel": "07c_train_eval_model.ipynb",
          "CandidateBatchComputer": "09a_acquisition_functions.ipynb",
          "Random": "09a_acquisition_functions.ipynb",
@@ -144,8 +146,8 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "mnist_initial_samples": "09b_experiment.ipynb",
          "Experiment": "09b_experiment.ipynb",
          "configs": "09d_uniform_target_ood_experiment.ipynb",
+         "ExperimentData": "09d_uniform_target_ood_experiment.ipynb",
          "RejectionOodExperiment": "09c_rejection_ood_experiment.ipynb",
-         "ExperimentDatasets": "09d_uniform_target_ood_experiment.ipynb",
          "UniformTargetOodExperiment": "09d_uniform_target_ood_experiment.ipynb",
          "DependencyInjection": "Z_dependency_injection.ipynb"}
 
@@ -173,4 +175,5 @@ doc_url = "https://blackhc.github.io/batchbald_redux/"
 
 git_url = "https://github.com/blackhc/batchbald_redux/tree/master/"
 
-def custom_doc_links(name): return None
+def custom_doc_links(name):
+    return None

@@ -467,12 +467,16 @@ def get_coreset_bald_scores(
     N, K, C = log_probs_N_K_C.shape
 
     labels_N_1_1 = labels_N[:, None, None]
-    log_probs_N_K = joint_entropy.gather_expand(log_probs_N_K_C, dim=2, index=labels_N_1_1).squeeze(2).to(dtype=dtype, device=device)
+    log_probs_N_K = (
+        joint_entropy.gather_expand(log_probs_N_K_C, dim=2, index=labels_N_1_1)
+        .squeeze(2)
+        .to(dtype=dtype, device=device)
+    )
 
     log_prob_mean_N = torch.logsumexp(log_probs_N_K, dim=1) - np.log(K)
 
     lhs = -log_prob_mean_N
-    rhs = -torch.mean(log_probs_N_K * log_probs_N_K.exp(), dim=1)/log_prob_mean_N.exp()
+    rhs = -torch.mean(log_probs_N_K * log_probs_N_K.exp(), dim=1) / log_prob_mean_N.exp()
 
     coreset_infogain = lhs - rhs
 
@@ -515,7 +519,9 @@ def get_batch_coreset_bald_batch(
             # p(\omega) cancels out in:
             # p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }
             log_prob_conditional_omega_joint_N_K = log_prob_joint_N_K - log_prob_joint_sum_N_1
-            conditional_entropy_joint_N = -torch.sum(log_prob_conditional_omega_joint_N_K.exp() * log_prob_joint_N_K, dim=1)
+            conditional_entropy_joint_N = -torch.sum(
+                log_prob_conditional_omega_joint_N_K.exp() * log_prob_joint_N_K, dim=1
+            )
             entropy_joint_N = -log_prob_joint_sum_N_1.squeeze(1) + np.log(K)
             scores_N = entropy_joint_N - conditional_entropy_joint_N
         else:
@@ -524,10 +530,11 @@ def get_batch_coreset_bald_batch(
             prob_joint_sum_N = log_prob_joint_N_K.exp().sum(dim=1, keepdim=False)
             # p(\omega) cancels out in:
             # p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }
-            conditional_entropy_joint_N = -torch.sum(log_prob_joint_N_K.exp() * log_prob_joint_N_K, dim=1) / prob_joint_sum_N
+            conditional_entropy_joint_N = (
+                -torch.sum(log_prob_joint_N_K.exp() * log_prob_joint_N_K, dim=1) / prob_joint_sum_N
+            )
             entropy_joint_N = -prob_joint_sum_N.log() + np.log(K)
             scores_N = entropy_joint_N - conditional_entropy_joint_N
-
 
         # Select candidate
         scores_N[candidate_indices] = -float("inf")

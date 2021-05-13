@@ -40,7 +40,6 @@ class DependencyInjection:
         if missing_fields:
             raise ValueError(f"Unresolved fields for {dataclass_type.__qualname__}: {', '.join(missing_fields)}")
 
-
     def resolve_dataclass_args(self, dataclass_type):
         fields = dataclasses.fields(dataclass_type)
 

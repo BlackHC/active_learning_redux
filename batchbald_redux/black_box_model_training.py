@@ -20,7 +20,8 @@ from torch import nn
 from .consistent_mc_dropout import (
     GeometricMeanPrediction,
     SamplerModel,
-    multi_sample_loss, )
+    multi_sample_loss,
+)
 from .restoring_early_stopping import RestoringEarlyStopping
 
 # Cell
@@ -84,7 +85,9 @@ def train(
 
     enable_tqdm_pbars = is_run_from_ipython()
 
-    setup_common_training_handlers(trainer, with_pbars=enable_tqdm_pbars, with_gpu_stats=torch.cuda.is_available(), log_every_iters=LOG_INTERVAL)
+    setup_common_training_handlers(
+        trainer, with_pbars=enable_tqdm_pbars, with_gpu_stats=torch.cuda.is_available(), log_every_iters=LOG_INTERVAL
+    )
 
     if enable_tqdm_pbars:
         ProgressBar(persist=False).attach(

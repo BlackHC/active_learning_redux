@@ -88,8 +88,8 @@ class BayesianModule(Module):
             for batch_x, batch_labels in loader:
                 # TODO: implement this in all the get_predictions variants?
                 if labels is None:
-                        labels_shape = (N, *batch_labels.shape[1:])
-                        labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
+                    labels_shape = (N, *batch_labels.shape[1:])
+                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
 
                 batch_x = batch_x.to(device=device)
 
@@ -251,6 +251,7 @@ class ConsistentMCDropout2d(_ConsistentMCDropout):
 
 class SamplerModel(Module):
     """Wrap a `BayesianModule` to sample k MC dropout samples consistently."""
+
     def __init__(self, bayesian_module: BayesianModule, k: int):
         super().__init__()
         self.bayesian_module = bayesian_module
@@ -291,6 +292,7 @@ class GeometricMeanPrediction(Module):
 
     We assume we receive log probs (so after Softmax).
     """
+
     def __init__(self, module: Module):
         super().__init__()
         self.module = module
@@ -304,6 +306,7 @@ class LogProbMeanPrediction(Module):
     """
     Use a eg. SamplerModel and compute the geometric mean as "ensemble" prediction.
     """
+
     def __init__(self, module: Module):
         super().__init__()
         self.module = module

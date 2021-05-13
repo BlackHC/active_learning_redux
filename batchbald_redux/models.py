@@ -21,6 +21,7 @@ from .model_optimizer_factory import ModelOptimizer, ModelOptimizerFactory
 
 # Cell
 
+
 class BayesianMNISTCNN(BayesianModule):
     def __init__(self, num_classes=10):
         super().__init__()
