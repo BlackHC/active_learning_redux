@@ -86,11 +86,11 @@ class UniformTargetOodExperiment:
     def load_experiment_data(self) -> ExperimentData:
         # num_classes = 10, input_size = 28
         full_train_dataset = NamedDataset(
-            FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
+            FastFashionMNIST("data", train=True, download=True, device=self.device), "FastFashionMNIST (train)"
         )
 
-        ood_dataset = FastFashionMNIST("data", train=True, download=True, device=self.device)
-        ood_dataset = NamedDataset(ood_dataset, f"OoD Dataset ({len(ood_dataset)} samples)")
+        ood_dataset = FastMNIST("data", train=True, download=True, device=self.device)
+        ood_dataset = NamedDataset(ood_dataset, f"OoD Dataset: FastMNIST ({len(ood_dataset)} samples)")
         if self.ood_fmnist_repetitions > 1:
             ood_dataset = ood_dataset * self.ood_fmnist_repetitions
 
@@ -102,9 +102,9 @@ class UniformTargetOodExperiment:
             validation_split_random_state=self.validation_split_random_state,
         )
 
-        train_dataset = AliasDataset(train_dataset, f"FastMNIST (train; {len(train_dataset)} samples)")
+        train_dataset = AliasDataset(train_dataset, f"FastFashionMNIST (train; {len(train_dataset)} samples)")
         validation_dataset = AliasDataset(
-            validation_dataset, f"FastMNIST (validation; {len(validation_dataset)} samples)"
+            validation_dataset, f"FastFashionMNIST (validation; {len(validation_dataset)} samples)"
         )
 
         # If we reduce the train set, we need to do so before picking the initial train set.
@@ -137,8 +137,8 @@ class UniformTargetOodExperiment:
         if self.add_dataset_noise:
             train_dataset = AdditiveGaussianNoise(train_dataset, 0.1)
 
-        test_dataset = FastMNIST("data", train=False, device=None)
-        test_dataset = NamedDataset(test_dataset, f"FastMNIST (test, {len(test_dataset)} samples)")
+        test_dataset = FastFashionMNIST("data", train=False, device=None)
+        test_dataset = NamedDataset(test_dataset, f"FastFashionMNIST (test, {len(test_dataset)} samples)")
 
         active_learning_data = ActiveLearningData(train_dataset)
 
@@ -295,14 +295,14 @@ class UniformTargetOodExperiment:
 configs = [
     UniformTargetOodExperiment(
         seed=seed+1234,
-        acquisition_function=acquisition_functions.TemperedEvalBALD,
+        acquisition_function=acquisition_functions.EvalBALD,
         acquisition_size=10,
         num_pool_samples=num_pool_samples,
         evaluation_set_size=evaluation_set_size,
         temperature=8,
     )
     for seed in range(10)
-    for evaluation_set_size in [100,1000]
+    for evaluation_set_size in [100,1000,10000]
     for num_pool_samples in [100]
 ]
 
