@@ -460,6 +460,22 @@ def get_batch_eig_batch(
 
 # Cell
 
+def get_coreset_bald_scores_from_predictions(
+    log_probs_N_K_C: torch.Tensor, target_probs_N_C: torch.Tensor, *, dtype=None, device=None
+) -> torch.Tensor:
+    N, K, C = log_probs_N_K_C.shape
+    assert target_probs_N_C.shape == (K, C)
+
+    log_prob_mean_N_C = torch.logsumexp(log_probs_N_K_C, dim=1) - np.log(K)
+
+    entropy_N_C = -log_prob_mean_N_C
+    conditional_entropy = -torch.mean(log_probs_N_K_C * log_probs_N_K_C.exp(), dim=1) / log_prob_mean_N_C.exp()
+    mutual_bits_N_C = entropy_N_C - conditional_entropy
+
+    cross_mutual_information = torch.sum(target_probs_N_C * mutual_bits_N_C, dim=1)
+
+    return cross_mutual_information
+
 
 def get_coreset_bald_scores(
     log_probs_N_K_C: torch.Tensor, labels_N: torch.Tensor, *, dtype=None, device=None
