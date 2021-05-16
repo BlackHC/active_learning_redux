@@ -114,7 +114,8 @@ def train(
     if patience is not None:
         early_stopping = RestoringEarlyStopping(
             patience=patience,
-            score_function=lambda: float(-validation_evaluator.state.metrics["crossentropy"]),
+            #score_function=lambda: float(-validation_evaluator.state.metrics["crossentropy"]),
+            score_function=lambda: float(validation_evaluator.state.metrics["accuracy"]),
             module=model,
             optimizer=optimizer,
             training_engine=trainer,
@@ -137,6 +138,9 @@ def evaluate(*, model, num_samples, loader, device, loss=None):
     # TODO: rewrite this on top of TrainedModel?
     # Add "get_log_prob_predictions" which returns the mean?
     # Compute accuracy etc based on that?
+
+    # Move model to device
+    model.to(device)
 
     evaluation_model = GeometricMeanPrediction(SamplerModel(model, num_samples))
 

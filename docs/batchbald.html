@@ -1962,7 +1962,31 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_coreset_bald_scores" class="doc_header"><code>get_coreset_bald_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L464" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_coreset_bald_scores</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>labels_N</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_coreset_bald_scores_from_predictions" class="doc_header"><code>get_coreset_bald_scores_from_predictions</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L463" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_coreset_bald_scores_from_predictions</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>target_probs_N_C</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="get_coreset_bald_scores" class="doc_header"><code>get_coreset_bald_scores</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L483" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_coreset_bald_scores</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>labels_N</code></strong>:<code>Tensor</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -1982,7 +2006,27 @@ $$\mathrm{I}\left[(y)_{B} ; \omega \mid(x)_{B}, D_{T}\right]-\mathrm{I}\left[(y)
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_coreset_bald_scores</span><span class="p">(</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_coreset_bald_scores_from_predictions</span><span class="p">(</span>
+    <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">target_probs_N_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">target_probs_N_C</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+    
+    <span class="n">log_probs_N_K_C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">target_probs_N_C</span> <span class="o">=</span> <span class="n">target_probs_N_C</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">log_prob_mean_N_C</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">log_probs_N_K_C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+
+    <span class="n">entropy_N_C</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_prob_mean_N_C</span>
+    <span class="n">conditional_entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_probs_N_K_C</span> <span class="o">*</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">exp</span><span class="p">(),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">log_prob_mean_N_C</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+    <span class="n">mutual_bits_N_C</span> <span class="o">=</span> <span class="n">entropy_N_C</span> <span class="o">-</span> <span class="n">conditional_entropy</span>
+
+    <span class="n">cross_mutual_information</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">target_probs_N_C</span> <span class="o">*</span> <span class="n">mutual_bits_N_C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cross_mutual_information</span>
+
+
+<span class="k">def</span> <span class="nf">get_coreset_bald_scores</span><span class="p">(</span>
     <span class="n">log_probs_N_K_C</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">labels_N</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">log_probs_N_K_C</span><span class="o">.</span><span class="n">shape</span>
@@ -2081,7 +2125,7 @@ $$p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) \; p((y)_{B-1}|(x)_{B-1}, \omega).
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_batch_coreset_bald_batch" class="doc_header"><code>get_batch_coreset_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L488" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batch_coreset_bald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>labels_N</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="get_batch_coreset_bald_batch" class="doc_header"><code>get_batch_coreset_bald_batch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/batchbald.py#L507" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_batch_coreset_bald_batch</code>(<strong><code>log_probs_N_K_C</code></strong>:<code>Tensor</code>, <strong><code>labels_N</code></strong>:<code>Tensor</code>, <strong><code>batch_size</code></strong>:<code>int</code>, <strong><code>dtype</code></strong>=<em><code>None</code></em>, <strong><code>device</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>

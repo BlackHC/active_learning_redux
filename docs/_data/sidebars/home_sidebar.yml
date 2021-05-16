@@ -50,7 +50,7 @@ entries:
       url: SSL.html
     - output: web,pdf
       title: Experiment
-      url: experiment.html
+      url: experiment_xmi_pred.html
     - output: web,pdf
       title: Rejection OOD Experiment
       url: rejection_ood_experiment.html
@@ -63,6 +63,12 @@ entries:
     - output: web,pdf
       title: Results OOD Baselines Visualizations
       url: B_results_visualization_ood_baselines.html
+    - output: web,pdf
+      title: Results OOD EvalBALD Visualizations
+      url: B_results_visualization_ood_eval_bald.html
+    - output: web,pdf
+      title: Results OOD FMNIST vs MNIST Visualizations
+      url: B_results_visualization_ood_fmnist_vs_mnist.html
     - output: web,pdf
       title: Analysis of BALD scores during Training
       url: U_BALD_score_analysis.html

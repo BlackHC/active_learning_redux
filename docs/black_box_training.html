@@ -91,7 +91,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L136" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L137" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -115,7 +115,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L162" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L166" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -222,7 +222,8 @@ nb_path: "07_black_box_training.ipynb"
     <span class="k">if</span> <span class="n">patience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">RestoringEarlyStopping</span><span class="p">(</span>
             <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>
-            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crossentropy&quot;</span><span class="p">]),</span>
+            <span class="c1">#score_function=lambda: float(-validation_evaluator.state.metrics[&quot;crossentropy&quot;]),</span>
+            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]),</span>
             <span class="n">module</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
             <span class="n">training_engine</span><span class="o">=</span><span class="n">trainer</span><span class="p">,</span>
@@ -245,6 +246,9 @@ nb_path: "07_black_box_training.ipynb"
     <span class="c1"># TODO: rewrite this on top of TrainedModel?</span>
     <span class="c1"># Add &quot;get_log_prob_predictions&quot; which returns the mean?</span>
     <span class="c1"># Compute accuracy etc based on that?</span>
+
+    <span class="c1"># Move model to device</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">evaluation_model</span> <span class="o">=</span> <span class="n">GeometricMeanPrediction</span><span class="p">(</span><span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">))</span>
 

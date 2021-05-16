@@ -22,6 +22,7 @@ from .batchbald import (
     get_batch_coreset_bald_batch,
     get_batch_eval_bald_batch,
     get_coreset_bald_scores,
+    get_coreset_bald_scores_from_predictions,
     get_eig_scores,
     get_eval_bald_scores,
     get_sampled_tempered_scorers,
@@ -163,7 +164,10 @@ class CoreSetPoolScorerCandidateBatchComputer(CandidateBatchComputer):
 @dataclass
 class _CoreSetBALD(CoreSetPoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, labels_N, device) -> CandidateBatch:
-        scores_N = get_coreset_bald_scores(log_probs_N_K_C, labels_N, dtype=torch.double, device=device)
+        if len(labels_N.shape) == 1:
+            scores_N = get_coreset_bald_scores(log_probs_N_K_C, labels_N, dtype=torch.double, device=device)
+        else:
+            scores_N = get_coreset_bald_scores_from_predictions(log_probs_N_K_C, labels_N, dtype=torch.double, device=device)
 
         candidate_batch = self.extract_candidates(scores_N)
 

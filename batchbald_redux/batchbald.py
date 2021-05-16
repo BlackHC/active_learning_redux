@@ -5,7 +5,7 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_batch_eval_bald_batch', 'compute_each_conditional_entropy', 'get_thompson_bald_batch',
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
-           'get_coreset_bald_scores', 'get_batch_coreset_bald_batch']
+           'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch']
 
 # Cell
 import math
@@ -464,7 +464,10 @@ def get_coreset_bald_scores_from_predictions(
     log_probs_N_K_C: torch.Tensor, target_probs_N_C: torch.Tensor, *, dtype=None, device=None
 ) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
-    assert target_probs_N_C.shape == (K, C)
+    assert target_probs_N_C.shape == (N, C)
+
+    log_probs_N_K_C = log_probs_N_K_C.to(dtype=dtype, device=device)
+    target_probs_N_C = target_probs_N_C.to(dtype=dtype, device=device)
 
     log_prob_mean_N_C = torch.logsumexp(log_probs_N_K_C, dim=1) - np.log(K)
 
