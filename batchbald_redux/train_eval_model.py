@@ -45,7 +45,7 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
-        train_eval_loader = torch.utils.data.DataLoader(train_eval_dataset, batch_size=64, drop_last=False)
+        train_eval_loader = torch.utils.data.DataLoader(train_eval_dataset, batch_size=512, drop_last=False)
 
         eval_log_probs_N_C = get_log_mean_probs(
             self.trained_model.get_log_probs_N_K_C(train_eval_loader, device=device)
