@@ -1,0 +1,102 @@
+store = {}
+store['timestamp']=1621202138
+store['cmdline']=['/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_xmi_labels.py', '--id=15']
+store['commit']='e58e22f40eef16250bf8eae7794770660a6579a1'
+store['github_url']='e58e22f40eef16250bf8eae7794770660a6579a1'
+store['experiment']='/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_xmi_labels.py'
+store['job_id']=15
+store['worker_id']=15
+store['num_workers']=40
+store['config']={'seed': 18, 'acquisition_size': 10, 'max_training_set': 300, 'num_pool_samples': 100, 'num_validation_samples': 20, 'num_training_samples': 1, 'num_patience_epochs': 20, 'max_training_epochs': 120, 'training_batch_size': 64, 'device': 'cuda', 'validation_set_size': 1024, 'initial_set_size': 20, 'min_samples_per_epoch': 1024, 'repeated_mnist_repetitions': 1, 'add_dataset_noise': False, 'acquisition_function': 'batchbald_redux.acquisition_functions.TemperedCoreSetBALD', 'train_eval_model': 'batchbald_redux.train_eval_model.TrainSelfDistillationEvalModel', 'model_optimizer_factory': 'batchbald_redux.models.MnistOptimizerFactory', 'acquisition_function_args': None, 'temperature': 8}
+store['log']={}
+store['initial_training_set_indices']=[38043, 40091, 17418, 2094, 39879, 3133, 5011, 40683, 54379, 24287, 9849, 59305, 39508, 39356, 8758, 52579, 13655, 7636, 21562, 41329]
+store['dataset_info']={'training': "'FastMNIST (train)' | replace_targets{'targets': tensor([5, 0, 4,  ..., 5, 6, 8], device='cuda:0'), 'num_classes': 10}", 'test': "'FastMNIST (test, 10000 samples)'"}
+store['active_learning_steps']=[]
+store['active_learning_steps'].append({})
+store['active_learning_steps'][0]['training']={}
+store['active_learning_steps'][0]['training']['epochs']=[]
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.529296875, 'crossentropy': 1.90408194065094})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6162109375, 'crossentropy': 1.9360153675079346})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.599609375, 'crossentropy': 2.341989517211914})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.654296875, 'crossentropy': 2.2736353874206543})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6357421875, 'crossentropy': 2.569042205810547})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.658203125, 'crossentropy': 2.46891188621521})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.642578125, 'crossentropy': 2.7524240016937256})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6474609375, 'crossentropy': 2.8496205806732178})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.623046875, 'crossentropy': 3.1396172046661377})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6572265625, 'crossentropy': 2.7475781440734863})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.609375, 'crossentropy': 3.107649564743042})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6484375, 'crossentropy': 2.7527337074279785})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.638671875, 'crossentropy': 2.8313148021698})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.63671875, 'crossentropy': 3.157966375350952})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6591796875, 'crossentropy': 2.943838119506836})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6484375, 'crossentropy': 3.0187113285064697})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6484375, 'crossentropy': 3.1436684131622314})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.64453125, 'crossentropy': 3.1643354892730713})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6533203125, 'crossentropy': 3.28171443939209})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.66015625, 'crossentropy': 3.2302768230438232})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.650390625, 'crossentropy': 3.239467144012451})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.638671875, 'crossentropy': 3.279114246368408})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6435546875, 'crossentropy': 3.369560718536377})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.63671875, 'crossentropy': 3.2214198112487793})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6171875, 'crossentropy': 3.2582507133483887})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6376953125, 'crossentropy': 3.1283555030822754})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.642578125, 'crossentropy': 3.2186577320098877})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.64453125, 'crossentropy': 3.281277656555176})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6552734375, 'crossentropy': 3.051795482635498})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6337890625, 'crossentropy': 3.405454397201538})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6318359375, 'crossentropy': 3.5799777507781982})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.658203125, 'crossentropy': 3.2624006271362305})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6376953125, 'crossentropy': 3.2825710773468018})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.623046875, 'crossentropy': 3.4360382556915283})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6513671875, 'crossentropy': 3.041853904724121})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6552734375, 'crossentropy': 3.0135648250579834})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.658203125, 'crossentropy': 3.0537524223327637})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6611328125, 'crossentropy': 3.1679623126983643})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6279296875, 'crossentropy': 3.413780450820923})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6376953125, 'crossentropy': 3.130051851272583})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.62890625, 'crossentropy': 3.2928543090820312})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.619140625, 'crossentropy': 3.7040905952453613})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.264707088470459})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6357421875, 'crossentropy': 3.3071696758270264})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.623046875, 'crossentropy': 3.607145309448242})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6533203125, 'crossentropy': 3.173539876937866})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.654296875, 'crossentropy': 3.2507216930389404})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.642578125, 'crossentropy': 3.5176455974578857})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6376953125, 'crossentropy': 3.494372606277466})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.337334156036377})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6337890625, 'crossentropy': 3.548081636428833})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.3318216800689697})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.662109375, 'crossentropy': 3.172621011734009})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.64453125, 'crossentropy': 3.314089775085449})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6455078125, 'crossentropy': 3.4477617740631104})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.642578125, 'crossentropy': 3.475754499435425})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.5947265625, 'crossentropy': 4.113287448883057})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.623046875, 'crossentropy': 3.7613420486450195})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6396484375, 'crossentropy': 3.468397617340088})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6318359375, 'crossentropy': 3.6122446060180664})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6455078125, 'crossentropy': 3.3125436305999756})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.666015625, 'crossentropy': 3.1287360191345215})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.559790849685669})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.64453125, 'crossentropy': 3.4319026470184326})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.666015625, 'crossentropy': 3.1480417251586914})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6591796875, 'crossentropy': 2.9822006225585938})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6103515625, 'crossentropy': 3.766885280609131})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6572265625, 'crossentropy': 3.3660776615142822})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6552734375, 'crossentropy': 3.0456299781799316})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.640625, 'crossentropy': 3.2799630165100098})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6318359375, 'crossentropy': 3.568765640258789})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.646484375, 'crossentropy': 3.155949831008911})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6328125, 'crossentropy': 3.462953805923462})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6533203125, 'crossentropy': 3.687674045562744})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6640625, 'crossentropy': 3.5526700019836426})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.658203125, 'crossentropy': 3.2208778858184814})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6474609375, 'crossentropy': 3.416544198989868})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.65234375, 'crossentropy': 3.447490692138672})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.6976001262664795})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.6357421875, 'crossentropy': 3.798758029937744})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.634765625, 'crossentropy': 3.603081226348877})
+store['active_learning_steps'][0]['training']['epochs'].append({'accuracy': 0.654296875, 'crossentropy': 3.3910269737243652})
+store['active_learning_steps'][0]['training']['best_epoch']=62
+store['active_learning_steps'][0]['evaluation_metrics']={'accuracy': 0.6638, 'crossentropy': 3.330257421875}
+store['exception']='Traceback (most recent call last):\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_xmi_labels.py", line 295, in <module>\n    config.run(store=store)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_xmi_labels.py", line 217, in run\n    candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/acquisition_functions.py", line 156, in compute_candidate_batch\n    return self.get_candidate_batch(log_probs_N_K_C, labels_N, device)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/acquisition_functions.py", line 172, in get_candidate_batch\n    candidate_batch = self.extract_candidates(scores_N)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/acquisition_functions.py", line 191, in extract_candidates\n    return get_sampled_tempered_scorers(scores_N, batch_size=self.acquisition_size, temperature=self.temperature)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/batchbald.py", line 376, in get_sampled_tempered_scorers\n    candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p)\n  File "mtrand.pyx", line 919, in numpy.random.mtrand.RandomState.choice\n  File "/scratch-ssd/andsch/tmp/conda_envs/job-6497/lib/python3.8/site-packages/torch/tensor.py", line 623, in __array__\n    return self.numpy().astype(dtype, copy=False)\nTypeError: can\'t convert cuda:0 device type tensor to numpy. Use Tensor.cpu() to copy the tensor to host memory first.\n'

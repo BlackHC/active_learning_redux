@@ -373,7 +373,8 @@ def get_sampled_tempered_scorers(scores_N: torch.Tensor, *, temperature: float, 
     partition_constant = tempered_scores_N.sum()
     p = tempered_scores_N / partition_constant
 
-    candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p)
+    # TODO: change this to use PyTorch instead of numpy?
+    candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p.cpu().numpy())
     candidate_scores = scores_N[candidate_indices]
 
     return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())

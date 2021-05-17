@@ -260,7 +260,7 @@ class Experiment:
 configs = [
     Experiment(
         seed=seed,
-        acquisition_function=acquisition_functions.CoreSetBALD,
+        acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
         temperature=8,
