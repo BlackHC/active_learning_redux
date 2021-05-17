@@ -144,12 +144,13 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "BatchEvalBALD": "09a_acquisition_functions.ipynb",
          "EIG": "09a_acquisition_functions.ipynb",
          "TemperedEIG": "09a_acquisition_functions.ipynb",
-         "mnist_initial_samples": "09e_experiment_xmi_pred.ipynb",
-         "Experiment": "09e_experiment_xmi_pred.ipynb",
-         "configs": "09e_experiment_xmi_pred.ipynb",
+         "mnist_initial_samples": "09f_experiment_xmi_labels.ipynb",
+         "Experiment": "09g_experiment_xmi_labels_clean.ipynb",
+         "configs": "09g_experiment_xmi_labels_clean.ipynb",
          "ExperimentData": "09d_uniform_target_ood_experiment.ipynb",
          "RejectionOodExperiment": "09c_rejection_ood_experiment.ipynb",
          "UniformTargetOodExperiment": "09d_uniform_target_ood_experiment.ipynb",
+         "compute_entropy_from_probs": "09g_experiment_xmi_labels_clean.ipynb",
          "DependencyInjection": "Z_dependency_injection.ipynb"}
 
 modules = ["batchbald.py",
@@ -170,8 +171,9 @@ modules = ["batchbald.py",
            "experiment.py",
            "rejection_ood_experiment.py",
            "uniform_target_ood_experiment.py",
-           "experiment_xmi_labels.py",
            "experiment_xmi_pred.py",
+           "experiment_xmi_labels.py",
+           "experiment_xmi_labels_clean.py",
            "di.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"
