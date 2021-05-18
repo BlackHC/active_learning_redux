@@ -263,25 +263,15 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        temperature=8,
+        max_training_set=150
     )
     for seed in range(5)
     for acquisition_function in [
         acquisition_functions.BALD,
-        acquisition_functions.TemperedBALD,
         acquisition_functions.CoreSetBALD,
-        acquisition_functions.TemperedCoreSetBALD,
     ]
-    for acquisition_size in [10]
+    for acquisition_size in [1]
     for num_pool_samples in [100]
-] + [
-    Experiment(
-        seed=seed,
-        acquisition_function=acquisition_functions.Random,
-        acquisition_size=5,
-        num_pool_samples=1,
-    )
-    for seed in range(20)
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
