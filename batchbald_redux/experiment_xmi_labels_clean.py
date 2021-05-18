@@ -279,9 +279,11 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
+        initial_training_set_size=0,
+        max_training_set=140,
         temperature=8,
     )
-    for seed in range(5)
+    for seed in range(10)
     for acquisition_function in [
         acquisition_functions.BALD,
         acquisition_functions.CoreSetBALD,
@@ -293,6 +295,8 @@ configs = [
         seed=seed,
         acquisition_function=acquisition_functions.Random,
         acquisition_size=5,
+        initial_training_set_size=0,
+        max_training_set=140,
         num_pool_samples=1,
     )
     for seed in range(5)
