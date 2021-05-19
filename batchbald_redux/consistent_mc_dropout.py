@@ -85,6 +85,7 @@ class BayesianModule(Module):
             num_sub_samples = end - start
 
             data_start = 0
+            # TODO: ensure that the dataloader is not shuffling!
             for batch_x, batch_labels in loader:
                 # TODO: implement this in all the get_predictions variants?
                 if labels is None:
@@ -101,8 +102,6 @@ class BayesianModule(Module):
                 predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
                 if start == 0:
                     labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
-                else:
-                    assert labels[data_start:data_end] == batch_labels.long()
 
                 data_start = data_end
 
@@ -329,6 +328,8 @@ def get_predictions_labels(*, model: BayesianModule, num_samples, num_classes, l
     pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
     pbar.start()
 
+    # TODO: check whether the dataloader is shuffling or not!
+
     @toma.execute.range(0, num_samples, 128)
     def get_prediction_batch(start, end):
         if start == 0:
@@ -350,9 +351,6 @@ def get_predictions_labels(*, model: BayesianModule, num_samples, num_classes, l
             predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
             if start == 0:
                 labels[data_start:data_end].copy_(batch_labels.long(), non_blocking=True)
-            else:
-                # TODO: check whether the dataloader is shuffling or not!
-                assert all(labels[data_start:data_end] == batch_labels.long())
 
             data_start = data_end
 
