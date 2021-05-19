@@ -117,7 +117,7 @@ def train(
     if patience is not None:
         if prefer_accuracy:
             def score_function():
-                lambda: float(validation_evaluator.state.metrics["accuracy"])
+                return float(validation_evaluator.state.metrics["accuracy"])
         else:
             def score_function():
                 return float(-validation_evaluator.state.metrics["crossentropy"])
