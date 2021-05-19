@@ -59,7 +59,7 @@ class ExperimentData:
 class UniformTargetOodExperiment:
     seed: int = 1337
     acquisition_size: int = 5
-    max_training_set: int = 450
+    max_training_set: int = 200
     num_pool_samples: int = 20
     num_validation_samples: int = 20
     num_training_samples: int = 1
