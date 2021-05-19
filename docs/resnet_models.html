@@ -621,7 +621,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <span class="k">class</span> <span class="nc">Cifar10BayesianResnetFactory</span><span class="p">(</span><span class="n">ModelOptimizerFactory</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">create_model_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelOptimizer</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">bayesian_resnet18</span><span class="p">(</span><span class="n">cifar_mod</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ModelOptimizer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
 </pre></div>
 
@@ -646,7 +646,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">batchbald_redux.datasets</span> <span class="kn">import</span> <span class="n">get_dataset</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">evaluate</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">train_with_schedule</span><span class="p">,</span> <span class="n">evaluate</span>
 </pre></div>
 
     </div>
@@ -705,7 +705,7 @@ Files already downloaded and verified
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">Cifar10BayesianResnetFactory</span><span class="p">()</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
+<span class="n">train_with_schedule</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience_schedule</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">factor_schedule</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">],</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
 </pre></div>
 
     </div>
@@ -718,29 +718,62 @@ Files already downloaded and verified
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.376, &#39;crossentropy&#39;: 1.7747087776184083}
-Epoch metrics: {&#39;accuracy&#39;: 0.3038, &#39;crossentropy&#39;: 2.8370810304641725}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.5404, &#39;crossentropy&#39;: 1.2979279357910156}
-Epoch metrics: {&#39;accuracy&#39;: 0.4976, &#39;crossentropy&#39;: 1.5118891874313354}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.5662, &#39;crossentropy&#39;: 1.2412569439888002}
-Epoch metrics: {&#39;accuracy&#39;: 0.5536, &#39;crossentropy&#39;: 1.507961089324951}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.648, &#39;crossentropy&#39;: 1.016942205429077}
-Epoch metrics: {&#39;accuracy&#39;: 0.6684, &#39;crossentropy&#39;: 1.0051459045410156}
-Epoch metrics: {&#39;accuracy&#39;: 0.5756, &#39;crossentropy&#39;: 1.322553720664978}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.6942, &#39;crossentropy&#39;: 0.9254168411254883}
-Epoch metrics: {&#39;accuracy&#39;: 0.6888, &#39;crossentropy&#39;: 0.9484675670623779}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.6718, &#39;crossentropy&#39;: 1.0473520345687866}
-RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.695, &#39;crossentropy&#39;: 1.0382579725265504}
-RestoringEarlyStopping: 3 / 3
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -0.9254168411254883)
-RestoringEarlyStopping: Restoring optimizer.
+<pre>Epoch metrics: {&#39;accuracy&#39;: 0.4036, &#39;crossentropy&#39;: 1.7882676845550538}
+Epoch metrics: {&#39;accuracy&#39;: 0.4834, &#39;crossentropy&#39;: 1.481701950454712}
+Epoch metrics: {&#39;accuracy&#39;: 0.5428, &#39;crossentropy&#39;: 1.3699166606903077}
+Epoch metrics: {&#39;accuracy&#39;: 0.501, &#39;crossentropy&#39;: 1.5626290748596192}
+Epoch 4: 0.501 worse than 0.5428, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.601, &#39;crossentropy&#39;: 1.2635912508010865}
+Epoch metrics: {&#39;accuracy&#39;: 0.6266, &#39;crossentropy&#39;: 1.187613642501831}
+Epoch metrics: {&#39;accuracy&#39;: 0.6734, &#39;crossentropy&#39;: 1.0052011548995972}
+Epoch metrics: {&#39;accuracy&#39;: 0.682, &#39;crossentropy&#39;: 1.0248640705108643}
+Epoch metrics: {&#39;accuracy&#39;: 0.7096, &#39;crossentropy&#39;: 0.9396376174926758}
+Epoch metrics: {&#39;accuracy&#39;: 0.7272, &#39;crossentropy&#39;: 0.8418712997436524}
+Epoch metrics: {&#39;accuracy&#39;: 0.7102, &#39;crossentropy&#39;: 0.992177451467514}
+Epoch 11: 0.7102 worse than 0.7272, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.7522, &#39;crossentropy&#39;: 0.8086827343940735}
+Epoch metrics: {&#39;accuracy&#39;: 0.7696, &#39;crossentropy&#39;: 0.7537960346221924}
+Epoch metrics: {&#39;accuracy&#39;: 0.677, &#39;crossentropy&#39;: 1.2522793543338775}
+Epoch 14: 0.677 worse than 0.7696, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.7704, &#39;crossentropy&#39;: 0.7572291868209838}
+Epoch metrics: {&#39;accuracy&#39;: 0.788, &#39;crossentropy&#39;: 0.6703125279903411}
+Epoch metrics: {&#39;accuracy&#39;: 0.8058, &#39;crossentropy&#39;: 0.6643583700180054}
+Epoch metrics: {&#39;accuracy&#39;: 0.7888, &#39;crossentropy&#39;: 0.7042493198394776}
+Epoch 18: 0.7888 worse than 0.8058, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.7828, &#39;crossentropy&#39;: 0.7735469184875489}
+Epoch 19: 0.7828 worse than 0.8058, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.7842, &#39;crossentropy&#39;: 0.8083664597511292}
+Epoch 20: 0.7842 worse than 0.8058, patience: 3/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.7916, &#39;crossentropy&#39;: 0.745104105758667}
+Epoch 21: 0.7916 worse than 0.8058, patience: 4/3!
+Epoch    21: reducing learning rate of group 0 to 1.0000e-04.
+Epoch metrics: {&#39;accuracy&#39;: 0.8576, &#39;crossentropy&#39;: 0.488191157746315}
+Epoch metrics: {&#39;accuracy&#39;: 0.8572, &#39;crossentropy&#39;: 0.48753206486701967}
+Epoch 23: 0.8572 worse than 0.8576, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8598, &#39;crossentropy&#39;: 0.48893280182480814}
+Epoch metrics: {&#39;accuracy&#39;: 0.863, &#39;crossentropy&#39;: 0.4871544968008995}
+Epoch metrics: {&#39;accuracy&#39;: 0.8594, &#39;crossentropy&#39;: 0.500533379971981}
+Epoch 26: 0.8594 worse than 0.863, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8614, &#39;crossentropy&#39;: 0.4965192899346352}
+Epoch 27: 0.8614 worse than 0.863, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8592, &#39;crossentropy&#39;: 0.5033470409154892}
+Epoch 28: 0.8592 worse than 0.863, patience: 3/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8594, &#39;crossentropy&#39;: 0.504065201023221}
+Epoch 29: 0.8594 worse than 0.863, patience: 4/3!
+Epoch    29: reducing learning rate of group 0 to 1.0000e-05.
+Epoch metrics: {&#39;accuracy&#39;: 0.8616, &#39;crossentropy&#39;: 0.49568186736106873}
+Epoch 30: 0.8616 worse than 0.863, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8628, &#39;crossentropy&#39;: 0.4986858606278896}
+Epoch 31: 0.8628 worse than 0.863, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8658, &#39;crossentropy&#39;: 0.5025872270286084}
+Epoch metrics: {&#39;accuracy&#39;: 0.8616, &#39;crossentropy&#39;: 0.4966917310476303}
+Epoch 33: 0.8616 worse than 0.8658, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.864, &#39;crossentropy&#39;: 0.5035948188602924}
+Epoch 34: 0.864 worse than 0.8658, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.864, &#39;crossentropy&#39;: 0.49511414707899093}
+Epoch 35: 0.864 worse than 0.8658, patience: 3/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.8628, &#39;crossentropy&#39;: 0.5081136326342821}
+Epoch 36: 0.8628 worse than 0.8658, patience: 4/3!
 </pre>
 </div>
 </div>
@@ -750,515 +783,7 @@ RestoringEarlyStopping: Restoring optimizer.
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Adam (
-Parameter Group 0
-    amsgrad: False
-    betas: (0.9, 0.999)
-    eps: 1e-08
-    lr: 0.001
-    weight_decay: 0.0005
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;accuracy&#39;: 0.6922, &#39;crossentropy&#39;: 0.9515853671073914}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0001</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.7822, &#39;crossentropy&#39;: 0.6646599209785461}
-Epoch metrics: {&#39;accuracy&#39;: 0.7838, &#39;crossentropy&#39;: 0.6699595861434936}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.7908, &#39;crossentropy&#39;: 0.6441399562835693}
-Epoch metrics: {&#39;accuracy&#39;: 0.8048, &#39;crossentropy&#39;: 0.6130667810440064}
-Epoch metrics: {&#39;accuracy&#39;: 0.7954, &#39;crossentropy&#39;: 0.6420934771537781}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.8068, &#39;crossentropy&#39;: 0.6177933835983276}
-RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.8086, &#39;crossentropy&#39;: 0.6145880765914917}
-RestoringEarlyStopping: 3 / 3
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -0.6130667810440064)
-RestoringEarlyStopping: Restoring optimizer.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Adam (
-Parameter Group 0
-    amsgrad: False
-    betas: (0.9, 0.999)
-    eps: 1e-08
-    lr: 0.0001
-    weight_decay: 0.0005
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.00001</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.8086, &#39;crossentropy&#39;: 0.6050274826049805}
-Epoch metrics: {&#39;accuracy&#39;: 0.8054, &#39;crossentropy&#39;: 0.6168006797790527}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.811, &#39;crossentropy&#39;: 0.5988133088111878}
-Epoch metrics: {&#39;accuracy&#39;: 0.8106, &#39;crossentropy&#39;: 0.6120677886009216}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.8092, &#39;crossentropy&#39;: 0.6218233244895935}
-RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.8124, &#39;crossentropy&#39;: 0.6057045068740845}
-RestoringEarlyStopping: 3 / 3
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -0.5988133088111878)
-RestoringEarlyStopping: Restoring optimizer.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Adam (
-Parameter Group 0
-    amsgrad: False
-    betas: (0.9, 0.999)
-    eps: 1e-08
-    lr: 0.0001
-    weight_decay: 0.0005
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;accuracy&#39;: 0.8094, &#39;crossentropy&#39;: 0.621852204322815}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="CIFAR-100">CIFAR-100<a class="anchor-link" href="#CIFAR-100"> </a></h2>
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">split_dataset</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;CIFAR-100&quot;</span><span class="p">,</span> <span class="n">normalize_like_cifar10</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">train_augmentation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validation_set_size</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to ./data/CIFAR100/cifar-100-python.tar.gz
-Extracting ./data/CIFAR100/cifar-100-python.tar.gz to ./data/CIFAR100
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils</span> <span class="kn">import</span> <span class="n">data</span>
-
-<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-
-<span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">train</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="n">validation_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="n">test_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">Cifar10BayesianResnetFactory</span><span class="p">()</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.0632, &#39;crossentropy&#39;: 4.14603406906128}
-Epoch metrics: {&#39;accuracy&#39;: 0.0716, &#39;crossentropy&#39;: 4.176568883514404}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.0816, &#39;crossentropy&#39;: 3.981301070022583}
-Epoch metrics: {&#39;accuracy&#39;: 0.1008, &#39;crossentropy&#39;: 3.867222649383545}
-Epoch metrics: {&#39;accuracy&#39;: 0.0936, &#39;crossentropy&#39;: 4.0362511753082275}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.1144, &#39;crossentropy&#39;: 3.7605818313598633}
-Epoch metrics: {&#39;accuracy&#39;: 0.1454, &#39;crossentropy&#39;: 3.6016291160583496}
-Epoch metrics: {&#39;accuracy&#39;: 0.158, &#39;crossentropy&#39;: 3.5560484287261964}
-Epoch metrics: {&#39;accuracy&#39;: 0.1634, &#39;crossentropy&#39;: 3.512123303222656}
-Epoch metrics: {&#39;accuracy&#39;: 0.1472, &#39;crossentropy&#39;: 3.567721910095215}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.2032, &#39;crossentropy&#39;: 3.289160566329956}
-Epoch metrics: {&#39;accuracy&#39;: 0.1902, &#39;crossentropy&#39;: 3.3693539279937745}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.227, &#39;crossentropy&#39;: 3.2229233028411866}
-Epoch metrics: {&#39;accuracy&#39;: 0.207, &#39;crossentropy&#39;: 3.318118774032593}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.2268, &#39;crossentropy&#39;: 3.3143065963745117}
-RestoringEarlyStopping: 2 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.2664, &#39;crossentropy&#39;: 3.0130730995178223}
-Epoch metrics: {&#39;accuracy&#39;: 0.2654, &#39;crossentropy&#39;: 3.140109531402588}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.283, &#39;crossentropy&#39;: 2.905575667190552}
-Epoch metrics: {&#39;accuracy&#39;: 0.2888, &#39;crossentropy&#39;: 2.9800102016448973}
-RestoringEarlyStopping: 1 / 3
-Epoch metrics: {&#39;accuracy&#39;: 0.3154, &#39;crossentropy&#39;: 2.8153507110595704}
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.8153507110595704)
-RestoringEarlyStopping: Restoring optimizer.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Adam (
-Parameter Group 0
-    amsgrad: False
-    betas: (0.9, 0.999)
-    eps: 1e-08
-    lr: 0.001
-    weight_decay: 0.0005
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;accuracy&#39;: 0.4073, &#39;crossentropy&#39;: 2.4089209457397462}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0001</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.4872, &#39;crossentropy&#39;: 2.1317770015716553}
-Epoch metrics: {&#39;accuracy&#39;: 0.4962, &#39;crossentropy&#39;: 2.124665393447876}
-Epoch metrics: {&#39;accuracy&#39;: 0.495, &#39;crossentropy&#39;: 2.117351225280762}
-Epoch metrics: {&#39;accuracy&#39;: 0.4988, &#39;crossentropy&#39;: 2.1308182596206664}
-RestoringEarlyStopping: 1 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.498, &#39;crossentropy&#39;: 2.1104691465377807}
-Epoch metrics: {&#39;accuracy&#39;: 0.4958, &#39;crossentropy&#39;: 2.1190622821807863}
-RestoringEarlyStopping: 1 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5042, &#39;crossentropy&#39;: 2.1231056619644164}
-RestoringEarlyStopping: 2 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5024, &#39;crossentropy&#39;: 2.1208188636779783}
-RestoringEarlyStopping: 3 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5118, &#39;crossentropy&#39;: 2.1385603052139284}
-RestoringEarlyStopping: 4 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5062, &#39;crossentropy&#39;: 2.1172529203414916}
-RestoringEarlyStopping: 5 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.509, &#39;crossentropy&#39;: 2.124829684829712}
-RestoringEarlyStopping: 6 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.511, &#39;crossentropy&#39;: 2.1580410612106324}
-RestoringEarlyStopping: 7 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5106, &#39;crossentropy&#39;: 2.1394233554840087}
-RestoringEarlyStopping: 8 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5154, &#39;crossentropy&#39;: 2.148689827346802}
-RestoringEarlyStopping: 9 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5108, &#39;crossentropy&#39;: 2.151118082046509}
-RestoringEarlyStopping: 10 / 10
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.1104691465377807)
-RestoringEarlyStopping: Restoring optimizer.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Adam (
-Parameter Group 0
-    amsgrad: False
-    betas: (0.9, 0.999)
-    eps: 1e-08
-    lr: 0.0001
-    weight_decay: 0.0005
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.00001</span>
-<span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.5028, &#39;crossentropy&#39;: 2.1124680683135986}
-Epoch metrics: {&#39;accuracy&#39;: 0.5082, &#39;crossentropy&#39;: 2.101543770599365}
-Epoch metrics: {&#39;accuracy&#39;: 0.5058, &#39;crossentropy&#39;: 2.097852055168152}
-Epoch metrics: {&#39;accuracy&#39;: 0.501, &#39;crossentropy&#39;: 2.109860559463501}
-RestoringEarlyStopping: 1 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.4998, &#39;crossentropy&#39;: 2.105793392944336}
-RestoringEarlyStopping: 2 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5064, &#39;crossentropy&#39;: 2.1044957824707033}
-RestoringEarlyStopping: 3 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5062, &#39;crossentropy&#39;: 2.1129880771636964}
-RestoringEarlyStopping: 4 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.509, &#39;crossentropy&#39;: 2.1033969470977785}
-RestoringEarlyStopping: 5 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5068, &#39;crossentropy&#39;: 2.093500965499878}
-Epoch metrics: {&#39;accuracy&#39;: 0.4992, &#39;crossentropy&#39;: 2.1043436504364013}
-RestoringEarlyStopping: 1 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.504, &#39;crossentropy&#39;: 2.1144892044067385}
-RestoringEarlyStopping: 2 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.506, &#39;crossentropy&#39;: 2.111311180496216}
-RestoringEarlyStopping: 3 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.506, &#39;crossentropy&#39;: 2.114365553665161}
-RestoringEarlyStopping: 4 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5054, &#39;crossentropy&#39;: 2.1056131956100463}
-RestoringEarlyStopping: 5 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5118, &#39;crossentropy&#39;: 2.1098979974746706}
-RestoringEarlyStopping: 6 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.51, &#39;crossentropy&#39;: 2.1050967222213743}
-RestoringEarlyStopping: 7 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5088, &#39;crossentropy&#39;: 2.108257216644287}
-RestoringEarlyStopping: 8 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.5124, &#39;crossentropy&#39;: 2.1050700443267822}
-RestoringEarlyStopping: 9 / 10
-Epoch metrics: {&#39;accuracy&#39;: 0.506, &#39;crossentropy&#39;: 2.1230926248550417}
-RestoringEarlyStopping: 10 / 10
-RestoringEarlyStopping: Out of patience
-RestoringEarlyStopping: Restoring best parameters. (Score: -2.093500965499878)
-RestoringEarlyStopping: Restoring optimizer.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Adam (
+<pre>AdamW (
 Parameter Group 0
     amsgrad: False
     betas: (0.9, 0.999)
@@ -1298,7 +823,7 @@ Parameter Group 0
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;accuracy&#39;: 0.501, &#39;crossentropy&#39;: 2.0839771587371825}</pre>
+<pre>{&#39;accuracy&#39;: 0.8638, &#39;crossentropy&#39;: 0.5297188091278077}</pre>
 </div>
 
 </div>
@@ -1311,7 +836,211 @@ Parameter Group 0
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is better than Random acquisition in VAAL (Variational Adversarial Active Learning, <a href="https://arxiv.org/abs/1904.00370">https://arxiv.org/abs/1904.00370</a>) and on par with the reported CoreSet AL results: 50.5%?</p>
+<h2 id="CIFAR-100">CIFAR-100<a class="anchor-link" href="#CIFAR-100"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">split_dataset</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;CIFAR-100&quot;</span><span class="p">,</span> <span class="n">normalize_like_cifar10</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">train_augmentation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validation_set_size</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Files already downloaded and verified
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils</span> <span class="kn">import</span> <span class="n">data</span>
+
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">train</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">validation_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">validation</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">split_dataset</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">Cifar10BayesianResnetFactory</span><span class="p">()</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
+<span class="n">train_with_schedule</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span> <span class="n">patience_schedule</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">factor_schedule</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">],</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">training_log</span><span class="o">=</span><span class="p">{})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch metrics: {&#39;accuracy&#39;: 0.037, &#39;crossentropy&#39;: 4.40652554473877}
+Epoch metrics: {&#39;accuracy&#39;: 0.0492, &#39;crossentropy&#39;: 4.2037655502319335}
+Epoch metrics: {&#39;accuracy&#39;: 0.061, &#39;crossentropy&#39;: 4.198613374328613}
+Epoch metrics: {&#39;accuracy&#39;: 0.0564, &#39;crossentropy&#39;: 4.067956605148315}
+Epoch 4: 0.0564 worse than 0.061, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.0838, &#39;crossentropy&#39;: 4.026535692596435}
+Epoch metrics: {&#39;accuracy&#39;: 0.0804, &#39;crossentropy&#39;: 4.04006093826294}
+Epoch 6: 0.0804 worse than 0.0838, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.0916, &#39;crossentropy&#39;: 3.950498880004883}
+Epoch metrics: {&#39;accuracy&#39;: 0.1032, &#39;crossentropy&#39;: 3.9708983085632323}
+Epoch metrics: {&#39;accuracy&#39;: 0.1142, &#39;crossentropy&#39;: 3.8166026466369627}
+Epoch metrics: {&#39;accuracy&#39;: 0.117, &#39;crossentropy&#39;: 3.8180666912078856}
+Epoch metrics: {&#39;accuracy&#39;: 0.1002, &#39;crossentropy&#39;: 3.947795548248291}
+Epoch 11: 0.1002 worse than 0.117, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.1012, &#39;crossentropy&#39;: 3.8586297302246093}
+Epoch 12: 0.1012 worse than 0.117, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.1334, &#39;crossentropy&#39;: 3.7211234298706053}
+Epoch metrics: {&#39;accuracy&#39;: 0.1526, &#39;crossentropy&#39;: 3.6456055068969726}
+Epoch metrics: {&#39;accuracy&#39;: 0.1506, &#39;crossentropy&#39;: 3.639182250213623}
+Epoch 15: 0.1506 worse than 0.1526, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.1556, &#39;crossentropy&#39;: 3.5743414745330813}
+Epoch metrics: {&#39;accuracy&#39;: 0.1798, &#39;crossentropy&#39;: 3.5142369106292723}
+Epoch metrics: {&#39;accuracy&#39;: 0.1766, &#39;crossentropy&#39;: 3.4968504013061525}
+Epoch 18: 0.1766 worse than 0.1798, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.19, &#39;crossentropy&#39;: 3.415262245178223}
+Epoch metrics: {&#39;accuracy&#39;: 0.2, &#39;crossentropy&#39;: 3.436680059814453}
+Epoch metrics: {&#39;accuracy&#39;: 0.2038, &#39;crossentropy&#39;: 3.479621842575073}
+Epoch metrics: {&#39;accuracy&#39;: 0.1874, &#39;crossentropy&#39;: 3.492301457977295}
+Epoch 22: 0.1874 worse than 0.2038, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.2194, &#39;crossentropy&#39;: 3.321240447998047}
+Epoch metrics: {&#39;accuracy&#39;: 0.2264, &#39;crossentropy&#39;: 3.2894559776306154}
+Epoch metrics: {&#39;accuracy&#39;: 0.2468, &#39;crossentropy&#39;: 3.2592536624908446}
+Epoch metrics: {&#39;accuracy&#39;: 0.255, &#39;crossentropy&#39;: 3.1534479541778566}
+Epoch metrics: {&#39;accuracy&#39;: 0.2574, &#39;crossentropy&#39;: 3.194382339859009}
+Epoch metrics: {&#39;accuracy&#39;: 0.2588, &#39;crossentropy&#39;: 3.2088769870758056}
+Epoch metrics: {&#39;accuracy&#39;: 0.2538, &#39;crossentropy&#39;: 3.1996145584106443}
+Epoch 29: 0.2538 worse than 0.2588, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.2868, &#39;crossentropy&#39;: 3.048496583557129}
+Epoch metrics: {&#39;accuracy&#39;: 0.285, &#39;crossentropy&#39;: 3.0462064266204836}
+Epoch 31: 0.285 worse than 0.2868, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.2916, &#39;crossentropy&#39;: 3.0441914291381837}
+Epoch metrics: {&#39;accuracy&#39;: 0.3042, &#39;crossentropy&#39;: 2.9938636936187746}
+Epoch metrics: {&#39;accuracy&#39;: 0.3142, &#39;crossentropy&#39;: 2.9616074798583982}
+Epoch metrics: {&#39;accuracy&#39;: 0.3128, &#39;crossentropy&#39;: 3.0372639751434325}
+Epoch 35: 0.3128 worse than 0.3142, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.3266, &#39;crossentropy&#39;: 2.9172872680664064}
+Epoch metrics: {&#39;accuracy&#39;: 0.332, &#39;crossentropy&#39;: 2.8956572322845457}
+Epoch metrics: {&#39;accuracy&#39;: 0.3346, &#39;crossentropy&#39;: 2.8784393520355223}
+Epoch metrics: {&#39;accuracy&#39;: 0.3478, &#39;crossentropy&#39;: 2.834599676513672}
+Epoch metrics: {&#39;accuracy&#39;: 0.3372, &#39;crossentropy&#39;: 2.8797668670654297}
+Epoch 40: 0.3372 worse than 0.3478, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.3616, &#39;crossentropy&#39;: 2.7556054058074952}
+Epoch metrics: {&#39;accuracy&#39;: 0.3524, &#39;crossentropy&#39;: 2.8509595169067383}
+Epoch 42: 0.3524 worse than 0.3616, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.3544, &#39;crossentropy&#39;: 2.8260359642028807}
+Epoch 43: 0.3544 worse than 0.3616, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.3708, &#39;crossentropy&#39;: 2.761400556564331}
+Epoch metrics: {&#39;accuracy&#39;: 0.3746, &#39;crossentropy&#39;: 2.743904900741577}
+Epoch metrics: {&#39;accuracy&#39;: 0.3752, &#39;crossentropy&#39;: 2.752844585418701}
+Epoch metrics: {&#39;accuracy&#39;: 0.391, &#39;crossentropy&#39;: 2.7870617553710937}
+Epoch metrics: {&#39;accuracy&#39;: 0.3912, &#39;crossentropy&#39;: 2.6811590377807617}
+Epoch metrics: {&#39;accuracy&#39;: 0.392, &#39;crossentropy&#39;: 2.7096566692352293}
+Epoch metrics: {&#39;accuracy&#39;: 0.3922, &#39;crossentropy&#39;: 2.6482392658233644}
+Epoch metrics: {&#39;accuracy&#39;: 0.4076, &#39;crossentropy&#39;: 2.69913618888855}
+Epoch metrics: {&#39;accuracy&#39;: 0.3926, &#39;crossentropy&#39;: 2.7104971210479736}
+Epoch 52: 0.3926 worse than 0.4076, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.4212, &#39;crossentropy&#39;: 2.7271564582824706}
+Epoch metrics: {&#39;accuracy&#39;: 0.3974, &#39;crossentropy&#39;: 2.7731422164916992}
+Epoch 54: 0.3974 worse than 0.4212, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.4226, &#39;crossentropy&#39;: 2.7127608409881594}
+Epoch metrics: {&#39;accuracy&#39;: 0.4286, &#39;crossentropy&#39;: 2.686399506378174}
+Epoch metrics: {&#39;accuracy&#39;: 0.4234, &#39;crossentropy&#39;: 2.731360105895996}
+Epoch 57: 0.4234 worse than 0.4286, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.4368, &#39;crossentropy&#39;: 2.6142911724090574}
+Epoch metrics: {&#39;accuracy&#39;: 0.4238, &#39;crossentropy&#39;: 2.699748579788208}
+Epoch 59: 0.4238 worse than 0.4368, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.4228, &#39;crossentropy&#39;: 2.831049083137512}
+Epoch 60: 0.4228 worse than 0.4368, patience: 2/3!
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>AdamW (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.005
+    weight_decay: 0.0005
+)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;accuracy&#39;: 0.5724, &#39;crossentropy&#39;: 3.0206112657546997}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>57.24% is better than Random acquisition in VAAL (Variational Adversarial Active Learning, <a href="https://arxiv.org/abs/1904.00370">https://arxiv.org/abs/1904.00370</a>) and also better than the reported CoreSet AL results: 50.5%?</p>
 <hr>
 <p>"Task-Aware Variational Adversarial Active Learning" (<a href="https://arxiv.org/abs/2002.04709">https://arxiv.org/abs/2002.04709</a>) reports much better numbers for Random on ResNet, however: 64%.</p>
 <p>They state:</p>

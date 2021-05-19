@@ -58,7 +58,7 @@ nb_path: "07_black_box_training.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L33" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="train" class="doc_header"><code>train</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L37" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>Optional</code>[<code>int</code>], <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>, <strong><code>prefer_accuracy</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 <p>:param model:
 :param train_loader:
@@ -69,54 +69,6 @@ nb_path: "07_black_box_training.ipynb"
 :param tb_log_dir:
 :param device:
 :return: Optimizer that was used for training.</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L137" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L166" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
-</blockquote>
 
 </div>
 
@@ -152,6 +104,7 @@ nb_path: "07_black_box_training.ipynb"
     <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">validation_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">prefer_accuracy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param model:</span>
@@ -220,10 +173,19 @@ nb_path: "07_black_box_training.ipynb"
 
     <span class="c1"># Add early stopping</span>
     <span class="k">if</span> <span class="n">patience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prefer_accuracy</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">score_function</span><span class="p">():</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">score_function</span><span class="p">():</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crossentropy&quot;</span><span class="p">])</span>
+
         <span class="n">early_stopping</span> <span class="o">=</span> <span class="n">RestoringEarlyStopping</span><span class="p">(</span>
             <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>
-            <span class="c1">#score_function=lambda: float(-validation_evaluator.state.metrics[&quot;crossentropy&quot;]),</span>
-            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]),</span>
+            <span class="n">score_function</span><span class="o">=</span><span class="n">score_function</span><span class="p">,</span>
             <span class="n">module</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
             <span class="n">training_engine</span><span class="o">=</span><span class="n">trainer</span><span class="p">,</span>
@@ -240,12 +202,493 @@ nb_path: "07_black_box_training.ipynb"
 
     <span class="c1"># Return the optimizer in case we want to continue training.</span>
     <span class="k">return</span> <span class="n">optimizer</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
 
 
-<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="c1"># TODO: rewrite this on top of TrainedModel?</span>
-    <span class="c1"># Add &quot;get_log_prob_predictions&quot; which returns the mean?</span>
-    <span class="c1"># Compute accuracy etc based on that?</span>
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="train_with_schedule" class="doc_header"><code>train_with_schedule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L153" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train_with_schedule</code>(<strong><code>model</code></strong>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>factor_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>, <strong><code>prefer_accuracy</code></strong>=<em><code>True</code></em>)</p>
+</blockquote>
+<p>:param model:
+:param train_loader:
+:param val_loader:
+:param metric_loader: We compute metrics for debugging and introspection purposes with this data.
+:param patience: How many epochs to wait for early-stopping.
+:param max_epochs:
+:param tb_log_dir:
+:param device:
+:return: Optimizer that was used for training.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">train_with_schedule</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">training_samples</span><span class="p">,</span>
+    <span class="n">validation_samples</span><span class="p">,</span>
+    <span class="n">train_loader</span><span class="p">,</span>
+    <span class="n">validation_loader</span><span class="p">,</span>
+    <span class="n">patience_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">factor_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">training_log</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">validation_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">prefer_accuracy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param model:</span>
+<span class="sd">    :param train_loader:</span>
+<span class="sd">    :param val_loader:</span>
+<span class="sd">    :param metric_loader: We compute metrics for debugging and introspection purposes with this data.</span>
+<span class="sd">    :param patience: How many epochs to wait for early-stopping.</span>
+<span class="sd">    :param max_epochs:</span>
+<span class="sd">    :param tb_log_dir:</span>
+<span class="sd">    :param device:</span>
+<span class="sd">    :return: Optimizer that was used for training.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">validation_loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">validation_loss</span> <span class="o">=</span> <span class="n">loss</span>
+
+    <span class="n">train_model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">training_samples</span><span class="p">)</span>
+    <span class="n">validation_model</span> <span class="o">=</span> <span class="n">GeometricMeanPrediction</span><span class="p">(</span><span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validation_samples</span><span class="p">))</span>
+
+    <span class="c1"># Move model to device before creating the optimizer</span>
+    <span class="n">train_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">create_supervised_trainer</span><span class="p">(</span><span class="n">train_model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">multi_sample_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">create_metrics</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">)</span>
+
+    <span class="n">validation_evaluator</span> <span class="o">=</span> <span class="n">create_supervised_evaluator</span><span class="p">(</span><span class="n">validation_model</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="nd">@trainer</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+        <span class="n">validation_evaluator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">validation_loader</span><span class="p">)</span>
+
+    <span class="c1"># Only to look nicer.</span>
+    <span class="n">RunningAverage</span><span class="p">(</span><span class="n">output_transform</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;crossentropy&quot;</span><span class="p">)</span>
+
+    <span class="n">enable_tqdm_pbars</span> <span class="o">=</span> <span class="n">is_run_from_ipython</span><span class="p">()</span>
+
+    <span class="n">setup_common_training_handlers</span><span class="p">(</span>
+        <span class="n">trainer</span><span class="p">,</span> <span class="n">with_pbars</span><span class="o">=</span><span class="n">enable_tqdm_pbars</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">enable_tqdm_pbars</span><span class="p">:</span>
+        <span class="n">ProgressBar</span><span class="p">(</span><span class="n">persist</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span>
+            <span class="n">validation_evaluator</span><span class="p">,</span>
+            <span class="n">metric_names</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+            <span class="n">event_name</span><span class="o">=</span><span class="n">Events</span><span class="o">.</span><span class="n">ITERATION_COMPLETED</span><span class="p">(</span><span class="n">every</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ignite_progress_bar</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="k">lambda</span> <span class="n">engine</span><span class="p">:</span> <span class="s2">&quot;Training&quot;</span><span class="p">,</span> <span class="n">log_interval</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
+
+    <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epochs_log</span> <span class="o">=</span> <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Logging</span>
+    <span class="nd">@validation_evaluator</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">log_training_results</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="n">epochs_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_run_from_ipython</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch metrics: </span><span class="si">{</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">prefer_accuracy</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">score_function</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">score_function</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crossentropy&quot;</span><span class="p">])</span>
+
+    <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;era_epochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">next_era_callback</span><span class="p">():</span>
+        <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;era_epochs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span><span class="p">)</span>
+
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">ReduceLROnPlateauWithScheduleWrapper</span><span class="p">(</span>
+        <span class="n">optimizer</span><span class="p">,</span>
+        <span class="n">metrics_transform</span><span class="o">=</span><span class="n">score_function</span><span class="p">,</span>
+        <span class="n">factor_schedule</span><span class="o">=</span><span class="n">factor_schedule</span><span class="p">,</span>
+        <span class="n">patience_schedule</span><span class="o">=</span><span class="n">patience_schedule</span><span class="p">,</span>
+        <span class="n">end_callback</span><span class="o">=</span><span class="n">trainer</span><span class="o">.</span><span class="n">terminate</span><span class="p">,</span>
+        <span class="n">next_era_callback</span><span class="o">=</span><span class="n">next_era_callback</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span> <span class="k">if</span> <span class="n">prefer_accuracy</span> <span class="k">else</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@validation_evaluator</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">step_scheduler</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+        <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="c1"># Kick everything off</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">max_epochs</span><span class="p">)</span>
+
+    <span class="c1"># Return the optimizer in case we want to continue training.</span>
+    <span class="k">return</span> <span class="n">optimizer</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ModelOptimizerStateDicts" class="doc_header"><code>class</code> <code>ModelOptimizerStateDicts</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L275" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ModelOptimizerStateDicts</code>(<strong><code>model_state_dict</code></strong>:<code>object</code>, <strong><code>optimizer_state_dict</code></strong>:<code>object</code>)</p>
+</blockquote>
+<p>ModelOptimizerStateDicts(model_state_dict: object, optimizer_state_dict: object)</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="DoubleSnapshots" class="doc_header"><code>class</code> <code>DoubleSnapshots</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L281" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DoubleSnapshots</code>(<strong><code>high_accuracy</code></strong>:<a href="/batchbald_redux/black_box_training.html#ModelOptimizerStateDicts"><code>ModelOptimizerStateDicts</code></a>, <strong><code>low_cross_entropy</code></strong>:<a href="/batchbald_redux/black_box_training.html#ModelOptimizerStateDicts"><code>ModelOptimizerStateDicts</code></a>)</p>
+</blockquote>
+<p>DoubleSnapshots(high_accuracy: batchbald_redux.black_box_model_training.ModelOptimizerStateDicts, low_cross_entropy: batchbald_redux.black_box_model_training.ModelOptimizerStateDicts)</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="train_double_snapshots" class="doc_header"><code>train_double_snapshots</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L286" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>train_double_snapshots</code>(<strong><code>model</code></strong>:<code>Module</code>, <strong><code>training_samples</code></strong>, <strong><code>validation_samples</code></strong>, <strong><code>train_loader</code></strong>, <strong><code>validation_loader</code></strong>, <strong><code>patience</code></strong>:<code>int</code>, <strong><code>max_epochs</code></strong>:<code>int</code>, <strong><code>device</code></strong>:<code>str</code>, <strong><code>training_log</code></strong>:<code>dict</code>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>validation_loss</code></strong>=<em><code>None</code></em>, <strong><code>optimizer</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>:param model:
+:param train_loader:
+:param val_loader:
+:param metric_loader: We compute metrics for debugging and introspection purposes with this data.
+:param patience: How many epochs to wait for early-stopping.
+:param max_epochs:
+:param tb_log_dir:
+:param device:
+:return: Optimizer that was used for training.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ModelOptimizerStateDicts</span><span class="p">:</span>
+    <span class="n">model_state_dict</span><span class="p">:</span> <span class="nb">object</span>
+    <span class="n">optimizer_state_dict</span><span class="p">:</span> <span class="nb">object</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DoubleSnapshots</span><span class="p">:</span>
+    <span class="n">high_accuracy</span><span class="p">:</span> <span class="n">ModelOptimizerStateDicts</span>
+    <span class="n">low_cross_entropy</span><span class="p">:</span> <span class="n">ModelOptimizerStateDicts</span>
+
+
+<span class="k">def</span> <span class="nf">train_double_snapshots</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+    <span class="n">training_samples</span><span class="p">,</span>
+    <span class="n">validation_samples</span><span class="p">,</span>
+    <span class="n">train_loader</span><span class="p">,</span>
+    <span class="n">validation_loader</span><span class="p">,</span>
+    <span class="n">patience</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">training_log</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">validation_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DoubleSnapshots</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param model:</span>
+<span class="sd">    :param train_loader:</span>
+<span class="sd">    :param val_loader:</span>
+<span class="sd">    :param metric_loader: We compute metrics for debugging and introspection purposes with this data.</span>
+<span class="sd">    :param patience: How many epochs to wait for early-stopping.</span>
+<span class="sd">    :param max_epochs:</span>
+<span class="sd">    :param tb_log_dir:</span>
+<span class="sd">    :param device:</span>
+<span class="sd">    :return: Optimizer that was used for training.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">validation_loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">validation_loss</span> <span class="o">=</span> <span class="n">loss</span>
+
+    <span class="n">train_model</span> <span class="o">=</span> <span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">training_samples</span><span class="p">)</span>
+    <span class="n">validation_model</span> <span class="o">=</span> <span class="n">GeometricMeanPrediction</span><span class="p">(</span><span class="n">SamplerModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">validation_samples</span><span class="p">))</span>
+
+    <span class="c1"># Move model to device before creating the optimizer</span>
+    <span class="n">train_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">create_supervised_trainer</span><span class="p">(</span><span class="n">train_model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">multi_sample_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">create_metrics</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">)</span>
+
+    <span class="n">validation_evaluator</span> <span class="o">=</span> <span class="n">create_supervised_evaluator</span><span class="p">(</span><span class="n">validation_model</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="nd">@trainer</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+        <span class="n">validation_evaluator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">validation_loader</span><span class="p">)</span>
+
+    <span class="c1"># Only to look nicer.</span>
+    <span class="n">RunningAverage</span><span class="p">(</span><span class="n">output_transform</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;crossentropy&quot;</span><span class="p">)</span>
+
+    <span class="n">enable_tqdm_pbars</span> <span class="o">=</span> <span class="n">is_run_from_ipython</span><span class="p">()</span>
+
+    <span class="n">setup_common_training_handlers</span><span class="p">(</span>
+        <span class="n">trainer</span><span class="p">,</span> <span class="n">with_pbars</span><span class="o">=</span><span class="n">enable_tqdm_pbars</span><span class="p">,</span> <span class="n">with_gpu_stats</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="n">log_every_iters</span><span class="o">=</span><span class="n">LOG_INTERVAL</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">enable_tqdm_pbars</span><span class="p">:</span>
+        <span class="n">ProgressBar</span><span class="p">(</span><span class="n">persist</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span>
+            <span class="n">validation_evaluator</span><span class="p">,</span>
+            <span class="n">metric_names</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+            <span class="n">event_name</span><span class="o">=</span><span class="n">Events</span><span class="o">.</span><span class="n">ITERATION_COMPLETED</span><span class="p">(</span><span class="n">every</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ignite_progress_bar</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="k">lambda</span> <span class="n">engine</span><span class="p">:</span> <span class="s2">&quot;Training&quot;</span><span class="p">,</span> <span class="n">log_interval</span><span class="o">=</span><span class="n">LOG_INTERVAL</span><span class="p">)</span>
+
+    <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epochs_log</span> <span class="o">=</span> <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Logging</span>
+    <span class="nd">@validation_evaluator</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">Events</span><span class="o">.</span><span class="n">EPOCH_COMPLETED</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">log_training_results</span><span class="p">(</span><span class="n">engine</span><span class="p">):</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+        <span class="n">epochs_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_run_from_ipython</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch metrics: </span><span class="si">{</span><span class="n">metrics</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">cross_entropy_state_dicts</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">accuracy_state_dicts</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Add early stopping</span>
+    <span class="k">if</span> <span class="n">patience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">cross_entropy_out_of_patience_callback</span><span class="p">(</span><span class="n">module_state_dict</span><span class="p">,</span> <span class="n">optimizer_state_dict</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">cross_entropy_state_dicts</span>
+            <span class="n">cross_entropy_state_dicts</span> <span class="o">=</span> <span class="n">ModelOptimizerStateDicts</span><span class="p">(</span>
+                <span class="n">model_state_dict</span><span class="o">=</span><span class="n">module_state_dict</span><span class="p">,</span> <span class="n">optimizer_state_dict</span><span class="o">=</span><span class="n">optimizer_state_dict</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cross_entropy_pws</span><span class="o">.</span><span class="n">is_out_of_patience</span><span class="p">()</span> <span class="ow">and</span> <span class="n">accuracy_entropy_pws</span><span class="o">.</span><span class="n">is_out_of_patience</span><span class="p">():</span>
+                <span class="n">trainer</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+        <span class="n">cross_entropy_pws</span> <span class="o">=</span> <span class="n">PatienceWithSnapshot</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;LowCrossEntropy-&quot;</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>
+            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crossentropy&quot;</span><span class="p">]),</span>
+            <span class="n">module</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">training_engine</span><span class="o">=</span><span class="n">trainer</span><span class="p">,</span>
+            <span class="n">validation_engine</span><span class="o">=</span><span class="n">validation_evaluator</span><span class="p">,</span>
+            <span class="n">out_of_patience_callback</span><span class="o">=</span><span class="n">cross_entropy_out_of_patience_callback</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">accuracy_out_of_patience_callback</span><span class="p">(</span><span class="n">module_state_dict</span><span class="p">,</span> <span class="n">optimizer_state_dict</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">accuracy_state_dicts</span>
+            <span class="n">accuracy_state_dicts</span> <span class="o">=</span> <span class="n">ModelOptimizerStateDicts</span><span class="p">(</span>
+                <span class="n">model_state_dict</span><span class="o">=</span><span class="n">module_state_dict</span><span class="p">,</span> <span class="n">optimizer_state_dict</span><span class="o">=</span><span class="n">optimizer_state_dict</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cross_entropy_pws</span><span class="o">.</span><span class="n">is_out_of_patience</span><span class="p">()</span> <span class="ow">and</span> <span class="n">accuracy_entropy_pws</span><span class="o">.</span><span class="n">is_out_of_patience</span><span class="p">():</span>
+                <span class="n">trainer</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+        <span class="n">accuracy_entropy_pws</span> <span class="o">=</span> <span class="n">PatienceWithSnapshot</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Accuracy-&quot;</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="n">patience</span><span class="p">,</span>
+            <span class="n">score_function</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">validation_evaluator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]),</span>
+            <span class="n">module</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">training_engine</span><span class="o">=</span><span class="n">trainer</span><span class="p">,</span>
+            <span class="n">validation_engine</span><span class="o">=</span><span class="n">validation_evaluator</span><span class="p">,</span>
+            <span class="n">out_of_patience_callback</span><span class="o">=</span><span class="n">accuracy_out_of_patience_callback</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Kick everything off</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">max_epochs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cross_entropy_state_dicts</span><span class="p">:</span>
+        <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;cross_entropy_best_epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_entropy_pws</span><span class="o">.</span><span class="n">best_epoch</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cross_entropy_state_dicts</span> <span class="o">=</span> <span class="n">ModelOptimizerStateDicts</span><span class="p">(</span>
+            <span class="n">model_state_dict</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">optimizer_state_dict</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">accuracy_state_dicts</span><span class="p">:</span>
+        <span class="n">training_log</span><span class="p">[</span><span class="s2">&quot;cross_entropy_best_epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross_entropy_pws</span><span class="o">.</span><span class="n">best_epoch</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">accuracy_state_dicts</span> <span class="o">=</span> <span class="n">ModelOptimizerStateDicts</span><span class="p">(</span>
+            <span class="n">model_state_dict</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">optimizer_state_dict</span><span class="o">=</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DoubleSnapshots</span><span class="p">(</span><span class="n">accuracy_state_dicts</span><span class="p">,</span> <span class="n">cross_entropy_state_dicts</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="evaluate" class="doc_header"><code>evaluate</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L432" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>evaluate</code>(<strong><code>model</code></strong>, <strong><code>num_samples</code></strong>, <strong><code>loader</code></strong>, <strong><code>device</code></strong>, <strong><code>loss</code></strong>=<em><code>None</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="create_metrics" class="doc_header"><code>create_metrics</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/black_box_model_training.py#L461" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_metrics</code>(<strong><code>loss</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># TODO: rewrite this on top of TrainedModel?</span>
+        <span class="c1"># Add &quot;get_log_prob_predictions&quot; which returns the mean?</span>
+        <span class="c1"># Compute accuracy etc based on that?</span>
 
     <span class="c1"># Move model to device</span>
     <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -300,15 +743,30 @@ nb_path: "07_black_box_training.ipynb"
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="n">GeometricMeanPrediction</span><span class="p">,</span> <span class="n">SamplerModel</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.dataset_challenges</span> <span class="kn">import</span> <span class="n">create_repeated_MNIST_dataset</span>
-<span class="kn">from</span> <span class="nn">batchbald_redux.example_models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.models</span> <span class="kn">import</span> <span class="n">BayesianMNISTCNN</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.fast_mnist</span> <span class="kn">import</span> <span class="n">FastMNIST</span>
 
 <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">create_repeated_MNIST_dataset</span><span class="p">(</span><span class="n">num_repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">BayesianMNISTCNN</span><span class="p">()</span>
-
-<span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">BayesianMNISTCNN</span><span class="p">()</span>
 
 <span class="n">training_log</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -337,10 +795,10 @@ nb_path: "07_black_box_training.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch metrics: {&#39;accuracy&#39;: 0.9739, &#39;crossentropy&#39;: 0.1600715060343345}
-Epoch metrics: {&#39;accuracy&#39;: 0.9785833333333334, &#39;crossentropy&#39;: 0.13283825434496005}
-Epoch metrics: {&#39;accuracy&#39;: 0.98225, &#39;crossentropy&#39;: 0.11636623338162899}
-RestoringEarlyStopping: Restoring best parameters. (Score: -0.11636623338162899)
+<pre>Epoch metrics: {&#39;accuracy&#39;: 0.8981666666666667, &#39;crossentropy&#39;: 0.526110907793045}
+Epoch metrics: {&#39;accuracy&#39;: 0.9351666666666667, &#39;crossentropy&#39;: 0.3658284072081248}
+Epoch metrics: {&#39;accuracy&#39;: 0.9536666666666667, &#39;crossentropy&#39;: 0.2736613269249598}
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.9536666666666667)
 RestoringEarlyStopping: Restoring optimizer.
 </pre>
 </div>
@@ -351,9 +809,10 @@ RestoringEarlyStopping: Restoring optimizer.
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.9739, &#39;crossentropy&#39;: 0.1600715060343345},
-  {&#39;accuracy&#39;: 0.9785833333333334, &#39;crossentropy&#39;: 0.13283825434496005},
-  {&#39;accuracy&#39;: 0.98225, &#39;crossentropy&#39;: 0.11636623338162899}],
+<pre>{&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.8981666666666667,
+   &#39;crossentropy&#39;: 0.526110907793045},
+  {&#39;accuracy&#39;: 0.9351666666666667, &#39;crossentropy&#39;: 0.3658284072081248},
+  {&#39;accuracy&#39;: 0.9536666666666667, &#39;crossentropy&#39;: 0.2736613269249598}],
  &#39;best_epoch&#39;: 3}</pre>
 </div>
 
@@ -388,6 +847,148 @@ RestoringEarlyStopping: Restoring optimizer.
 
 <div class="output_text output_subarea output_execute_result">
 <pre>{&#39;accuracy&#39;: 0.9715, &#39;crossentropy&#39;: 0.1681874878913164}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">BayesianMNISTCNN</span><span class="p">()</span>
+
+<span class="n">training_log</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">train_with_schedule</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">training_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">validation_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span>
+    <span class="n">validation_loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span>
+    <span class="n">patience_schedule</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">factor_schedule</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">],</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+    <span class="n">training_log</span><span class="o">=</span><span class="n">training_log</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">training_log</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch metrics: {&#39;accuracy&#39;: 0.8138, &#39;crossentropy&#39;: 0.8318569969177246}
+Epoch metrics: {&#39;accuracy&#39;: 0.9051, &#39;crossentropy&#39;: 0.5015810224533082}
+Epoch metrics: {&#39;accuracy&#39;: 0.9231, &#39;crossentropy&#39;: 0.4067144854307175}
+Epoch metrics: {&#39;accuracy&#39;: 0.9376, &#39;crossentropy&#39;: 0.33887774846553803}
+Epoch metrics: {&#39;accuracy&#39;: 0.9488, &#39;crossentropy&#39;: 0.284973241519928}
+Epoch metrics: {&#39;accuracy&#39;: 0.9463, &#39;crossentropy&#39;: 0.2858008557677269}
+Epoch 6: 0.9463 worse than 0.9488, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9544, &#39;crossentropy&#39;: 0.2509216430902481}
+Epoch metrics: {&#39;accuracy&#39;: 0.9573, &#39;crossentropy&#39;: 0.2428978340089321}
+Epoch metrics: {&#39;accuracy&#39;: 0.9608, &#39;crossentropy&#39;: 0.22644489660859107}
+Epoch metrics: {&#39;accuracy&#39;: 0.9608, &#39;crossentropy&#39;: 0.21278315509557724}
+Epoch 10: 0.9608 worse than 0.9608, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9618, &#39;crossentropy&#39;: 0.2145445026308298}
+Epoch metrics: {&#39;accuracy&#39;: 0.963, &#39;crossentropy&#39;: 0.21237999706566335}
+Epoch metrics: {&#39;accuracy&#39;: 0.9631, &#39;crossentropy&#39;: 0.21369002146720886}
+Epoch metrics: {&#39;accuracy&#39;: 0.9673, &#39;crossentropy&#39;: 0.188571187569201}
+Epoch metrics: {&#39;accuracy&#39;: 0.9667, &#39;crossentropy&#39;: 0.1944719546556473}
+Epoch 15: 0.9667 worse than 0.9673, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9679, &#39;crossentropy&#39;: 0.19227623180747033}
+Epoch metrics: {&#39;accuracy&#39;: 0.9673, &#39;crossentropy&#39;: 0.20758895537257194}
+Epoch 17: 0.9673 worse than 0.9679, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9689, &#39;crossentropy&#39;: 0.19289123542010783}
+Epoch metrics: {&#39;accuracy&#39;: 0.9701, &#39;crossentropy&#39;: 0.18630976665019988}
+Epoch metrics: {&#39;accuracy&#39;: 0.9695, &#39;crossentropy&#39;: 0.19547787671089173}
+Epoch 20: 0.9695 worse than 0.9701, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9706, &#39;crossentropy&#39;: 0.18417280072569847}
+Epoch metrics: {&#39;accuracy&#39;: 0.9718, &#39;crossentropy&#39;: 0.18118949906229972}
+Epoch metrics: {&#39;accuracy&#39;: 0.9694, &#39;crossentropy&#39;: 0.1888744118079543}
+Epoch 23: 0.9694 worse than 0.9718, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9683, &#39;crossentropy&#39;: 0.189695987880975}
+Epoch 24: 0.9683 worse than 0.9718, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9715, &#39;crossentropy&#39;: 0.1844632924541831}
+Epoch 25: 0.9715 worse than 0.9718, patience: 3/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9707, &#39;crossentropy&#39;: 0.19293912473917008}
+Epoch 26: 0.9707 worse than 0.9718, patience: 4/3!
+Epoch    26: reducing learning rate of group 0 to 1.0000e-04.
+Epoch metrics: {&#39;accuracy&#39;: 0.9744, &#39;crossentropy&#39;: 0.16678278848044575}
+Epoch metrics: {&#39;accuracy&#39;: 0.9732, &#39;crossentropy&#39;: 0.170559820997715}
+Epoch 28: 0.9732 worse than 0.9744, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9747, &#39;crossentropy&#39;: 0.16037208632528782}
+Epoch metrics: {&#39;accuracy&#39;: 0.9751, &#39;crossentropy&#39;: 0.16294795689582825}
+Epoch metrics: {&#39;accuracy&#39;: 0.9757, &#39;crossentropy&#39;: 0.1579607660241425}
+Epoch metrics: {&#39;accuracy&#39;: 0.9749, &#39;crossentropy&#39;: 0.15656672970429064}
+Epoch 32: 0.9749 worse than 0.9757, patience: 1/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9742, &#39;crossentropy&#39;: 0.165166756830737}
+Epoch 33: 0.9742 worse than 0.9757, patience: 2/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9744, &#39;crossentropy&#39;: 0.16184359027966858}
+Epoch 34: 0.9744 worse than 0.9757, patience: 3/3!
+Epoch metrics: {&#39;accuracy&#39;: 0.9754, &#39;crossentropy&#39;: 0.15807696827538312}
+Epoch 35: 0.9754 worse than 0.9757, patience: 4/3!
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;epochs&#39;: [{&#39;accuracy&#39;: 0.8138, &#39;crossentropy&#39;: 0.8318569969177246},
+  {&#39;accuracy&#39;: 0.9051, &#39;crossentropy&#39;: 0.5015810224533082},
+  {&#39;accuracy&#39;: 0.9231, &#39;crossentropy&#39;: 0.4067144854307175},
+  {&#39;accuracy&#39;: 0.9376, &#39;crossentropy&#39;: 0.33887774846553803},
+  {&#39;accuracy&#39;: 0.9488, &#39;crossentropy&#39;: 0.284973241519928},
+  {&#39;accuracy&#39;: 0.9463, &#39;crossentropy&#39;: 0.2858008557677269},
+  {&#39;accuracy&#39;: 0.9544, &#39;crossentropy&#39;: 0.2509216430902481},
+  {&#39;accuracy&#39;: 0.9573, &#39;crossentropy&#39;: 0.2428978340089321},
+  {&#39;accuracy&#39;: 0.9608, &#39;crossentropy&#39;: 0.22644489660859107},
+  {&#39;accuracy&#39;: 0.9608, &#39;crossentropy&#39;: 0.21278315509557724},
+  {&#39;accuracy&#39;: 0.9618, &#39;crossentropy&#39;: 0.2145445026308298},
+  {&#39;accuracy&#39;: 0.963, &#39;crossentropy&#39;: 0.21237999706566335},
+  {&#39;accuracy&#39;: 0.9631, &#39;crossentropy&#39;: 0.21369002146720886},
+  {&#39;accuracy&#39;: 0.9673, &#39;crossentropy&#39;: 0.188571187569201},
+  {&#39;accuracy&#39;: 0.9667, &#39;crossentropy&#39;: 0.1944719546556473},
+  {&#39;accuracy&#39;: 0.9679, &#39;crossentropy&#39;: 0.19227623180747033},
+  {&#39;accuracy&#39;: 0.9673, &#39;crossentropy&#39;: 0.20758895537257194},
+  {&#39;accuracy&#39;: 0.9689, &#39;crossentropy&#39;: 0.19289123542010783},
+  {&#39;accuracy&#39;: 0.9701, &#39;crossentropy&#39;: 0.18630976665019988},
+  {&#39;accuracy&#39;: 0.9695, &#39;crossentropy&#39;: 0.19547787671089173},
+  {&#39;accuracy&#39;: 0.9706, &#39;crossentropy&#39;: 0.18417280072569847},
+  {&#39;accuracy&#39;: 0.9718, &#39;crossentropy&#39;: 0.18118949906229972},
+  {&#39;accuracy&#39;: 0.9694, &#39;crossentropy&#39;: 0.1888744118079543},
+  {&#39;accuracy&#39;: 0.9683, &#39;crossentropy&#39;: 0.189695987880975},
+  {&#39;accuracy&#39;: 0.9715, &#39;crossentropy&#39;: 0.1844632924541831},
+  {&#39;accuracy&#39;: 0.9707, &#39;crossentropy&#39;: 0.19293912473917008},
+  {&#39;accuracy&#39;: 0.9744, &#39;crossentropy&#39;: 0.16678278848044575},
+  {&#39;accuracy&#39;: 0.9732, &#39;crossentropy&#39;: 0.170559820997715},
+  {&#39;accuracy&#39;: 0.9747, &#39;crossentropy&#39;: 0.16037208632528782},
+  {&#39;accuracy&#39;: 0.9751, &#39;crossentropy&#39;: 0.16294795689582825},
+  {&#39;accuracy&#39;: 0.9757, &#39;crossentropy&#39;: 0.1579607660241425},
+  {&#39;accuracy&#39;: 0.9749, &#39;crossentropy&#39;: 0.15656672970429064},
+  {&#39;accuracy&#39;: 0.9742, &#39;crossentropy&#39;: 0.165166756830737},
+  {&#39;accuracy&#39;: 0.9744, &#39;crossentropy&#39;: 0.16184359027966858},
+  {&#39;accuracy&#39;: 0.9754, &#39;crossentropy&#39;: 0.15807696827538312}],
+ &#39;era_epochs&#39;: [26]}</pre>
 </div>
 
 </div>

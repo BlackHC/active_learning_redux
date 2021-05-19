@@ -204,7 +204,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
             <span class="n">FastMNIST</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="s2">&quot;FastMNIST (train)&quot;</span>
         <span class="p">)</span>
         <span class="n">train_predictions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;./data/mnist_train_predictions.pt&quot;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        
+
         <span class="c1"># If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeated_mnist_repetitions</span>
@@ -213,7 +213,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dataset_noise</span><span class="p">:</span>
             <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">AdditiveGaussianNoise</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-            
+
         <span class="n">active_learning_data</span> <span class="o">=</span> <span class="n">ActiveLearningData</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
 
         <span class="n">active_learning_data</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">initial_training_set_indices</span><span class="p">)</span>
@@ -221,7 +221,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
         <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">active_learning_data</span><span class="o">.</span><span class="n">extract_dataset_from_pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validation_set_size</span><span class="p">)</span>
         <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">NamedDataset</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;FastMNIST (validation, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span><span class="p">)</span>
         <span class="n">validation_dataset</span> <span class="o">=</span> <span class="n">validation_dataset</span><span class="o">.</span><span class="n">override_targets</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="n">validation_dataset</span><span class="o">.</span><span class="n">get_targets</span><span class="p">()</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-        
+
         <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">FastMNIST</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">NamedDataset</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;FastMNIST (test, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples)&quot;</span><span class="p">)</span>
 
@@ -241,12 +241,12 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
         <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mnist_initial_samples</span><span class="p">):</span>
-            <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">mnist_initial_samples</span> 
+            <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="n">mnist_initial_samples</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_set_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">initial_training_set_indices</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;initial_set_size </span><span class="si">{</span><span class="n">initial_set_size</span><span class="si">}</span><span class="s2"> not supported here!&quot;</span><span class="p">)</span>
-            
+
         <span class="n">store</span><span class="p">[</span><span class="s2">&quot;initial_training_set_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_training_set_indices</span>
 
         <span class="c1"># Active Learning setup</span>
@@ -302,7 +302,7 @@ Switched to directory /home/blackhc/PycharmProjects/bald-ical
                     <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
                     <span class="n">training_log</span><span class="o">=</span><span class="n">iteration_log</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">],</span>
                     <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">KLDivLoss</span><span class="p">(</span><span class="n">log_target</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;batchmean&quot;</span><span class="p">),</span>
-                    <span class="n">validation_loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">(),</span>                
+                    <span class="n">validation_loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">(),</span>
                 <span class="p">)</span>
 
             <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
@@ -763,28 +763,18 @@ Done.
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Experiment</span><span class="p">(</span>
         <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-        <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">CoreSetBALD</span><span class="p">,</span>
+        <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_function</span><span class="p">,</span>
         <span class="n">acquisition_size</span><span class="o">=</span><span class="n">acquisition_size</span><span class="p">,</span>
         <span class="n">num_pool_samples</span><span class="o">=</span><span class="n">num_pool_samples</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">max_training_set</span><span class="o">=</span><span class="mi">150</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">acquisition_function</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">BALD</span><span class="p">,</span>
-        <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">TemperedBALD</span><span class="p">,</span>
         <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">CoreSetBALD</span><span class="p">,</span>
-        <span class="n">acquisition_functions</span><span class="o">.</span><span class="n">TemperedCoreSetBALD</span><span class="p">,</span>
     <span class="p">]</span>
-    <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">acquisition_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">num_pool_samples</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">]</span>
-<span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
-    <span class="n">Experiment</span><span class="p">(</span>
-        <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-        <span class="n">acquisition_function</span><span class="o">=</span><span class="n">acquisition_functions</span><span class="o">.</span><span class="n">Random</span><span class="p">,</span>
-        <span class="n">acquisition_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">num_pool_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
 <span class="p">]</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">is_run_from_ipython</span><span class="p">()</span> <span class="ow">and</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
