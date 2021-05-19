@@ -59,7 +59,7 @@ class ExperimentData:
 class RejectionOodExperiment:
     seed: int = 1337
     acquisition_size: int = 5
-    max_training_set: int = 450
+    max_training_set: int = 200
     num_pool_samples: int = 20
     num_validation_samples: int = 20
     num_training_samples: int = 1
@@ -193,6 +193,9 @@ class RejectionOodExperiment:
 
         acquisition_function = self.create_acquisition_function()
 
+        num_iterations = 0
+        max_iterations = int(1.5* (self.max_training_set - self.initial_training_set_size) / self.acquisition_size)
+
         # Active Training Loop
         while True:
             training_set_size = len(data.active_learning.training_dataset)
@@ -228,7 +231,7 @@ class RejectionOodExperiment:
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
 
-            if training_set_size >= self.max_training_set:
+            if training_set_size >= self.max_training_set or num_iterations >= max_iterations:
                 print("Done.")
                 break
 
@@ -290,19 +293,22 @@ class RejectionOodExperiment:
             ls = ", ".join(f"{label} ({score:.4})" for label, score in zip(candidate_labels, candidate_batch.scores))
             print(f"Acquiring (label, score)s: {ls}")
 
+            num_iterations += 1
+
 # Cell
 
 configs = [
     RejectionOodExperiment(
-        seed=seed+1234,
-        acquisition_function=acquisition_functions.EvalBALD,
-        acquisition_size=10,
+        seed=seed + 1234,
+        acquisition_function=acquisition_function,
+        acquisition_size=5,
         num_pool_samples=num_pool_samples,
         evaluation_set_size=evaluation_set_size,
         temperature=8,
     )
     for seed in range(10)
-    for evaluation_set_size in [100,1000, 10000]
+    for acquisition_function in [acquisition_functions.BatchEvalBALD, acquisition_functions.BatchBALD]
+    for evaluation_set_size in [10000]
     for num_pool_samples in [100]
 ]
 
