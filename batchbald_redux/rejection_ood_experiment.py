@@ -278,16 +278,16 @@ class RejectionOodExperiment:
                 indices=candidate_global_indices, labels=candidate_labels, scores=candidate_batch.scores
             )
 
-            data.active_learning.acquire(
-                [index for index, label in zip(candidate_batch.indices, candidate_labels) if label != -1]
-            )
-
             print(candidate_batch)
             print(
                 [
                     (index, get_base_dataset_index(data.active_learning.pool_dataset, index))
                     for index in candidate_batch.indices
                 ]
+            )
+
+            data.active_learning.acquire(
+                [index for index, label in zip(candidate_batch.indices, candidate_labels) if label != -1]
             )
 
             ls = ", ".join(f"{label} ({score:.4})" for label, score in zip(candidate_labels, candidate_batch.scores))
