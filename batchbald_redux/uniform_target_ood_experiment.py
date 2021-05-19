@@ -295,14 +295,15 @@ class UniformTargetOodExperiment:
 configs = [
     UniformTargetOodExperiment(
         seed=seed+1234,
-        acquisition_function=acquisition_functions.EvalBALD,
-        acquisition_size=10,
+        acquisition_function=acquisition_function,
+        acquisition_size=5,
         num_pool_samples=num_pool_samples,
         evaluation_set_size=evaluation_set_size,
         temperature=8,
     )
     for seed in range(10)
-    for evaluation_set_size in [100,1000,10000]
+    for acquisition_function in [acquisition_functions.BatchEvalBALD, acquisition_functions.BatchBALD]
+    for evaluation_set_size in [10000]
     for num_pool_samples in [100]
 ]
 
