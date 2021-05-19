@@ -203,7 +203,7 @@ class Experiment:
 
             double_snapshots = None
             if training_set_size > 0:
-                double_snapshots = train_double_snapshots(
+                train(
                     model=model_optimizer.model,
                     optimizer=model_optimizer.optimizer,
                     training_samples=self.num_training_samples,
@@ -215,8 +215,6 @@ class Experiment:
                     device=self.device,
                     training_log=iteration_log["training"],
                 )
-
-                model_optimizer.model.load_state_dict(double_snapshots.high_accuracy.model_state_dict)
 
             evaluation_metrics = evaluate(
                 model=model_optimizer.model,
@@ -230,9 +228,6 @@ class Experiment:
             if training_set_size >= self.max_training_set:
                 print("Done.")
                 break
-
-            if double_snapshots:
-                model_optimizer.model.load_state_dict(double_snapshots.low_cross_entropy.model_state_dict)
 
             trained_model = TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=model_optimizer.model)
 
