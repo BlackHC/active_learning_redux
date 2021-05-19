@@ -311,5 +311,5 @@ def bayesian_resnet34(*, cifar_mod=False, pretrained=False, progress=True, **kwa
 class Cifar10BayesianResnetFactory(ModelOptimizerFactory):
     def create_model_optimizer(self) -> ModelOptimizer:
         model = bayesian_resnet18(cifar_mod=True)
-        optimizer = torch.optim.Adam(model.parameters(), weight_decay=5e-4)
+        optimizer = torch.optim.AdamW(model.parameters(), weight_decay=5e-4)
         return ModelOptimizer(model=model, optimizer=optimizer)
