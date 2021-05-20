@@ -6,14 +6,14 @@ __all__ = ['AliasDataset', 'DatasetIndex', 'get_base_dataset_index', 'get_num_cl
            'get_balanced_sample_indices', 'get_balanced_sample_indices_by_class', 'ImbalancedDataset',
            'ImbalancedClassSplitDataset', 'OneHotDataset', 'RepeatedDataset', 'RandomSubsetDataset',
            'ConstantTargetDataset', 'UniformTargetDataset', 'AdditiveGaussianNoise', 'dataset_to_tensors',
-           'get_dataset_state_dict', 'ImportedDataset', 'save_dataset', 'load_dataset', 'create_repeated_MNIST_dataset',
-           'create_MNIST_dataset']
+           'get_dataset_state_dict', 'ImportedDataset', 'save_dataset', 'load_dataset', 'create_named_mnist',
+           'create_repeated_MNIST_dataset', 'create_MNIST_dataset']
 
 # Cell
 
 import bisect
 from dataclasses import dataclass
-from typing import List, Optional, Union, Dict
+from typing import List, Optional, Union, Dict, Type
 
 import numpy as np
 import torch
@@ -21,7 +21,7 @@ import torch.utils.data as data
 import torchvision.datasets
 from fastcore.basics import patch
 
-from .fast_mnist import FastMNIST
+from .fast_mnist import FastMNIST, FastFashionMNIST
 
 # Cell
 
@@ -680,6 +680,17 @@ def load_dataset(f, map_location=None, **kwargs):
     return dataset
 
 # Cell
+
+
+def create_named_mnist(mnist_type: Union[Type[FastMNIST], Type[FastFashionMNIST]], root: str,
+           *,
+        train: bool = True,
+        download: bool = False,
+        device = None
+        ):
+    dataset = mnist_type(root=root, train=train, download=download, device=device)
+    name = f"{mnist_type.__name__} {'Train' if train else 'Test'} ({len(dataset)} samples)"
+    return NamedDataset(dataset, name)
 
 
 def create_repeated_MNIST_dataset(*, device=None, num_repetitions: int = 3, add_noise: bool = True):

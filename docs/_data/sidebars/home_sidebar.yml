@@ -50,13 +50,16 @@ entries:
       url: SSL.html
     - output: web,pdf
       title: Experiment
-      url: experiment_xmi_pred.html
+      url: experiment_xmi_labels.html
     - output: web,pdf
       title: Rejection OOD Experiment
       url: rejection_ood_experiment.html
     - output: web,pdf
       title: Uniform Target OOD Experiment
       url: uniform_target_ood_experiment.html
+    - output: web,pdf
+      title: Experiment XMI Labels Clean
+      url: experiment_xmi_labels_clean.html
     - output: web,pdf
       title: Results Visualizations
       url: X_arxiv_draft_report_plots.html
@@ -67,8 +70,20 @@ entries:
       title: Results OOD EvalBALD Visualizations
       url: B_results_visualization_ood_eval_bald.html
     - output: web,pdf
+      title: Results OOD FMNIST vs MNIST BALD vs EvalBALD Visualizations
+      url: B_results_visualization_ood_fmnist_vs_mnist-bald_vs_evalbald.html
+    - output: web,pdf
       title: Results OOD FMNIST vs MNIST Visualizations
       url: B_results_visualization_ood_fmnist_vs_mnist.html
+    - output: web,pdf
+      title: Results Visualizations for XMI
+      url: B_results_visualization_xmi_mnist.html
+    - output: web,pdf
+      title: Results Visualizations for XMI (clean cold start)
+      url: B_results_visualization_xmi_mnist_clean_cold_start.html
+    - output: web,pdf
+      title: Results Visualizations for XMI (clean & double snapshots)
+      url: B_results_visualization_xmi_mnist_clean_double_snapshots.html
     - output: web,pdf
       title: Analysis of BALD scores during Training
       url: U_BALD_score_analysis.html
