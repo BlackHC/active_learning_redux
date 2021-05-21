@@ -267,7 +267,7 @@ class BayesianResNet(BayesianModule):
 
     def mc_forward_impl(self, x: Tensor):
         x = self.fc(x)
-        x = F.log_softmax(x, dim=1)
+        x = F.log_softmax(x, dim=-1)
         return x
 
 
@@ -310,6 +310,6 @@ def bayesian_resnet34(*, cifar_mod=False, pretrained=False, progress=True, **kwa
 @dataclass
 class Cifar10BayesianResnetFactory(ModelOptimizerFactory):
     def create_model_optimizer(self) -> ModelOptimizer:
-        model = bayesian_resnet18(cifar_mod=True)
+        model = bayesian_resnet18(cifar_mod=True, num_classes=10)
         optimizer = torch.optim.AdamW(model.parameters(), weight_decay=5e-4)
         return ModelOptimizer(model=model, optimizer=optimizer)

@@ -42,6 +42,8 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
     model_optimizer_factory: Type[ModelOptimizerFactory]
     trained_model: TrainedModel
     min_samples_per_epoch: int
+    # TODO: this is a bad hack!
+    data: object
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
@@ -63,6 +65,9 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
         loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
 
+        if self.data:
+            self.data.toggle_augmentations(True)
+
         train(
             model=eval_model_optimizer.model,
             optimizer=eval_model_optimizer.optimizer,
@@ -77,6 +82,9 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
             device=device,
             training_log=training_log,
         )
+
+        if self.data:
+            self.data.toggle_augmentations(False)
 
         return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
 

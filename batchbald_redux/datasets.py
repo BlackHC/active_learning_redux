@@ -77,8 +77,8 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
     normalize = CIFAR10_NORMALIZE if normalize_like_cifar10 else transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     transform = transforms.Compose([transforms.ToTensor(), normalize])
 
-    full_train_dataset = datasets.SVHN(root + "data/SVHN", split="train", transform=transform, download=True)
-    full_validation_dataset = datasets.SVHN(root + "data/SVHN", split="train", transform=transform, download=True)
+    full_train_dataset = datasets.SVHN(root + "/SVHN", split="train", transform=transform, download=True)
+    full_validation_dataset = datasets.SVHN(root + "/SVHN", split="train", transform=transform, download=True)
 
     train_dataset, validation_dataset = train_validation_split(
         full_train_dataset=full_train_dataset,
@@ -88,7 +88,7 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = datasets.SVHN(root + "data/SVHN", split="test", transform=transform, download=True)
+    test_dataset = datasets.SVHN(root + "/SVHN", split="test", transform=transform, download=True)
     return SplitDataset(
         input_size,
         num_classes,
@@ -131,9 +131,9 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
     else:
         train_transform = test_transform
 
-    full_train_dataset = datasets.CIFAR10(root + "data/CIFAR10", train=True, transform=train_transform, download=True)
+    full_train_dataset = datasets.CIFAR10(root + "/CIFAR10", train=True, transform=train_transform, download=True)
     full_validation_dataset = datasets.CIFAR10(
-        root + "data/CIFAR10", train=True, transform=test_transform, download=True
+        root + "/CIFAR10", train=True, transform=test_transform, download=True
     )
 
     train_dataset, validation_dataset = train_validation_split(
@@ -144,7 +144,7 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = datasets.CIFAR10(root + "data/CIFAR10", train=False, transform=test_transform, download=True)
+    test_dataset = datasets.CIFAR10(root + "/CIFAR10", train=False, transform=test_transform, download=True)
 
     return SplitDataset(
         input_size,
@@ -194,9 +194,9 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
     else:
         train_transform = test_transform
 
-    full_train_dataset = datasets.CIFAR100(root + "data/CIFAR100", train=True, transform=train_transform, download=True)
+    full_train_dataset = datasets.CIFAR100(root + "/CIFAR100", train=True, transform=train_transform, download=True)
     full_validation_dataset = datasets.CIFAR100(
-        root + "data/CIFAR100", train=True, transform=test_transform, download=False
+        root + "/CIFAR100", train=True, transform=test_transform, download=False
     )
 
     train_dataset, validation_dataset = train_validation_split(
@@ -207,7 +207,7 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = datasets.CIFAR100(root + "data/CIFAR100", train=False, transform=test_transform, download=False)
+    test_dataset = datasets.CIFAR100(root + "/CIFAR100", train=False, transform=test_transform, download=False)
 
     return SplitDataset(
         input_size,

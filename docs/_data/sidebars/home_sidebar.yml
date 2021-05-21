@@ -55,6 +55,9 @@ entries:
       title: OOD Experiment
       url: ood_experiment.html
     - output: web,pdf
+      title: SVHN/CIFAR-10 OOD Experiment
+      url: svhn_cifar10_ood_experiment.html
+    - output: web,pdf
       title: Experiment XMI Labels Clean
       url: experiment_xmi_labels_clean.html
     - output: web,pdf

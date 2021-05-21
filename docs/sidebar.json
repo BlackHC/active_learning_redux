@@ -16,6 +16,7 @@
     "Semi-Supervised Learning": "SSL.html",
     "Experiment": "experiment_xmi_labels.html",
     "OOD Experiment": "ood_experiment.html",
+    "SVHN/CIFAR-10 OOD Experiment": "svhn_cifar10_ood_experiment.html",
     "Experiment XMI Labels Clean": "experiment_xmi_labels_clean.html",
     "Results Visualizations": "X_arxiv_draft_report_plots.html",
     "Results OOD Baselines Visualizations": "B_results_visualization_ood_baselines.html",

@@ -110,6 +110,8 @@ def get_base_dataset_index(dataset: data.Dataset, index: int) -> DatasetIndex:
         return DatasetIndex(dataset, int(index))
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
         return DatasetIndex(dataset, int(index))
+    elif isinstance(dataset, torchvision.datasets.SVHN):
+        return DatasetIndex(dataset, int(index))
     elif isinstance(dataset, AliasDataset):
         return dataset.get_base_dataset_index(index)
     else:
@@ -125,6 +127,8 @@ def get_num_classes(dataset: data.Dataset) -> int:
         return len(dataset.classes)
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
         return len(dataset.classes)
+    elif isinstance(dataset, torchvision.datasets.SVHN):
+        return 10
     elif isinstance(dataset, AliasDataset):
         return dataset.get_num_classes()
     elif hasattr(dataset, "num_classes"):
@@ -133,7 +137,8 @@ def get_num_classes(dataset: data.Dataset) -> int:
         raise NotImplementedError(f"Unrecognized dataset {dataset}!")
 
 
-def get_target(dataset, index: int) -> torch.Tensor:
+# TODO: should include ,device if we really want to return Tensors consistently!
+def get_target(dataset, index: int):
     if isinstance(dataset, data.ConcatDataset):
         if index < 0:
             if -index > len(dataset):
@@ -144,22 +149,26 @@ def get_target(dataset, index: int) -> torch.Tensor:
             sample_idx = index
         else:
             sample_idx = index - dataset.cumulative_sizes[dataset_idx - 1]
-        return get_target(dataset.datasets[dataset_idx], sample_idx)
+        target = get_target(dataset.datasets[dataset_idx], sample_idx)
     elif isinstance(dataset, data.Subset):
-        return get_target(dataset.dataset, dataset.indices[index])
+        target = get_target(dataset.dataset, dataset.indices[index])
     elif isinstance(dataset, data.TensorDataset):
-        return dataset.tensors[1][index]
+        target = dataset.tensors[1][index]
     elif isinstance(dataset, torchvision.datasets.MNIST):
-        return dataset.targets[index]
+        target = dataset.targets[index]
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
-        return dataset.targets[index]
+        target = dataset.targets[index]
+    elif isinstance(dataset, torchvision.datasets.SVHN):
+        target = dataset.labels[index]
     elif isinstance(dataset, AliasDataset):
-        return dataset.get_target(index)
+        target = dataset.get_target(index)
+    else:
+        raise NotImplementedError(f"Unrecognized dataset {dataset}!")
+    return torch.as_tensor(target)
 
-    raise NotImplementedError(f"Unrecognized dataset {dataset}!")
 
-
-def get_targets(dataset):
+# TODO: should include ,device if we really want to return Tensors consistently!
+def get_targets(dataset) -> torch.Tensor:
     if isinstance(dataset, data.ConcatDataset):
         return torch.cat([get_targets(sub_dataset).to(device="cpu") for sub_dataset in dataset.datasets])
     elif isinstance(dataset, data.Subset):
@@ -170,6 +179,8 @@ def get_targets(dataset):
         return torch.as_tensor(dataset.targets)
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
         return torch.as_tensor(dataset.targets)
+    elif isinstance(dataset, torchvision.datasets.SVHN):
+        return torch.as_tensor(dataset.labels)
     elif isinstance(dataset, AliasDataset):
         return dataset.get_targets()
 
@@ -397,13 +408,13 @@ def get_class_indices_by_class(
     remaining_samples = sum(class_counts)
 
     indices = generator.permutation(len(dataset))
+    targets = get_targets(dataset)
     for index in indices:
-        _, y = dataset[index]
-        y = y.item()
+        target = targets[index].item()
 
-        if class_counts[y] > 0:
-            subset_indices[y].append(index)
-            class_counts[y] -= 1
+        if class_counts[target] > 0:
+            subset_indices[target].append(index)
+            class_counts[target] -= 1
             remaining_samples -= 1
 
             if remaining_samples <= 0:
@@ -506,9 +517,8 @@ class OneHotDataset(ReplaceTargetsDataset):
 
         N = len(dataset)
         targets = torch.zeros(N, num_classes, dtype=dtype, device=device)
-        # TODO: use get_targets() here, which will require a refactoring
-        for i, (_, label) in enumerate(dataset):
-            targets[i, label] = 1.0
+        for i, label in enumerate(get_targets(dataset)):
+            targets[i, label.item()] = 1.0
 
         super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | one_hot_targets{options}")
         self.options = options
