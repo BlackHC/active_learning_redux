@@ -144,12 +144,12 @@ def load_experiment_data(
     if id_repetitions > 1:
         train_dataset = train_dataset * id_repetitions
 
-    ood_dataset = create_named_mnist(ood_dataset_type, "data", train=True, download=True, device=device)
+    original_ood_dataset = create_named_mnist(ood_dataset_type, "data", train=True, download=True, device=device)
     if uniform_ood:
         train_dataset = train_dataset.one_hot(device=device)
-        ood_dataset = ood_dataset.uniform_target(device=device)
+        ood_dataset = original_ood_dataset.uniform_target(device=device)
     else:
-        ood_dataset = ood_dataset.constant_target(
+        ood_dataset = original_ood_dataset.constant_target(
             target=torch.tensor(-1, device=device), num_classes=train_dataset.get_num_classes()
         )
 
@@ -174,7 +174,7 @@ def load_experiment_data(
 
     return ExperimentData(
         active_learning=active_learning_data,
-        ood_dataset=ood_dataset,
+        ood_dataset=original_ood_dataset,
         validation_dataset=validation_dataset,
         test_dataset=test_dataset,
         evaluation_dataset=evaluation_dataset,

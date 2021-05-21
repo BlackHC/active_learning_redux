@@ -38,6 +38,7 @@ nb_path: "Z_dependency_injection.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Type</span>
 </pre></div>
 
     </div>
@@ -58,7 +59,7 @@ nb_path: "Z_dependency_injection.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DependencyInjection" class="doc_header"><code>class</code> <code>DependencyInjection</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/di.py#L13" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DependencyInjection</code>(<strong><code>config</code></strong>:<code>dict</code>, <strong><code>supported_types</code></strong>:<code>list</code>=<em><code>None</code></em>)</p>
+<h2 id="DependencyInjection" class="doc_header"><code>class</code> <code>DependencyInjection</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/di.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DependencyInjection</code>(<strong><code>config</code></strong>:<code>dict</code>, <strong><code>supported_types</code></strong>:<code>list</code>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>DependencyInjection(config: dict, supported_types: list = None)</p>
 
@@ -79,19 +80,21 @@ nb_path: "Z_dependency_injection.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>  <span class="c1"># Any type.</span>
+
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">DependencyInjection</span><span class="p">:</span>
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supported_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">create_dataclass_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_dataclass_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
         <span class="n">resolved_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_dataclass_args</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">)</span>
         <span class="n">final_args</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">resolved_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
 
-        <span class="n">args_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">final_args</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">args_str</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">final_args</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_missing_fields</span><span class="p">(</span><span class="n">dataclass_type</span><span class="p">,</span> <span class="n">final_args</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating: </span><span class="si">{</span><span class="n">dataclass_type</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">args_str</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating: </span><span class="si">{</span><span class="n">dataclass_type</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">(</span><span class="se">\n</span><span class="si">{</span><span class="n">args_str</span><span class="si">}</span><span class="se">\n</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataclass_type</span><span class="p">(</span><span class="o">**</span><span class="n">final_args</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">check_missing_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataclass_type</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
@@ -125,7 +128,7 @@ nb_path: "Z_dependency_injection.ipynb"
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_types</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_types</span><span class="p">:</span>
                 <span class="n">resolved_args</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataclass_type</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resolved: </span><span class="si">{</span><span class="n">dataclass_type</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">resolved_args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># print(f&quot;Resolved: {dataclass_type.__qualname__} with {resolved_args}&quot;)</span>
 
         <span class="k">return</span> <span class="n">resolved_args</span>
 </pre></div>

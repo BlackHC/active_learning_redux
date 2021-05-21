@@ -668,7 +668,7 @@ of epochs, the learning rate is reduced.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2"> worse than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="si">}</span><span class="s2">, patience: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
-            
+
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cooldown</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cooldown_counter</span> <span class="o">-=</span> <span class="mi">1</span>

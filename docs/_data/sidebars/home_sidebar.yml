@@ -52,11 +52,8 @@ entries:
       title: Experiment
       url: experiment_xmi_labels.html
     - output: web,pdf
-      title: Rejection OOD Experiment
-      url: rejection_ood_experiment.html
-    - output: web,pdf
-      title: Uniform Target OOD Experiment
-      url: uniform_target_ood_experiment.html
+      title: OOD Experiment
+      url: ood_experiment.html
     - output: web,pdf
       title: Experiment XMI Labels Clean
       url: experiment_xmi_labels_clean.html
@@ -69,6 +66,9 @@ entries:
     - output: web,pdf
       title: Results OOD EvalBALD Visualizations
       url: B_results_visualization_ood_eval_bald.html
+    - output: web,pdf
+      title: Results OOD FMNIST and MNIST with BALD vs EvalBALD Ablation Visualizations
+      url: B_results_visualization_ood_fmnist_and_mnist_bald_vs_evalbald.html
     - output: web,pdf
       title: Results OOD FMNIST vs MNIST BALD vs EvalBALD Visualizations
       url: B_results_visualization_ood_fmnist_vs_mnist-bald_vs_evalbald.html
