@@ -145,3 +145,4 @@ checklink/cookies.txt
 /data/CIFAR10/
 /data/CIFAR100/
 /data/FastFashionMNIST/
+/data/SVHN/
