@@ -508,6 +508,9 @@ def get_coreset_bald_scores(
 def get_batch_coreset_bald_batch(
     log_probs_N_K_C: torch.Tensor, labels_N: torch.Tensor, *, batch_size: int, dtype=None, device=None
 ) -> CandidateBatch:
+    # We want to compute (note this does not follow the notation from below):
+    # CoreSetBALD = H[y_1, ..., y_n ] - E_p(w) p(y_1, ..., y_n | w) / p(y_1, ..., y_n) H[y_1, ..., y_n | w]
+    # H[y_1, ..., y_n | w] = H[y_1, ..., y_{n-1} | w] + H[y_n | w] because y_i _||_ y_j | w
     N, K, C = log_probs_N_K_C.shape
 
     batch_size = min(batch_size, N)
@@ -526,35 +529,28 @@ def get_batch_coreset_bald_batch(
     )
 
     # p((y)_{B-1}|(x)_{B-1}, \omega)
-    log_probs_join_batch_K = torch.zeros_like(log_probs_N_K[0], dtype=dtype, device=device)
+    log_probs_conditional_joint_batch_K = torch.zeros_like(log_probs_N_K[0], dtype=dtype, device=device)
 
     for i in with_progress_bar(range(batch_size), tqdm_args=dict(desc="BatchCoreSetBALD", leave=False)):
         # p((y)_B|(x)_B, \omega) = p(y_B|x_B, \omega) * p((y)_{B-1}|(x)_{B-1}, \omega)
-        log_prob_joint_N_K = log_probs_N_K + log_probs_join_batch_K[None, :]
+        log_prob_conditional_joint_N_K = log_probs_N_K + log_probs_conditional_joint_batch_K[None, :]
 
-        if False:
-            # Marginalize over \omega (but using sum not mean):
-            # + np.log(K) compared to actual joint log prob
-            log_prob_joint_sum_N_1 = log_prob_joint_N_K.logsumexp(dim=1, keepdim=True)
-            # p(\omega) cancels out in:
-            # p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }
-            log_prob_conditional_omega_joint_N_K = log_prob_joint_N_K - log_prob_joint_sum_N_1
-            conditional_entropy_joint_N = -torch.sum(
-                log_prob_conditional_omega_joint_N_K.exp() * log_prob_joint_N_K, dim=1
-            )
-            entropy_joint_N = -log_prob_joint_sum_N_1.squeeze(1) + np.log(K)
-            scores_N = entropy_joint_N - conditional_entropy_joint_N
-        else:
-            # Marginalize over \omega (but using sum not mean):
-            # + np.log(K) compared to actual joint log prob
-            prob_joint_sum_N = log_prob_joint_N_K.exp().sum(dim=1, keepdim=False)
-            # p(\omega) cancels out in:
-            # p(\omega|(y)_B, (x)_B) = \frac{ p((y)_B| (x)_B, \omega) p(\omega) }{ p((y)_B| (x)_B) }
-            conditional_entropy_joint_N = (
-                -torch.sum(log_prob_joint_N_K.exp() * log_prob_joint_N_K, dim=1) / prob_joint_sum_N
-            )
-            entropy_joint_N = -prob_joint_sum_N.log() + np.log(K)
-            scores_N = entropy_joint_N - conditional_entropy_joint_N
+        # Marginalize over w (but using sum not mean):
+        # p((y)_B|(x)_B) = E_p(\omega) p((y)_B|(x)_B, \omega)
+        # log_prob_joint_N_1 = log_prob_conditional_joint_N_K.logsumexp(dim=1, keepdim=True) - np.log(K)
+        log_prob_joint_pK_N_1 = log_prob_conditional_joint_N_K.logsumexp(dim=1, keepdim=True)
+        # \frac{ p((y)_B| (x)_B, \omega) }{ p((y)_B| (x)_B) }
+        # log_ratio_N_K = log_prob_conditional_joint_N_K - log_prob_joint_N_1
+        # log_ratio_N_K = log_prob_conditional_joint_N_K - log_prob_joint_pK_N_1 + np.log(K)
+        log_ratio_mK_N_K = log_prob_conditional_joint_N_K - log_prob_joint_pK_N_1
+        # conditional_entropy_joint_N = -torch.mean(log_ratio_N_K.exp() * log_prob_conditional_joint_N_K, dim=1)
+        # conditional_entropy_joint_N =
+        #       -torch.mean((log_ratio_mK_N_K + np.log(K)).exp() * log_prob_conditional_joint_N_K, dim=1)
+        conditional_entropy_joint_N = -torch.sum(log_ratio_mK_N_K.exp() * log_prob_conditional_joint_N_K, dim=1)
+        # entropy_joint_N = -log_prob_joint_N_1.squeeze(1)
+        # entropy_joint_N = -(log_prob_joint_pK_N_1 - np.log(K)).squeeze(1)
+        entropy_joint_N = -log_prob_joint_pK_N_1.squeeze(1) + np.log(K)
+        scores_N = entropy_joint_N - conditional_entropy_joint_N
 
         # Select candidate
         scores_N[candidate_indices] = -float("inf")
@@ -564,7 +560,7 @@ def get_batch_coreset_bald_batch(
         candidate_indices.append(candidate_index.item())
         candidate_scores.append(candidate_score.item())
 
-        # Update log_probs_join_batch_K
-        log_probs_join_batch_K = log_prob_joint_N_K[candidate_index]
+        # Update log_probs_conditional_joint_batch_K
+        log_probs_conditional_joint_batch_K = log_prob_conditional_joint_N_K[candidate_index]
 
     return CandidateBatch(candidate_scores, candidate_indices)
