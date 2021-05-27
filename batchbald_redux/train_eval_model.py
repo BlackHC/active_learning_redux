@@ -43,7 +43,7 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
     trained_model: TrainedModel
     min_samples_per_epoch: int
     # TODO: this is a bad hack!
-    data: object
+    data: object = None
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
