@@ -142,7 +142,7 @@ def load_experiment_data(
 
     train_entropies = compute_entropy_from_probs(train_predictions[train_indices, None, :])
 
-    entropy_threshold = 0.1
+    entropy_threshold = 0.01
     allowed_indices = torch.nonzero(train_entropies < entropy_threshold, as_tuple=True)[0].numpy()
     print(f"Removing {len(train_dataset) - len(allowed_indices)} training samples with entropy >= {entropy_threshold}.")
 
