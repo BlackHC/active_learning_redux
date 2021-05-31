@@ -233,7 +233,6 @@ def train_with_schedule(
             print(f"Epoch metrics: {metrics}")
 
     if prefer_accuracy:
-
         def score_function(metrics):
             return float(metrics["accuracy"])
 
