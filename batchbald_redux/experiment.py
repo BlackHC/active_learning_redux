@@ -78,7 +78,7 @@ class Experiment:
     max_training_epochs: int = 30*4
     training_batch_size: int = 64
     device: str = "cuda"
-    validation_set_size: int = 1024
+    validation_set_size: int = 2048
     initial_set_size: int = 20
     min_samples_per_epoch: int = 1024
     repeated_mnist_repetitions: int = 1
@@ -232,22 +232,24 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed,
-        acquisition_function=acquisition_functions.BALD,
+        seed=seed + 789,
+        acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
+        repeated_mnist_repetitions=repeated_mnist_repetitions
     )
     for seed in range(5)
-    for acquisition_size in [5, 10, 20, 50]
-    for num_pool_samples in [10, 20, 50, 100]
-] + [
-    Experiment(
-        seed=seed,
-        acquisition_function=acquisition_functions.Random,
-        acquisition_size=5,
-        num_pool_samples=20,
-    )
-    for seed in range(20)
+    for acquisition_function in [
+                acquisition_functions.EIG,
+                acquisition_functions.BALD,
+                acquisition_functions.EvalBALD,
+                acquisition_functions.BatchBALD,
+                acquisition_functions.BatchEvalBALD,
+                acquisition_functions.BatchEIG
+            ]
+    for acquisition_size in [5]
+    for num_pool_samples in [100]
+    for repeated_mnist_repetitions in [1,2]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":

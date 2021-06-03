@@ -3,7 +3,7 @@
 __all__ = ['CandidateBatchComputer', 'Random', 'PoolScorerCandidateBatchComputer', 'BALD', 'TemperedBALD', 'RandomBALD',
            'ThompsonBALD', 'BatchBALD', 'CoreSetPoolScorerCandidateBatchComputer', 'CoreSetBALD', 'TemperedCoreSetBALD',
            'BatchCoreSetBALD', 'EvalCandidateBatchComputer', 'EvaluationPoolScorerCandidateBatchComputer', 'EvalBALD',
-           'TemperedEvalBALD', 'BatchEvalBALD', 'EIG', 'TemperedEIG']
+           'TemperedEvalBALD', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG']
 
 # Cell
 
@@ -19,6 +19,7 @@ from .batchbald import (
     CandidateBatch,
     get_bald_scores,
     get_batch_bald_batch,
+    get_batch_eig_batch,
     get_batch_coreset_bald_batch,
     get_batch_eval_bald_batch,
     get_coreset_bald_scores,
@@ -300,6 +301,20 @@ class _EIG(EvaluationPoolScorerCandidateBatchComputer):
 class EIG(_EIG):
     def extract_candidates(self, scores_N) -> CandidateBatch:
         return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
+
+
+@dataclass
+class BatchEIG(EvaluationPoolScorerCandidateBatchComputer):
+    def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
+        candidate_batch = get_batch_eig_batch(
+            log_probs_N_K_C,
+            log_eval_probs_N_K_C,
+            batch_size=self.acquisition_size,
+            num_samples=self.num_samples,
+            dtype=torch.double,
+            device=device,
+        )
+        return candidate_batch
 
 
 @dataclass
