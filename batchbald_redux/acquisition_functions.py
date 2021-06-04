@@ -3,7 +3,9 @@
 __all__ = ['CandidateBatchComputer', 'Random', 'PoolScorerCandidateBatchComputer', 'BALD', 'TemperedBALD', 'RandomBALD',
            'ThompsonBALD', 'BatchBALD', 'CoreSetPoolScorerCandidateBatchComputer', 'CoreSetBALD', 'TemperedCoreSetBALD',
            'BatchCoreSetBALD', 'EvalCandidateBatchComputer', 'EvaluationPoolScorerCandidateBatchComputer', 'EvalBALD',
-           'TemperedEvalBALD', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG']
+           'TemperedEvalBALD', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG',
+           'CoreSetEvaluationPoolScorerCandidateBatchComputer', 'CoreSetPIGBALD', 'TemperedCoreSetPIGBALD',
+           'CoreSetPIG', 'TemperedCoreSetPIG']
 
 # Cell
 
@@ -19,11 +21,13 @@ from .batchbald import (
     CandidateBatch,
     get_bald_scores,
     get_batch_bald_batch,
-    get_batch_eig_batch,
     get_batch_coreset_bald_batch,
+    get_batch_eig_batch,
     get_batch_eval_bald_batch,
     get_coreset_bald_scores,
     get_coreset_bald_scores_from_predictions,
+    get_coreset_eig_scores,
+    get_coreset_eig_bald_scores,
     get_eig_scores,
     get_eval_bald_scores,
     get_sampled_tempered_scorers,
@@ -168,7 +172,9 @@ class _CoreSetBALD(CoreSetPoolScorerCandidateBatchComputer):
         if len(labels_N.shape) == 1:
             scores_N = get_coreset_bald_scores(log_probs_N_K_C, labels_N, dtype=torch.double, device=device)
         else:
-            scores_N = get_coreset_bald_scores_from_predictions(log_probs_N_K_C, labels_N, dtype=torch.double, device=device)
+            scores_N = get_coreset_bald_scores_from_predictions(
+                log_probs_N_K_C, labels_N, dtype=torch.double, device=device
+            )
 
         candidate_batch = self.extract_candidates(scores_N)
 
@@ -305,6 +311,8 @@ class EIG(_EIG):
 
 @dataclass
 class BatchEIG(EvaluationPoolScorerCandidateBatchComputer):
+    num_samples: int = 1000000
+
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
         candidate_batch = get_batch_eig_batch(
             log_probs_N_K_C,
@@ -319,6 +327,79 @@ class BatchEIG(EvaluationPoolScorerCandidateBatchComputer):
 
 @dataclass
 class TemperedEIG(_EIG):
+    temperature: float
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_sampled_tempered_scorers(scores_N, batch_size=self.acquisition_size, temperature=self.temperature)
+
+# Cell
+
+
+@dataclass
+class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
+    def compute_candidate_batch(
+        self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
+    ) -> CandidateBatch:
+        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, device)
+        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, device)
+
+        # With high probability, this ensures that we are not shuffling the batches.
+        assert torch.equal(training_labels_N, eval_labels_N)
+
+        return self.get_candidate_batch(training_log_probs_N_K_C, eval_log_probs_N_K_C, training_labels_N, device)
+
+    def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
+        raise NotImplementedError()
+
+# Cell
+
+@dataclass
+class _CoreSetPIGBALD(CoreSetEvaluationPoolScorerCandidateBatchComputer):
+    def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
+        scores_N = get_coreset_eig_bald_scores(training_log_probs_N_K_C=training_log_probs_N_K_C, eval_log_probs_N_K_C=eval_log_probs_N_K_C, labels_N=labels_N, dtype=torch.double, device=device)
+        candidate_batch = self.extract_candidates(scores_N)
+
+        return candidate_batch
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        raise NotImplementedError()
+
+
+@dataclass
+class CoreSetPIGBALD(_CoreSetPIGBALD):
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
+
+
+@dataclass
+class TemperedCoreSetPIGBALD(_CoreSetPIGBALD):
+    temperature: float
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_sampled_tempered_scorers(scores_N, batch_size=self.acquisition_size, temperature=self.temperature)
+
+# Cell
+
+@dataclass
+class _CoreSetPIG(CoreSetEvaluationPoolScorerCandidateBatchComputer):
+    def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
+        scores_N = get_coreset_eig_scores(training_log_probs_N_K_C=training_log_probs_N_K_C, eval_log_probs_N_K_C=eval_log_probs_N_K_C, labels_N=labels_N, dtype=torch.double, device=device)
+        candidate_batch = self.extract_candidates(scores_N)
+
+        return candidate_batch
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        raise NotImplementedError()
+
+
+@dataclass
+class CoreSetPIG(_CoreSetPIG):
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
+
+
+@dataclass
+class TemperedCoreSetPIG(_CoreSetPIG):
     temperature: float
 
     def extract_candidates(self, scores_N) -> CandidateBatch:

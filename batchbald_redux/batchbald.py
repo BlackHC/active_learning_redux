@@ -5,7 +5,8 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_batch_eval_bald_batch', 'compute_each_conditional_entropy', 'get_thompson_bald_batch',
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
-           'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch']
+           'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
+           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores']
 
 # Cell
 import math
@@ -564,3 +565,60 @@ def get_batch_coreset_bald_batch(
         log_probs_conditional_joint_batch_K = log_prob_conditional_joint_N_K[candidate_index]
 
     return CandidateBatch(candidate_scores, candidate_indices)
+
+# Cell
+
+def get_coreset_eig_scores(
+        *,
+        training_log_probs_N_K_C: torch.Tensor,
+        eval_log_probs_N_K_C: torch.Tensor,
+        labels_N: torch.Tensor, dtype=None, device=None
+) -> torch.Tensor:
+    # We want to compute I[y_eval; y_batch].
+    # I[y_eval; y_train] = H[y_batch] - H[y_batch|y_eval]
+    N, K, C = training_log_probs_N_K_C.shape
+
+    labels_N_1_1 = labels_N[:, None, None]
+    training_log_probs_N_K = (
+        joint_entropy.gather_expand(training_log_probs_N_K_C, dim=2, index=labels_N_1_1)
+        .squeeze(2)
+        .to(dtype=dtype, device=device)
+    )
+    training_log_prob_mean_N = torch.logsumexp(training_log_probs_N_K, dim=1) - np.log(K)
+
+    eval_log_probs_N_K = (
+        joint_entropy.gather_expand(eval_log_probs_N_K_C, dim=2, index=labels_N_1_1)
+            .squeeze(2)
+            .to(dtype=dtype, device=device)
+    )
+    eval_log_prob_mean_N = torch.logsumexp(eval_log_probs_N_K, dim=1) - np.log(K)
+
+    pig = -training_log_prob_mean_N + eval_log_prob_mean_N
+
+    return pig
+
+
+def get_coreset_eig_bald_scores(
+        *,
+        training_log_probs_N_K_C: torch.Tensor,
+        eval_log_probs_N_K_C: torch.Tensor,
+        labels_N: torch.Tensor, dtype=None, device=None
+) -> torch.Tensor:
+    # We want to compute I[y_eval; y_batch; W].
+    # I[y_eval; y_batch; W] = I[y_batch; W] - I[y_batch; W|y_eval]
+    training_coreset = get_coreset_bald_scores(training_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
+    eval_coreset = get_coreset_bald_scores(eval_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
+    return training_coreset - eval_coreset
+
+
+# def get_batch_coreset_eig_batch(
+#     *,
+#     training_log_probs_N_K_C: torch.Tensor,
+#     eval_log_probs_N_K_C: torch.Tensor,
+#     labels_N: torch.Tensor,
+#     batch_size: int,
+#     dtype=None, device=None
+# ) -> CandidateBatch:
+#     # We want to compute I[y_eval; y_batch].
+#     # I[y_eval; y_train] = H[y_batch] - H[y_batch|y_eval]
+# TOOD: extract the batch coreset code into helper functions/classes. this will be really easy to write then
