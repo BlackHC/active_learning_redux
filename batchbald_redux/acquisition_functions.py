@@ -305,6 +305,8 @@ class EIG(_EIG):
 
 @dataclass
 class BatchEIG(EvaluationPoolScorerCandidateBatchComputer):
+    num_samples: int = 1000000
+    
     def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
         candidate_batch = get_batch_eig_batch(
             log_probs_N_K_C,
