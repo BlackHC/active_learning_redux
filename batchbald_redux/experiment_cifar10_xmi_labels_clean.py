@@ -377,14 +377,14 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        initial_training_set_size=1000,
-        max_training_set=1300
+        initial_training_set_size=0,
+        max_training_set=250
     )
     for seed in range(5)
     for acquisition_function in [
         acquisition_functions.BALD,
         acquisition_functions.CoreSetBALD,
-        acquisition_functions.Random,
+        #acquisition_functions.Random,
     ]
     for acquisition_size in [1]
     for num_pool_samples in [100]
