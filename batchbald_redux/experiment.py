@@ -236,7 +236,8 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        repeated_mnist_repetitions=repeated_mnist_repetitions
+        repeated_mnist_repetitions=repeated_mnist_repetitions,
+        add_dataset_noise=repeated_mnist_repetitions > 1
     )
     for seed in range(5)
     for acquisition_function in [

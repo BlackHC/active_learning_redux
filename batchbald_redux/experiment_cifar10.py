@@ -162,29 +162,29 @@ def load_experiment_data(
 @dataclass
 class Experiment:
     seed: int
+    acquisition_function: Union[
+        Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
+    ]
 
     id_dataset_name: str = "CIFAR-10"
-    initial_training_set_size: int = 1000
+    initial_training_set_size: int = 5000
     validation_set_size: int = 5000
     evaluation_set_size: int = 0
     id_repetitions: float = 1
     add_dataset_noise: bool = False
     validation_split_random_state: int = 0
 
-    acquisition_size: int = 5
-    max_training_set: int = 300
+    acquisition_size: int = 2500
+    max_training_set: int = 40000
     num_pool_samples: int = 20
     num_validation_samples: int = 20
     num_training_samples: int = 1
-    max_training_epochs: int = 60
+    max_training_epochs: int = 120
     training_batch_size: int = 128
     device: str = "cuda"
     min_samples_per_epoch: int = 5056
-    patience_schedule: [int] = (3, 3, 3)
+    patience_schedule: [int] = (6, 4, 2)
     factor_schedule: [int] = (0.1,)
-    acquisition_function: Union[
-        Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
-    ] = acquisition_functions.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModelWithSchedule
     model_optimizer_factory: Type[ModelOptimizerFactory] = Cifar10BayesianResnetFactory
     acquisition_function_args: dict = None
@@ -336,21 +336,37 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        initial_training_set_size=1000,
-        evaluation_set_size=5000,
-        max_training_set=30000,
-        temperature=8
+        initial_training_set_size=5000,
+        evaluation_set_size=0,
+        max_training_set=20000,
+        temperature=temperature
     )
     for seed in range(5)
     for acquisition_function in [
         acquisition_functions.TemperedBALD,
         acquisition_functions.BALD,
-        acquisition_functions.EvalBALD,
-        acquisition_functions.TemperedEvalBALD,
+    ]
+    for acquisition_size in [2500]
+    for num_pool_samples in [100]
+    for temperature in [5,10,15]
+] + [
+    Experiment(
+        seed=seed + 7893,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        initial_training_set_size=5000,
+        evaluation_set_size=0,
+        max_training_set=20000,
+        temperature=temperature
+    )
+    for seed in range(20)
+    for acquisition_function in [
         acquisition_functions.Random,
     ]
-    for acquisition_size in [250]
+    for acquisition_size in [2500]
     for num_pool_samples in [100]
+    for temperature in [0]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":

@@ -609,16 +609,3 @@ def get_coreset_eig_bald_scores(
     training_coreset = get_coreset_bald_scores(training_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
     eval_coreset = get_coreset_bald_scores(eval_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
     return training_coreset - eval_coreset
-
-
-# def get_batch_coreset_eig_batch(
-#     *,
-#     training_log_probs_N_K_C: torch.Tensor,
-#     eval_log_probs_N_K_C: torch.Tensor,
-#     labels_N: torch.Tensor,
-#     batch_size: int,
-#     dtype=None, device=None
-# ) -> CandidateBatch:
-#     # We want to compute I[y_eval; y_batch].
-#     # I[y_eval; y_train] = H[y_batch] - H[y_batch|y_eval]
-# TOOD: extract the batch coreset code into helper functions/classes. this will be really easy to write then
