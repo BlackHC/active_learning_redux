@@ -332,7 +332,7 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed + 7893,
+        seed=seed + 8945,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
@@ -341,17 +341,16 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(5)
+    for seed in range(25)
     for acquisition_function in [
         acquisition_functions.TemperedBALD,
-        acquisition_functions.BALD,
     ]
     for acquisition_size in [2500]
     for num_pool_samples in [100]
     for temperature in [5,10,15]
 ] + [
     Experiment(
-        seed=seed + 7893,
+        seed=seed + 8945,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
@@ -360,9 +359,10 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(20)
+    for seed in range(15)
     for acquisition_function in [
         acquisition_functions.Random,
+        acquisition_functions.BALD,
     ]
     for acquisition_size in [2500]
     for num_pool_samples in [100]
