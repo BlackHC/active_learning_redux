@@ -97,13 +97,13 @@ class Experiment:
         train_dataset = NamedDataset(
             FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
         )
-        train_predictions = torch.load("./data/mnist_train_predictions.pt", map_location=self.device)
+        #train_predictions = torch.load("./data/mnist_train_predictions.pt", map_location=self.device)
 
         # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.
         if self.repeated_mnist_repetitions > 1:
             train_dataset = train_dataset * self.repeated_mnist_repetitions
 
-        train_dataset = train_dataset.override_targets(targets=train_predictions.argmax(dim=1))
+        #train_dataset = train_dataset.override_targets(targets=train_predictions.argmax(dim=1))
 
         if self.add_dataset_noise:
             train_dataset = AdditiveGaussianNoise(train_dataset, 0.1)
@@ -262,23 +262,25 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
+        max_training_set=200,
         temperature=8,
     )
     for seed in range(5)
     for acquisition_function in [
         acquisition_functions.BALD,
-        acquisition_functions.TemperedBALD,
+        #acquisition_functions.TemperedBALD,
         acquisition_functions.CoreSetBALD,
-        acquisition_functions.TemperedCoreSetBALD,
+        #acquisition_functions.TemperedCoreSetBALD,
     ]
-    for acquisition_size in [10]
+    for acquisition_size in [1]
     for num_pool_samples in [100]
 ] + [
     Experiment(
         seed=seed,
         acquisition_function=acquisition_functions.Random,
-        acquisition_size=5,
+        acquisition_size=10,
         num_pool_samples=1,
+        max_training_set=200,
     )
     for seed in range(20)
 ]
