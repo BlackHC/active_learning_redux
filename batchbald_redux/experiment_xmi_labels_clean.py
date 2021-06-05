@@ -286,10 +286,9 @@ configs = [
     )
     for seed in range(10)
     for acquisition_function in [
-        acquisition_functions.BALD,
-        acquisition_functions.CoreSetBALD,
+        acquisition_functions.BatchCoreSetBALD
     ]
-    for acquisition_size in [1]
+    for acquisition_size in [5]
     for num_pool_samples in [100]
 ]
 
