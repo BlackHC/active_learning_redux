@@ -217,11 +217,11 @@ class Experiment:
     num_pool_samples: int = 20
     num_validation_samples: int = 20
     num_training_samples: int = 1
-    max_training_epochs: int = 60
+    max_training_epochs: int = 120
     training_batch_size: int = 128
     device: str = "cuda"
     min_samples_per_epoch: int = 5056
-    patience_schedule: [int] = (3, 3, 3)
+    patience_schedule: [int] = (6, 4, 3)
     factor_schedule: [int] = (0.1,)
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
@@ -378,15 +378,15 @@ configs = [
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
         initial_training_set_size=1000,
-        max_training_set=20000
+        max_training_set=1300
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BatchBALD,
-        acquisition_functions.BatchCoreSetBALD,
+        acquisition_functions.BALD,
+        acquisition_functions.CoreSetBALD,
         acquisition_functions.Random,
     ]
-    for acquisition_size in [5]
+    for acquisition_size in [1]
     for num_pool_samples in [100]
 ]
 

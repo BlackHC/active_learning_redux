@@ -282,7 +282,7 @@ configs = [
         num_pool_samples=1,
         max_training_set=200,
     )
-    for seed in range(20)
+    for seed in range(10)
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
