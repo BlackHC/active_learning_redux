@@ -373,12 +373,13 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed + 6666,
+        seed=seed + 7777,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
         initial_training_set_size=0,
-        max_training_set=250
+        max_training_set=250,
+        prefer_accuracy=True
     )
     for seed in range(5)
     for acquisition_function in [

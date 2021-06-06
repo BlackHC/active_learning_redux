@@ -189,7 +189,7 @@ class Experiment:
     model_optimizer_factory: Type[ModelOptimizerFactory] = Cifar10BayesianResnetFactory
     acquisition_function_args: dict = None
     temperature: float = 0.0
-    prefer_accuracy: bool = False
+    prefer_accuracy: bool = True
 
     def load_experiment_data(self) -> ExperimentData:
         di = DependencyInjection(vars(self))
@@ -341,13 +341,13 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(25)
+    for seed in range(20)
     for acquisition_function in [
         acquisition_functions.TemperedBALD,
     ]
     for acquisition_size in [2500]
     for num_pool_samples in [100]
-    for temperature in [5,10,15]
+    for temperature in [10,15,20]
 ] + [
     Experiment(
         seed=seed + 8945,
@@ -359,7 +359,7 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(15)
+    for seed in range(20)
     for acquisition_function in [
         acquisition_functions.Random,
         acquisition_functions.BALD,
