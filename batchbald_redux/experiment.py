@@ -250,7 +250,7 @@ configs = [
             ]
     for acquisition_size in [5]
     for num_pool_samples in [100]
-    for repeated_mnist_repetitions in [1,2]
+    for repeated_mnist_repetitions in [2]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
