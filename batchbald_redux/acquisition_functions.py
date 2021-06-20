@@ -114,6 +114,14 @@ class TemperedBALD(_BALD):
 
 
 @dataclass
+class SoftmaxBALD(_BALD):
+    temperature: float
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_sampled_tempered_scorers(scores_N.exp(), batch_size=self.acquisition_size, temperature=self.temperature)
+
+
+@dataclass
 class RandomBALD(_BALD):
     def extract_candidates(self, scores_N) -> CandidateBatch:
         return get_top_random_scorers(scores_N, batch_size=self.acquisition_size, num_classes=10)

@@ -365,18 +365,18 @@ def get_top_random_eval_bald_batch(
 # Cell
 
 
-def get_sampled_tempered_scorers(scores_N: torch.Tensor, *, temperature: float, batch_size: int) -> CandidateBatch:
-    N = len(scores_N)
+def get_sampled_tempered_scorers(exp_scores_N: torch.Tensor, *, temperature: float, batch_size: int) -> CandidateBatch:
+    N = len(exp_scores_N)
     batch_size = min(batch_size, N)
 
-    tempered_scores_N = scores_N ** temperature
-    tempered_scores_N[tempered_scores_N < 0] = 0.0
+    tempered_scores_N = exp_scores_N ** (1/temperature)
+    tempered_scores_N[exp_scores_N < 0] = 0.0
     partition_constant = tempered_scores_N.sum()
     p = tempered_scores_N / partition_constant
 
     # TODO: change this to use PyTorch instead of numpy?
     candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p.cpu().numpy())
-    candidate_scores = scores_N[candidate_indices]
+    candidate_scores = exp_scores_N[candidate_indices]
 
     return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())
 
