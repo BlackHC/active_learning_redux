@@ -281,7 +281,7 @@ configs = [
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
         initial_training_set_size=20,
-        max_training_set=140,
+        max_training_set=160,
         temperature=8,
     )
     for seed in range(10)
