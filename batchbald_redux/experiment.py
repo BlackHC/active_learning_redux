@@ -232,22 +232,21 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed + 789,
+        seed=seed + 115,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
         repeated_mnist_repetitions=repeated_mnist_repetitions,
-        add_dataset_noise=repeated_mnist_repetitions > 1
+        add_dataset_noise=repeated_mnist_repetitions > 1,
+        temperature=temperature,
+        max_training_set=150,
     )
     for seed in range(5)
     for acquisition_function in [
-                acquisition_functions.EIG,
-                acquisition_functions.BALD,
-                acquisition_functions.EvalBALD,
-                acquisition_functions.BatchBALD,
-                acquisition_functions.BatchEvalBALD,
-                acquisition_functions.BatchEIG
+                acquisition_functions.SoftmaxBALD,
+                acquisition_functions.TemperedBALD,
             ]
+    for temperature in [1/16, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16]
     for acquisition_size in [5]
     for num_pool_samples in [100]
     for repeated_mnist_repetitions in [2]
