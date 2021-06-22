@@ -232,7 +232,7 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed + 215,
+        seed=seed + 315,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
@@ -243,10 +243,9 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-                acquisition_functions.BALD,
-                acquisition_functions.Random,
+                acquisition_functions.SoftmaxBALD,
             ]
-    for temperature in [0]
+    for temperature in [1/32, 1/64, 1/128, 1/256]
     for acquisition_size in [5]
     for num_pool_samples in [100]
     for repeated_mnist_repetitions in [2]
