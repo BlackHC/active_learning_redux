@@ -341,13 +341,13 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(20)
+    for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.TemperedBALD,
+        acquisition_functions.SoftmaxBALD,
     ]
-    for acquisition_size in [2500]
+    for acquisition_size in [100]
     for num_pool_samples in [100]
-    for temperature in [10,15,20]
+    for temperature in [1/8,1/32,1/64]
 ] + [
     Experiment(
         seed=seed + 8945,
@@ -359,12 +359,12 @@ configs = [
         max_training_set=20000,
         temperature=temperature
     )
-    for seed in range(20)
+    for seed in range(15)
     for acquisition_function in [
         acquisition_functions.Random,
         acquisition_functions.BALD,
     ]
-    for acquisition_size in [2500]
+    for acquisition_size in [100]
     for num_pool_samples in [100]
     for temperature in [0]
 ]
