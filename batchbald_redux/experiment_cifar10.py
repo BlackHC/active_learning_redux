@@ -347,7 +347,7 @@ configs = [
     ]
     for acquisition_size in [100]
     for num_pool_samples in [100]
-    for temperature in [1/8,1/32,1/64]
+    for temperature in [1/128,1/256]
 ] + [
     Experiment(
         seed=seed + 8945,
