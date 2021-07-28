@@ -27,16 +27,14 @@ from .fast_mnist import FastMNIST, FastFashionMNIST
 
 
 def _wrap_alias(dataset: data.Dataset):
-    if isinstance(dataset, NamedDataset):
+    if not isinstance(dataset, NamedDataset):
         return repr(dataset)
     return f"({dataset.alias})"
 
 
 class AliasDataset(data.Dataset):
     """
-    A dataset with an easier to understand alias.
-
-    And convenience operators.
+    A dataset with an easier to understand alias. And convenience operators.
     """
 
     dataset: data.Dataset
@@ -75,10 +73,10 @@ class AliasDataset(data.Dataset):
     def get_num_classes(self):
         return get_num_classes(self.dataset)
 
-    def get_target(self, index):
+    def get_target(self, index, *, device=None):
         return get_target(self.dataset, index)
 
-    def get_targets(self):
+    def get_targets(self, device=None):
         return get_targets(self.dataset)
 
 # Cell
@@ -137,8 +135,7 @@ def get_num_classes(dataset: data.Dataset) -> int:
         raise NotImplementedError(f"Unrecognized dataset {dataset}!")
 
 
-# TODO: should include ,device if we really want to return Tensors consistently!
-def get_target(dataset, index: int):
+def get_target(dataset, index: int, *, device=None):
     if isinstance(dataset, data.ConcatDataset):
         if index < 0:
             if -index > len(dataset):
@@ -149,9 +146,9 @@ def get_target(dataset, index: int):
             sample_idx = index
         else:
             sample_idx = index - dataset.cumulative_sizes[dataset_idx - 1]
-        target = get_target(dataset.datasets[dataset_idx], sample_idx)
+        target = get_target(dataset.datasets[dataset_idx], sample_idx, device=device)
     elif isinstance(dataset, data.Subset):
-        target = get_target(dataset.dataset, dataset.indices[index])
+        target = get_target(dataset.dataset, dataset.indices[index], device=device)
     elif isinstance(dataset, data.TensorDataset):
         target = dataset.tensors[1][index]
     elif isinstance(dataset, torchvision.datasets.MNIST):
@@ -161,28 +158,28 @@ def get_target(dataset, index: int):
     elif isinstance(dataset, torchvision.datasets.SVHN):
         target = dataset.labels[index]
     elif isinstance(dataset, AliasDataset):
-        target = dataset.get_target(index)
+        target = dataset.get_target(index, device=device)
     else:
         raise NotImplementedError(f"Unrecognized dataset {dataset}!")
-    return torch.as_tensor(target)
+    return torch.as_tensor(target, device=device)
 
 
-# TODO: should include ,device if we really want to return Tensors consistently!
-def get_targets(dataset) -> torch.Tensor:
+def get_targets(dataset, *, device=None) -> torch.Tensor:
     if isinstance(dataset, data.ConcatDataset):
-        return torch.cat([get_targets(sub_dataset).to(device="cpu") for sub_dataset in dataset.datasets])
+        # Move all tensors to the same device for torch.cat. When in doubt, use the cpu.
+        return torch.cat([get_targets(sub_dataset, device=device or "cpu") for sub_dataset in dataset.datasets])
     elif isinstance(dataset, data.Subset):
-        return get_targets(dataset.dataset)[torch.as_tensor(dataset.indices)]
+        return get_targets(dataset.dataset, device=device)[torch.as_tensor(dataset.indices)]
     elif isinstance(dataset, data.TensorDataset):
-        return torch.as_tensor(dataset.tensors[1])
+        return torch.as_tensor(dataset.tensors[1], device=device)
     elif isinstance(dataset, torchvision.datasets.MNIST):
-        return torch.as_tensor(dataset.targets)
+        return torch.as_tensor(dataset.targets, device=device)
     elif isinstance(dataset, torchvision.datasets.CIFAR10):
-        return torch.as_tensor(dataset.targets)
+        return torch.as_tensor(dataset.targets, device=device)
     elif isinstance(dataset, torchvision.datasets.SVHN):
-        return torch.as_tensor(dataset.labels)
+        return torch.as_tensor(dataset.labels, device=device)
     elif isinstance(dataset, AliasDataset):
-        return dataset.get_targets()
+        return dataset.get_targets(device=device)
 
     raise NotImplementedError(f"Unrecognized dataset {dataset} with type {type(dataset)}!")
 
@@ -210,11 +207,11 @@ class SubsetAliasDataset(AliasDataset):
     def get_num_classes(self) -> int:
         return get_num_classes(self.dataset)
 
-    def get_target(self, index) -> torch.Tensor:
-        return get_target(self.dataset, self.indices[index])
+    def get_target(self, index, *, device=None) -> torch.Tensor:
+        return get_target(self.dataset, self.indices[index], device=device)
 
-    def get_targets(self) -> torch.Tensor:
-        return get_targets(self.dataset)[torch.as_tensor(self.indices)]
+    def get_targets(self, device=None) -> torch.Tensor:
+        return get_targets(self.dataset, device=device)[torch.as_tensor(self.indices)]
 
 
 @patch
@@ -243,11 +240,11 @@ class ReplaceTargetsDataset(AliasDataset):
     def get_num_classes(self):
         return self.num_classes
 
-    def get_target(self, index):
-        return self.targets[index]
+    def get_target(self, index, *, device=None):
+        return torch.as_tensor(self.targets[index], device=device)
 
-    def get_targets(self):
-        return self.targets
+    def get_targets(self, device=None):
+        return torch.as_tensor(self.targets, device=device)
 
 
 class NamedDataset(AliasDataset):
@@ -293,18 +290,18 @@ class OverrideTargetsDataset(AliasDataset):
     def get_num_classes(self):
         return self.num_classes
 
-    def get_target(self, index):
+    def get_target(self, index, *, device=None):
         if index not in self.reverse_indices:
-            return get_target(self.dataset, index)
+            return get_target(self.dataset, index, device=device)
 
         ridx = self.reverse_indices[index]
         new_target = self.targets[ridx]
-        return new_target
+        return torch.as_tensor(new_target, device=device)
 
-    def get_targets(self):
+    def get_targets(self, device=None):
         targets = torch.clone(get_targets(self.dataset))
         targets[list(self.reverse_indices.keys())] = torch.as_tensor(self.targets)
-        return targets
+        return torch.as_tensor(targets, device=device)
 
 
 @patch
@@ -360,11 +357,11 @@ class CorruptedLabelsDataset(AliasDataset):
     def get_num_classes(self):
         return self.num_classes
 
-    def get_target(self, index):
-        return self.implementation.get_target(index)
+    def get_target(self, index, *, device=None):
+        return self.implementation.get_target(index, device=device)
 
-    def get_targets(self):
-        return self.implementation.get_targets()
+    def get_targets(self, device=None):
+        return self.implementation.get_targets(device=device)
 
 
 @patch
@@ -547,11 +544,11 @@ class RepeatedDataset(AliasDataset):
     def get_base_dataset_index(self, index):
         return get_base_dataset_index(self.dataset, index % len(self.dataset))
 
-    def get_target(self, index):
-        return get_target(self.dataset, index % len(self.dataset))
+    def get_target(self, index, *, device=None):
+        return get_target(self.dataset, index % len(self.dataset), device=device)
 
-    def get_targets(self):
-        return get_targets(self.dataset).repeat(self.num_repeats)
+    def get_targets(self, device=None):
+        return get_targets(self.dataset, device=device).repeat(self.num_repeats)
 
 
 class RandomSubsetDataset(SubsetAliasDataset):
@@ -573,11 +570,13 @@ class RandomSubsetDataset(SubsetAliasDataset):
                 alias = f"{_wrap_alias(dataset)}~x{factor} (seed={seed})"
 
         N = len(dataset)
+        # noinspection PyUnboundLocalVariable
         assert subset_size < N
 
         generator = np.random.default_rng(seed)
         indices = generator.choice(N, size=subset_size, replace=False)
 
+        # noinspection PyUnboundLocalVariable
         super().__init__(dataset, indices, alias)
         self.options = dict(size=size, factor=factor, seed=seed)
 
@@ -598,11 +597,11 @@ class ConstantTargetDataset(AliasDataset):
     def get_num_classes(self):
         return self.num_classes
 
-    def get_target(self, index):
-        return self.target
+    def get_target(self, index, *, device=None):
+        return torch.as_tensor(self.target, device=device)
 
-    def get_targets(self):
-        return self.target.expand(len(self), *self.target.shape)
+    def get_targets(self, device=None):
+        return torch.as_tensor(self.target, device=device).expand(len(self), *self.target.shape)
 
 
 @patch
