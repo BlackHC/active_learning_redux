@@ -13,6 +13,7 @@ import torch
 import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
+from torch import nn
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
@@ -21,7 +22,7 @@ from .acquisition_functions import (
     EvalCandidateBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate, train, train_double_snapshots
+from .black_box_model_training import evaluate, train
 from .dataset_challenges import (
     create_repeated_MNIST_dataset,
     get_base_dataset_index,

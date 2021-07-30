@@ -21,7 +21,7 @@ from .acquisition_functions import (
     EvalCandidateBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate, train, train_double_snapshots
+from .black_box_model_training import evaluate, train
 from .dataset_challenges import (
     NamedDataset,
     create_repeated_MNIST_dataset,

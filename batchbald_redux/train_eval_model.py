@@ -10,6 +10,7 @@ from typing import Type
 import torch
 import torch.nn
 import torch.utils.data
+from torch import nn
 
 from .active_learning import RandomFixedLengthSampler
 from .black_box_model_training import train, train_with_schedule
@@ -43,10 +44,10 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
     model_optimizer_factory: Type[ModelOptimizerFactory]
     trained_model: TrainedModel
     min_samples_per_epoch: int
+    # TODO: remove the default?
+    train_augmentations: nn.Module = None
     # TODO: remove the default!
     prefer_accuracy: bool = True
-    # TODO: this is a bad hack!
-    data: object = None
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
@@ -68,12 +69,10 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
         loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
 
-        if self.data:
-            self.data.toggle_augmentations(True)
-
         train(
             model=eval_model_optimizer.model,
             optimizer=eval_model_optimizer.optimizer,
+            train_augmentations=self.train_augmentations,
             loss=loss,
             validation_loss=torch.nn.NLLLoss(),
             training_samples=self.num_training_samples,
@@ -86,9 +85,6 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
             device=device,
             training_log=training_log,
         )
-
-        if self.data:
-            self.data.toggle_augmentations(False)
 
         return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
 
@@ -109,8 +105,8 @@ class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
     trained_model: TrainedModel
     min_samples_per_epoch: int
     prefer_accuracy: bool
-    # TODO: this is a bad hack!
-    data: object = None
+    # TODO: remove the default?
+    train_augmentations: nn.Module = None
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
@@ -132,13 +128,11 @@ class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
 
         loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
 
-        if self.data:
-            self.data.toggle_augmentations(True)
-
         train_with_schedule(
             model=eval_model_optimizer.model,
             optimizer=eval_model_optimizer.optimizer,
             loss=loss,
+            train_augmentations=self.train_augmentations,
             validation_loss=torch.nn.NLLLoss(),
             training_samples=self.num_training_samples,
             validation_samples=self.num_validation_samples,
@@ -151,9 +145,6 @@ class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
             device=device,
             training_log=training_log,
         )
-
-        if self.data:
-            self.data.toggle_augmentations(False)
 
         return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
 

@@ -13,6 +13,7 @@ import torch
 import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
+from torch import nn
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
@@ -49,21 +50,14 @@ from .trained_model import TrainedMCDropoutModel
 @dataclass
 class ExperimentData:
     active_learning: ActiveLearningData
-    augmentation_node: AliasDataset
-    unaugmented_train_dataset: Dataset
-    augmented_train_dataset: Dataset
+    train_dataset: Dataset
+    train_augmentations: nn.Module
     ood_dataset: NamedDataset
     validation_dataset: Dataset
     test_dataset: Dataset
     evaluation_dataset: Dataset
     initial_training_set_indices: [int]
     evaluation_set_indices: [int]
-
-    def toggle_augmentations(self, augment: bool):
-        if augment:
-            self.augmentation_node.dataset = self.augmented_train_dataset
-        else:
-            self.augmentation_node.dataset = self.unaugmented_train_dataset
 
 
 @dataclass
@@ -112,13 +106,10 @@ def load_experiment_data(
     device: str,
     uniform_ood: bool,
 ) -> ExperimentData:
-    split_dataset = get_dataset(id_dataset_name, root="data", train_augmentation=True, validation_set_size=validation_set_size,
-                                validation_split_random_state=validation_split_random_state, normalize_like_cifar10=True)
-    unaugmented_split_dataset = get_dataset(id_dataset_name, root="data", train_augmentation=True, validation_set_size=validation_set_size,
+    split_dataset = get_dataset(id_dataset_name, root="data", validation_set_size=validation_set_size,
                                 validation_split_random_state=validation_split_random_state, normalize_like_cifar10=True)
 
-    augmentation_node = AliasDataset(split_dataset.train, "Augmentation Node")
-    train_dataset=augmentation_node
+    train_dataset = split_dataset.train
 
     # If we reduce the train set, we need to do so before picking the initial train set.
     if id_repetitions < 1:
@@ -146,7 +137,7 @@ def load_experiment_data(
     if id_repetitions > 1:
         train_dataset = train_dataset * id_repetitions
 
-    original_ood_dataset = get_dataset(ood_dataset_name, root="data", train_augmentation=False, normalize_like_cifar10=True).train
+    original_ood_dataset = get_dataset(ood_dataset_name, root="data", normalize_like_cifar10=True).train
     if uniform_ood:
         train_dataset = train_dataset.one_hot(device=device)
         ood_dataset = original_ood_dataset.uniform_target(device=device)
@@ -174,9 +165,8 @@ def load_experiment_data(
 
     return ExperimentData(
         active_learning=active_learning_data,
-        augmentation_node=augmentation_node,
-        augmented_train_dataset=split_dataset.train,
-        unaugmented_train_dataset=unaugmented_split_dataset.train,
+        train_dataset=train_dataset,
+        train_augmentations=split_dataset.train_augmentations,
         ood_dataset=original_ood_dataset,
         validation_dataset=split_dataset.validation,
         test_dataset=split_dataset.test,
@@ -285,24 +275,22 @@ class OodExperiment:
             else:
                 loss = validation_loss = torch.nn.NLLLoss()
 
-            data.toggle_augmentations(True)
-
-            train(
-                model=model_optimizer.model,
-                optimizer=model_optimizer.optimizer,
-                training_samples=self.num_training_samples,
-                validation_samples=self.num_validation_samples,
-                train_loader=train_loader,
-                validation_loader=validation_loader,
-                patience=self.num_patience_epochs,
-                max_epochs=self.max_training_epochs,
-                device=self.device,
-                training_log=iteration_log["training"],
-                loss=loss,
-                validation_loss=validation_loss,
-            )
-
-            data.toggle_augmentations(False)
+            if training_set_size > 0:
+                train(
+                    model=model_optimizer.model,
+                    optimizer=model_optimizer.optimizer,
+                    train_augmentations=data.train_augmentations,
+                    training_samples=self.num_training_samples,
+                    validation_samples=self.num_validation_samples,
+                    train_loader=train_loader,
+                    validation_loader=validation_loader,
+                    patience=self.num_patience_epochs,
+                    max_epochs=self.max_training_epochs,
+                    device=self.device,
+                    training_log=iteration_log["training"],
+                    loss=loss,
+                    validation_loss=validation_loss,
+                )
 
             evaluation_metrics = evaluate(
                 model=model_optimizer.model,
@@ -336,7 +324,7 @@ class OodExperiment:
                         eval_dataset=eval_dataset,
                         validation_loader=validation_loader,
                         trained_model=trained_model,
-                        data=data,
+                        train_augmentations=data.train_augmentations
                     )
                 )
 

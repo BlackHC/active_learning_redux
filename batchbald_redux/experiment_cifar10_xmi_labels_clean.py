@@ -14,6 +14,7 @@ import torch
 import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
+from torch import nn
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
@@ -74,20 +75,14 @@ def compute_entropy_from_probs(probs_N_K_C: torch.Tensor) -> torch.Tensor:
 @dataclass
 class ExperimentData:
     active_learning: ActiveLearningData
-    augmentation_node: AliasDataset
-    unaugmented_train_dataset: Dataset
-    augmented_train_dataset: Dataset
+    train_dataset: Dataset
+    train_augmentations: nn.Module
+    ood_dataset: NamedDataset
     validation_dataset: Dataset
     test_dataset: Dataset
     evaluation_dataset: Dataset
     initial_training_set_indices: [int]
     evaluation_set_indices: [int]
-
-    def toggle_augmentations(self, augment: bool):
-        if augment:
-            self.augmentation_node.dataset = self.augmented_train_dataset
-        else:
-            self.augmentation_node.dataset = self.unaugmented_train_dataset
 
 
 @dataclass
@@ -126,18 +121,14 @@ def load_experiment_data(
     validation_split_random_state: int,
     device: str,
 ) -> ExperimentData:
-    split_dataset = get_dataset(id_dataset_name, root="data", train_augmentation=True, validation_set_size=validation_set_size,
+    split_dataset = get_dataset(id_dataset_name, root="data", validation_set_size=validation_set_size,
                                 validation_split_random_state=validation_split_random_state, normalize_like_cifar10=True)
-    unaugmented_split_dataset = get_dataset(id_dataset_name, root="data", train_augmentation=True, validation_set_size=validation_set_size,
-                                validation_split_random_state=validation_split_random_state, normalize_like_cifar10=True)
-
-    augmentation_node = AliasDataset(split_dataset.train, "Augmentation Node")
-    train_dataset=augmentation_node
 
     assert id_dataset_name == "CIFAR-10"
     train_predictions = torch.load("./data/cifar10_train_predictions.pt", map_location=device)
 
-    train_indices = split_dataset.train.dataset.indices
+    train_dataset = split_dataset.train
+    train_indices = train_dataset.indices
     train_dataset = train_dataset.override_targets(targets=train_predictions[train_indices].argmax(dim=1))
 
     train_entropies = compute_entropy_from_probs(train_predictions[train_indices, None, :])
@@ -188,9 +179,8 @@ def load_experiment_data(
 
     return ExperimentData(
         active_learning=active_learning_data,
-        augmentation_node=augmentation_node,
-        augmented_train_dataset=split_dataset.train,
-        unaugmented_train_dataset=unaugmented_split_dataset.train,
+        train_dataset=train_dataset,
+        train_augmentations=split_dataset.train_augmentations,
         validation_dataset=split_dataset.validation,
         test_dataset=split_dataset.test,
         evaluation_dataset=evaluation_dataset,
@@ -287,12 +277,11 @@ class Experiment:
 
             model_optimizer = self.model_optimizer_factory().create_model_optimizer()
 
-            data.toggle_augmentations(True)
-
             if training_set_size > 0:
                 train_with_schedule(
                     model=model_optimizer.model,
                     optimizer=model_optimizer.optimizer,
+                    train_augmentations=data.train_augmentations,
                     training_samples=self.num_training_samples,
                     validation_samples=self.num_validation_samples,
                     train_loader=train_loader,
@@ -304,8 +293,6 @@ class Experiment:
                     training_log=iteration_log["training"],
                     prefer_accuracy=self.prefer_accuracy
                 )
-
-            data.toggle_augmentations(False)
 
             evaluation_metrics = evaluate(
                 model=model_optimizer.model,
@@ -339,7 +326,7 @@ class Experiment:
                         eval_dataset=eval_dataset,
                         validation_loader=validation_loader,
                         trained_model=trained_model,
-                        data=data,
+                        train_augmentations=data.train_augmentations
                     )
                 )
 
