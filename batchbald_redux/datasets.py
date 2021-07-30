@@ -7,8 +7,10 @@ __all__ = ['SplitDataset', 'SplitDataLoader', 'train_validation_split', 'get_SVH
 
 from dataclasses import dataclass
 
+import kornia.augmentation as K
 import numpy as np
 from sklearn.model_selection import StratifiedShuffleSplit
+from torch import nn
 from torch.utils import data
 from torchvision import datasets, transforms
 
@@ -29,6 +31,8 @@ class SplitDataset:
     validation: data.Dataset
     test: data.Dataset
 
+    train_augmentations: nn.Sequential
+
 
 @dataclass
 class SplitDataLoader:
@@ -39,6 +43,8 @@ class SplitDataLoader:
     train: data.DataLoader
     validation: data.DataLoader
     test: data.DataLoader
+
+    train_augmentations: nn.Sequential
 
 # Cell
 
@@ -55,12 +61,13 @@ def train_validation_split(
             X=np.zeros(len(full_train_dataset)), y=np.asarray(train_labels)
         ):
             pass
-
-        train_dataset = data.Subset(full_train_dataset, train_indices)
-        validation_dataset = data.Subset(full_validation_dataset, validation_indices)
     else:
-        train_dataset = data.Subset(full_train_dataset, list(range(len(full_train_dataset))))
-        validation_dataset = data.Subset(full_validation_dataset, [])
+        # Always wrap the dataset in a subset so there
+        train_indices = list(range(len(full_train_dataset)))
+        validation_indices = []
+
+    train_dataset = data.Subset(full_train_dataset, train_indices)
+    validation_dataset = data.Subset(full_validation_dataset, validation_indices)
 
     return train_dataset, validation_dataset
 
@@ -69,7 +76,7 @@ def train_validation_split(
 CIFAR10_NORMALIZE = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 
 
-def get_SVHN(root, validation_set_size, validation_split_random_state, normalize_like_cifar10, train_augmentation):
+def get_SVHN(root, validation_set_size, validation_split_random_state, normalize_like_cifar10):
     input_size = 32
     num_classes = 10
 
@@ -95,7 +102,6 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
         dict(
             validation_split_random_state=validation_split_random_state,
             normalize_like_cifar10=normalize_like_cifar10,
-            train_augmentation=False,
         ),
         NamedDataset(
             train_dataset, f"SVHN (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
@@ -105,35 +111,29 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
             f"SVHN (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "SVHN (Test)"),
+        nn.Sequential()
     )
 
 
-def get_CIFAR10(root, validation_set_size, validation_split_random_state, normalize_like_cifar10, train_augmentation):
+def get_CIFAR10(root, validation_set_size, validation_split_random_state, normalize_like_cifar10):
     input_size = 32
     num_classes = 10
 
-    test_transform = transforms.Compose(
+    dataset_transform = transforms.Compose(
         [
             transforms.ToTensor(),
             CIFAR10_NORMALIZE,
         ]
     )
 
-    if train_augmentation:
-        train_transform = transforms.Compose(
-            [
-                transforms.RandomCrop(32, padding=4),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                CIFAR10_NORMALIZE,
-            ]
-        )
-    else:
-        train_transform = test_transform
+    train_augmentations = nn.Sequential(
+        K.RandomCrop((32, 32), padding=4),
+        K.RandomHorizontalFlip(),
+    )
 
-    full_train_dataset = datasets.CIFAR10(root + "/CIFAR10", train=True, transform=train_transform, download=True)
+    full_train_dataset = datasets.CIFAR10(root + "/CIFAR10", train=True, transform=dataset_transform, download=True)
     full_validation_dataset = datasets.CIFAR10(
-        root + "/CIFAR10", train=True, transform=test_transform, download=True
+        root + "/CIFAR10", train=True, transform=dataset_transform, download=True
     )
 
     train_dataset, validation_dataset = train_validation_split(
@@ -144,7 +144,7 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = datasets.CIFAR10(root + "/CIFAR10", train=False, transform=test_transform, download=True)
+    test_dataset = datasets.CIFAR10(root + "/CIFAR10", train=False, transform=dataset_transform, download=True)
 
     return SplitDataset(
         input_size,
@@ -152,7 +152,6 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
         dict(
             validation_split_random_state=validation_split_random_state,
             normalize_like_cifar10=True,
-            train_augmentation=train_augmentation,
         ),
         NamedDataset(
             train_dataset, f"CIFAR-10 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
@@ -162,10 +161,11 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
             f"CIFAR-10 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "CIFAR-10 (Test)"),
+        train_augmentations
     )
 
 
-def get_CIFAR100(root, validation_set_size, validation_split_random_state, normalize_like_cifar10, train_augmentation):
+def get_CIFAR100(root, validation_set_size, validation_split_random_state, normalize_like_cifar10):
     input_size = 32
     num_classes = 100
 
@@ -175,28 +175,21 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
         else transforms.Normalize((0.5071, 0.4866, 0.4409), (0.2673, 0.2564, 0.2762))
     )
 
-    test_transform = transforms.Compose(
+    dataset_transform = transforms.Compose(
         [
             transforms.ToTensor(),
             normalize,
         ]
     )
 
-    if train_augmentation:
-        train_transform = transforms.Compose(
-            [
-                transforms.RandomCrop(32, padding=4),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                normalize,
-            ]
-        )
-    else:
-        train_transform = test_transform
+    train_augmentations = nn.Sequential(
+        K.RandomCrop((32, 32), padding=4),
+        K.RandomHorizontalFlip(),
+    )
 
-    full_train_dataset = datasets.CIFAR100(root + "/CIFAR100", train=True, transform=train_transform, download=True)
+    full_train_dataset = datasets.CIFAR100(root + "/CIFAR100", train=True, transform=dataset_transform, download=True)
     full_validation_dataset = datasets.CIFAR100(
-        root + "/CIFAR100", train=True, transform=test_transform, download=False
+        root + "/CIFAR100", train=True, transform=dataset_transform, download=False
     )
 
     train_dataset, validation_dataset = train_validation_split(
@@ -207,7 +200,7 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = datasets.CIFAR100(root + "/CIFAR100", train=False, transform=test_transform, download=False)
+    test_dataset = datasets.CIFAR100(root + "/CIFAR100", train=False, transform=dataset_transform, download=False)
 
     return SplitDataset(
         input_size,
@@ -215,7 +208,6 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
         dict(
             validation_split_random_state=validation_split_random_state,
             normalize_like_cifar10=normalize_like_cifar10,
-            train_augmentation=train_augmentation,
         ),
         NamedDataset(
             train_dataset, f"CIFAR-100 (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
@@ -225,6 +217,7 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
             f"CIFAR-100 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "CIFAR-100 (Test)"),
+        train_augmentations
     )
 
 # Cell
@@ -243,16 +236,14 @@ def get_dataset(
     validation_set_size=0,
     validation_split_random_state=0,
     normalize_like_cifar10=False,
-    train_augmentation=True,
 ):
     root = root if root is not None else "./"
     validation_set_size = validation_set_size if validation_set_size is not None else 0
     validation_split_random_state = validation_split_random_state if validation_split_random_state is not None else 0
     normalize_like_cifar10 = normalize_like_cifar10 if normalize_like_cifar10 is not None else False
-    train_augmentation = train_augmentation if train_augmentation is not None else True
 
     split_dataset = dataset_factories[name](
-        root, validation_set_size, validation_split_random_state, normalize_like_cifar10, train_augmentation
+        root, validation_set_size, validation_split_random_state, normalize_like_cifar10
     )
     return split_dataset
 
@@ -272,6 +263,7 @@ def get_dataloaders(split_dataset: SplitDataset, *, train_batch_size=128, eval_b
         train_loader,
         validation_loader,
         test_loader,
+        split_dataset.train_augmentations
     )
 
 
@@ -279,7 +271,6 @@ def get_dataloaders_by_name(
     name: str,
     *,
     normalize_like_cifar10,
-    train_augmentation,
     root=None,
     validation_set_size=None,
     validation_split_random_state=None,
@@ -293,7 +284,6 @@ def get_dataloaders_by_name(
         validation_set_size=validation_set_size,
         validation_split_random_state=validation_split_random_state,
         normalize_like_cifar10=normalize_like_cifar10,
-        train_augmentation=train_augmentation,
     )
 
     split_dataloaders = get_dataloaders(
