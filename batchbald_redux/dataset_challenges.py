@@ -629,16 +629,24 @@ class AdditiveGaussianNoise(AliasDataset):
     noise: torch.Tensor
     options: dict
 
-    def __init__(self, dataset: data.Dataset, sigma: float):
+    def __init__(self, dataset: data.Dataset, sigma: float, *, max_num_noise_samples=None):
         sample = dataset[0][0]
-        self.noise = torch.randn(len(dataset), *sample.shape, device=sample.device)
-        self.options = dict(sigma=sigma)
+
+        # Goal: easily add redundancy without OOM.
+        if max_num_noise_samples is None:
+            # A "big" prime, so it is unlikely we will repeat the noise
+            max_num_noise_samples = 16273
+
+        num_noise_samples = min(len(dataset), max_num_noise_samples)
+
+        self.noise = torch.randn(num_noise_samples, *sample.shape, device=sample.device)
+        self.options = dict(sigma=sigma, max_num_noise_samples=max_num_noise_samples)
 
         super().__init__(dataset, f"{dataset} + 𝓝(0;σ={sigma})")
 
     def __getitem__(self, idx):
         sample, target = self.dataset[idx]
-        return sample + self.noise[idx], target
+        return sample + self.noise[idx % len(self.noise)], target
 
 # Cell
 
