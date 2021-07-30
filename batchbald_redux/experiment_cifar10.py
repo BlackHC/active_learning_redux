@@ -326,15 +326,19 @@ configs = [
         initial_training_set_size=5000,
         evaluation_set_size=0,
         max_training_set=20000,
-        temperature=temperature
+        temperature=temperature,
+        id_repetitions=id_repetitions,
+        add_dataset_noise=True
+
     )
     for seed in range(5)
     for acquisition_function in [
         acquisition_functions.SoftmaxBALD,
     ]
-    for acquisition_size in [100]
+    for acquisition_size in [200]
     for num_pool_samples in [100]
-    for temperature in [1/128,1/256]
+    for temperature in [1/64]
+    for id_repetitions in [1,5,10,20]
 ] + [
     Experiment(
         seed=seed + 8945,
@@ -344,16 +348,18 @@ configs = [
         initial_training_set_size=5000,
         evaluation_set_size=0,
         max_training_set=20000,
-        temperature=temperature
+        temperature=temperature,
+        id_repetitions=id_repetitions,
+        add_dataset_noise=True
     )
-    for seed in range(15)
+    for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.Random,
         acquisition_functions.BALD,
     ]
-    for acquisition_size in [100]
+    for acquisition_size in [200]
     for num_pool_samples in [100]
     for temperature in [0]
+    for id_repetitions in [1,5,10,20]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
