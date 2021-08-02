@@ -77,7 +77,6 @@ class ExperimentData:
     active_learning: ActiveLearningData
     train_dataset: Dataset
     train_augmentations: nn.Module
-    ood_dataset: NamedDataset
     validation_dataset: Dataset
     test_dataset: Dataset
     evaluation_dataset: Dataset
@@ -128,12 +127,12 @@ def load_experiment_data(
     train_predictions = torch.load("./data/cifar10_train_predictions.pt", map_location=device)
 
     train_dataset = split_dataset.train
-    train_indices = train_dataset.indices
+    train_indices = train_dataset.dataset.indices
     train_dataset = train_dataset.override_targets(targets=train_predictions[train_indices].argmax(dim=1))
 
     train_entropies = compute_entropy_from_probs(train_predictions[train_indices, None, :])
 
-    entropy_threshold = 0.1
+    entropy_threshold = 0.01
     allowed_indices = torch.nonzero(train_entropies < entropy_threshold, as_tuple=True)[0].numpy()
     print(f"Removing {len(train_dataset) - len(allowed_indices)} training samples with entropy >= {entropy_threshold}.")
 
