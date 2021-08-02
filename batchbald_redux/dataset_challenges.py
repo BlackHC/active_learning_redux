@@ -639,7 +639,7 @@ class AdditiveGaussianNoise(AliasDataset):
 
         num_noise_samples = min(len(dataset), max_num_noise_samples)
 
-        self.noise = torch.randn(num_noise_samples, *sample.shape, device=sample.device)
+        self.noise = sigma * torch.randn(num_noise_samples, *sample.shape, device=sample.device)
         self.options = dict(sigma=sigma, max_num_noise_samples=max_num_noise_samples)
 
         super().__init__(dataset, f"{dataset} + 𝓝(0;σ={sigma})")
