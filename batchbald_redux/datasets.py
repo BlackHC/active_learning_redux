@@ -11,6 +11,7 @@ from dataclasses import dataclass
 import kornia.augmentation as K
 import numpy as np
 from sklearn.model_selection import StratifiedShuffleSplit
+import torch
 from torch import nn
 from torch.utils import data
 from torchvision import datasets, transforms
