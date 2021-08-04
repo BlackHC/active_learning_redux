@@ -10,8 +10,6 @@ __all__ = ['CandidateBatchComputer', 'Random', 'PoolScorerCandidateBatchComputer
 # Cell
 
 from dataclasses import dataclass
-from enum import Enum
-from typing import Union
 
 import numpy as np
 import torch
@@ -35,11 +33,6 @@ from .batchbald import (
     get_top_k_scorers,
     get_top_random_scorers,
 )
-from .consistent_mc_dropout import (
-    get_predictions,
-    get_predictions_labels,
-)
-from .dataset_challenges import get_num_classes
 from .trained_model import TrainedModel
 
 # Cell
@@ -72,10 +65,12 @@ class Random(CandidateBatchComputer):
 
 @dataclass
 class PoolScorerCandidateBatchComputer(CandidateBatchComputer):
+    num_pool_samples: int
+
     def compute_candidate_batch(
         self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, device)
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, device)
 
@@ -161,10 +156,12 @@ class BatchBALD(PoolScorerCandidateBatchComputer):
 
 @dataclass
 class CoreSetPoolScorerCandidateBatchComputer(CandidateBatchComputer):
+    num_pool_samples: int
+
     def compute_candidate_batch(
         self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, device)
+        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, labels_N, device)
 
@@ -237,11 +234,13 @@ class EvalCandidateBatchComputer:
 
 @dataclass
 class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
+    num_pool_samples: int
+
     def compute_candidate_batch(
         self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, device)
-        log_eval_probs_N_K_C = eval_model.get_log_probs_N_K_C(pool_loader, device)
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
+        log_eval_probs_N_K_C = eval_model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
 
         return self.get_candidate_batch(log_probs_N_K_C, log_eval_probs_N_K_C, device)
 
@@ -345,11 +344,13 @@ class TemperedEIG(_EIG):
 
 @dataclass
 class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
+    num_pool_samples: int
+
     def compute_candidate_batch(
         self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, device)
-        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, device)
+        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
+        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
 
         # With high probability, this ensures that we are not shuffling the batches.
         assert torch.equal(training_labels_N, eval_labels_N)

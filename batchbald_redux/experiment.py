@@ -22,7 +22,7 @@ from .acquisition_functions import (
     EvalCandidateBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate, train
+from .black_box_model_training import evaluate_old, train, evaluate
 from .dataset_challenges import (
     create_repeated_MNIST_dataset,
     get_base_dataset_index,
@@ -30,7 +30,7 @@ from .dataset_challenges import (
 )
 from .di import DependencyInjection
 from .model_optimizer_factory import ModelOptimizerFactory
-from .models import MnistOptimizerFactory
+from .models import MnistOptimizerFactory, MnistModelTrainer
 
 # Cell
 
@@ -39,7 +39,7 @@ from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import TrainedMCDropoutModel
+from .trained_model import TrainedBayesianModel, ModelTrainer
 
 mnist_initial_samples = [
     38043,
@@ -87,8 +87,8 @@ class Experiment:
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
     ] = acquisition_functions.BALD
-    train_eval_model: TrainEvalModel = TrainSelfDistillationEvalModel
-    model_optimizer_factory: Type[ModelOptimizerFactory] = MnistOptimizerFactory
+    train_eval_model_factory: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
+    model_trainer_factory: Type[ModelTrainer] = MnistModelTrainer
     acquisition_function_args: dict = None
     temperature: float = 0.0
 
@@ -112,7 +112,11 @@ class Experiment:
     def create_train_eval_model(self, runtime_config) -> TrainEvalModel:
         config = {**vars(self), **runtime_config}
         di = DependencyInjection(config, [])
-        return di.create_dataclass_type(self.train_eval_model)
+        return di.create_dataclass_type(self.train_eval_model_factory)
+
+    def create_model_trainer(self) -> ModelTrainer:
+        di = DependencyInjection(vars(self))
+        return di.create_dataclass_type(self.model_trainer_factory)
 
     def run(self, store):
         torch.manual_seed(self.seed)
@@ -147,6 +151,14 @@ class Experiment:
 
         acquisition_function = self.create_acquisition_function()
 
+        model_trainer = MnistModelTrainer(
+            num_training_samples=self.num_training_samples,
+            num_validation_samples=self.num_validation_samples,
+            num_patience_epochs=self.num_patience_epochs,
+            max_training_epochs=self.max_training_epochs,
+            device=self.device
+        )
+
         # Active Training Loop
         while True:
             training_set_size = len(active_learning_data.training_dataset)
@@ -157,28 +169,11 @@ class Experiment:
             iteration_log = active_learning_steps[-1]
 
             iteration_log["training"] = {}
+            trained_model = model_trainer.get_trained(train_loader=train_loader, train_augmentations=None,
+                                                      validation_loader=validation_loader, log=iteration_log["training"])
 
-            model_optimizer = self.model_optimizer_factory().create_model_optimizer()
+            evaluation_metrics = evaluate(model=trained_model, num_samples=self.num_validation_samples, loader=test_loader, device=self.device)
 
-            train(
-                model=model_optimizer.model,
-                optimizer=model_optimizer.optimizer,
-                training_samples=self.num_training_samples,
-                validation_samples=self.num_validation_samples,
-                train_loader=train_loader,
-                validation_loader=validation_loader,
-                patience=self.num_patience_epochs,
-                max_epochs=self.max_training_epochs,
-                device=self.device,
-                training_log=iteration_log["training"],
-            )
-
-            evaluation_metrics = evaluate(
-                model=model_optimizer.model,
-                num_samples=self.num_validation_samples,
-                loader=test_loader,
-                device=self.device,
-            )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
 
@@ -186,16 +181,12 @@ class Experiment:
                 print("Done.")
                 break
 
-            trained_model = TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=model_optimizer.model)
-
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
             elif isinstance(acquisition_function, EvalCandidateBatchComputer):
-                current_max_epochs = iteration_log["training"]["best_epoch"]
-
                 train_eval_model = self.create_train_eval_model(
                     dict(
-                        max_epochs=current_max_epochs,
+                        model_trainer=model_trainer,
                         training_dataset=active_learning_data.training_dataset,
                         eval_dataset=active_learning_data.pool_dataset,
                         validation_loader=validation_loader,

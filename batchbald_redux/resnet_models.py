@@ -307,7 +307,6 @@ def bayesian_resnet34(*, cifar_mod=False, pretrained=False, progress=True, **kwa
 # Cell
 
 
-@dataclass
 class Cifar10BayesianResnetFactory(ModelOptimizerFactory):
     def create_model_optimizer(self) -> ModelOptimizer:
         model = bayesian_resnet18(cifar_mod=True, num_classes=10)

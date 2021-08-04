@@ -13,14 +13,13 @@ import torch.utils.data
 from torch import nn
 
 from .active_learning import RandomFixedLengthSampler
-from .black_box_model_training import train, train_with_schedule
 from .consistent_mc_dropout import get_log_mean_probs
 from .dataset_challenges import (
     RandomLabelsDataset,
     ReplaceTargetsDataset,
 )
-from .model_optimizer_factory import ModelOptimizerFactory
-from .trained_model import TrainedMCDropoutModel, TrainedModel
+from .trained_model import TrainedModel, ModelTrainer
+
 
 # Cell
 
@@ -33,78 +32,13 @@ class TrainEvalModel:
 @dataclass
 class TrainSelfDistillationEvalModel(TrainEvalModel):
     num_pool_samples: int
-    num_training_samples: int
-    num_validation_samples: int
-    num_patience_epochs: int
-    max_epochs: int
     training_dataset: torch.utils.data.Dataset
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
     training_batch_size: int
-    model_optimizer_factory: Type[ModelOptimizerFactory]
     trained_model: TrainedModel
+    model_trainer: ModelTrainer
     min_samples_per_epoch: int
-    # TODO: remove the default?
-    train_augmentations: nn.Module = None
-    # TODO: remove the default!
-    prefer_accuracy: bool = True
-
-    def __call__(self, *, training_log, device):
-        train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
-        train_eval_loader = torch.utils.data.DataLoader(train_eval_dataset, batch_size=512, drop_last=False)
-
-        eval_log_probs_N_C = get_log_mean_probs(
-            self.trained_model.get_log_probs_N_K_C(train_eval_loader, device=device)
-        )
-
-        eval_self_distillation_dataset = ReplaceTargetsDataset(dataset=train_eval_dataset, targets=eval_log_probs_N_C)
-        train_eval_self_distillation_loader = torch.utils.data.DataLoader(
-            eval_self_distillation_dataset,
-            batch_size=self.training_batch_size,
-            sampler=RandomFixedLengthSampler(eval_self_distillation_dataset, self.min_samples_per_epoch),
-            drop_last=True,
-        )
-
-        eval_model_optimizer = self.model_optimizer_factory().create_model_optimizer()
-
-        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
-
-        train(
-            model=eval_model_optimizer.model,
-            optimizer=eval_model_optimizer.optimizer,
-            train_augmentations=self.train_augmentations,
-            loss=loss,
-            validation_loss=torch.nn.NLLLoss(),
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_validation_samples,
-            train_loader=train_eval_self_distillation_loader,
-            validation_loader=self.validation_loader,
-            patience=self.num_patience_epochs,
-            max_epochs=self.max_epochs,
-            prefer_accuracy=self.prefer_accuracy,
-            device=device,
-            training_log=training_log,
-        )
-
-        return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
-
-
-@dataclass
-class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
-    num_pool_samples: int
-    num_training_samples: int
-    num_validation_samples: int
-    patience_schedule: [int]
-    factor_schedule: [int]
-    max_epochs: int
-    training_dataset: torch.utils.data.Dataset
-    eval_dataset: torch.utils.data.Dataset
-    validation_loader: torch.utils.data.DataLoader
-    training_batch_size: int
-    model_optimizer_factory: Type[ModelOptimizerFactory]
-    trained_model: TrainedModel
-    min_samples_per_epoch: int
-    prefer_accuracy: bool
     # TODO: remove the default?
     train_augmentations: nn.Module = None
 
@@ -113,10 +47,12 @@ class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
         train_eval_loader = torch.utils.data.DataLoader(train_eval_dataset, batch_size=512, drop_last=False)
 
         eval_log_probs_N_C = get_log_mean_probs(
-            self.trained_model.get_log_probs_N_K_C(train_eval_loader, device=device)
+            self.trained_model.get_log_probs_N_K_C(train_eval_loader, num_samples=self.num_pool_samples, device=device)
         )
 
         eval_self_distillation_dataset = ReplaceTargetsDataset(dataset=train_eval_dataset, targets=eval_log_probs_N_C)
+
+        # TODO: Dataloaders should be part of the model trainer, too!
         train_eval_self_distillation_loader = torch.utils.data.DataLoader(
             eval_self_distillation_dataset,
             batch_size=self.training_batch_size,
@@ -124,29 +60,14 @@ class TrainSelfDistillationEvalModelWithSchedule(TrainEvalModel):
             drop_last=True,
         )
 
-        eval_model_optimizer = self.model_optimizer_factory().create_model_optimizer()
-
-        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
-
-        train_with_schedule(
-            model=eval_model_optimizer.model,
-            optimizer=eval_model_optimizer.optimizer,
-            loss=loss,
+        trained_model = self.model_trainer.get_distilled(
+            prediction_loader=train_eval_self_distillation_loader,
             train_augmentations=self.train_augmentations,
-            validation_loss=torch.nn.NLLLoss(),
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_validation_samples,
-            train_loader=train_eval_self_distillation_loader,
             validation_loader=self.validation_loader,
-            patience_schedule=self.patience_schedule,
-            factor_schedule=self.factor_schedule,
-            max_epochs=self.max_epochs,
-            prefer_accuracy=self.prefer_accuracy,
-            device=device,
-            training_log=training_log,
+            log=training_log
         )
 
-        return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
+        return trained_model
 
 
 @dataclass
@@ -160,7 +81,9 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
     training_batch_size: int
-    model_optimizer_factory: ModelOptimizerFactory
+    model_trainer: ModelTrainer
+    # TODO: remove the default?
+    train_augmentations: nn.Module = None
 
     def __call__(self, *, training_log, device):
         # TODO: support one_hot!
@@ -172,26 +95,14 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
             train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
         )
 
-        eval_model_optimizer = self.model_optimizer_factory.create_model_optimizer()
-
-        loss = torch.nn.NLLLoss()
-
-        train(
-            model=eval_model_optimizer.model,
-            optimizer=eval_model_optimizer.optimizer,
-            loss=loss,
-            validation_loss=loss,
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_validation_samples,
-            train_loader=train_eval_loader,
+        trained_model = self.model_trainer.get_distilled(
+            prediction_loader=train_eval_loader,
+            train_augmentations=self.train_augmentations,
             validation_loader=self.validation_loader,
-            patience=self.num_patience_epochs,
-            max_epochs=self.max_epochs,
-            device=device,
-            training_log=training_log,
+            log=training_log
         )
 
-        return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
+        return trained_model
 
 
 @dataclass
@@ -205,7 +116,9 @@ class TrainExplicitEvalModel(TrainEvalModel):
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
     training_batch_size: int
-    model_optimizer_factory: ModelOptimizerFactory
+    model_trainer: ModelTrainer
+    # TODO: remove the default?
+    train_augmentations: nn.Module = None
 
     def __call__(self, *, training_log, device):
         # TODO: support one_hot!
@@ -215,23 +128,11 @@ class TrainExplicitEvalModel(TrainEvalModel):
             train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
         )
 
-        eval_model_optimizer = self.model_optimizer_factory.create_model_optimizer()
-
-        loss = torch.nn.NLLLoss()
-
-        train(
-            model=eval_model_optimizer.model,
-            optimizer=eval_model_optimizer.optimizer,
-            loss=loss,
-            validation_loss=loss,
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_validation_samples,
+        trained_model = self.model_trainer.get_trained(
             train_loader=train_eval_loader,
+            train_augmentations=self.train_augmentations,
             validation_loader=self.validation_loader,
-            patience=self.num_patience_epochs,
-            max_epochs=self.max_epochs,
-            device=device,
-            training_log=training_log,
+            log=training_log
         )
 
-        return TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=eval_model_optimizer.model)
+        return trained_model

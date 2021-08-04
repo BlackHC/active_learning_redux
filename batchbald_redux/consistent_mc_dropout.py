@@ -2,30 +2,38 @@
 
 __all__ = ['BayesianModule', 'ConsistentMCDropout', 'ConsistentMCDropout2d', 'SamplerModel', 'multi_sample_loss',
            'geometric_mean_loss', 'GeometricMeanPrediction', 'LogProbMeanPrediction', 'get_predictions_labels',
-           'get_predictions', 'get_log_mean_probs', 'get_module_predictions_labels', 'get_ensemble_predictions_labels']
+           'get_log_mean_probs', 'get_ensemble_predictions_labels']
 
 # Cell
-
+from dataclasses import dataclass
 from functools import wraps
+from typing import List
 
 import numpy as np
 import torch
-from blackhc.progress_bar import create_progress_bar, with_progress_bar
+from blackhc.progress_bar import create_progress_bar
 from toma import toma
 from torch.nn import Module
 
 # Cell
 from torch.utils import data
 
-from .dataset_challenges import get_num_classes
+
+@dataclass
+class PredictionsLabels:
+    predictions: torch.Tensor
+    labels: torch.Tensor
 
 
 class BayesianModule(Module):
     """A module that we can sample multiple times from given a single input batch.
 
     To be efficient, the module allows for a part of the forward pass to be deterministic.
+
+    If we sample with "0" samples, we do a single deterministic forward pass with disabled dropout during evaluation.
     """
 
+    # num MC dropout samples
     k = None
 
     def __init__(self):
@@ -34,6 +42,13 @@ class BayesianModule(Module):
     # Returns B x K x ...
     def forward(self, input_B: torch.Tensor, k: int):
         BayesianModule.k = k
+
+        if k == 0:
+            # No MC dropout (0 samples).
+            features_B = self.deterministic_forward_impl(input_B)
+            output_B = self.mc_forward_impl(features_B)
+            output_B_1 = BayesianModule.unflatten_tensor(output_B, 1)
+            return output_B_1
 
         features_B = self.deterministic_forward_impl(input_B)
         mc_features_BK = BayesianModule.mc_tensor(features_B, k)
@@ -62,19 +77,65 @@ class BayesianModule(Module):
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
     @torch.no_grad()
-    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device):
+    def _get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device):
+        self.to(device=device)
+        self.eval()
+
+        N = len(loader.dataset)
+        predictions = None
+        labels = None
+
+        pbar = create_progress_bar(N, tqdm_args=dict(desc="get_predictions_labels", leave=False))
+        pbar.start()
+
+        data_start = 0
+
+        for batch_x, batch_labels in loader:
+            batch_x = batch_x.to(device=device)
+            batch_predictions = self(batch_x, k=0)
+
+            batch_size = len(batch_predictions)
+            data_end = data_start + batch_size
+
+            # Support multi-dim labels.
+            if labels is None:
+                labels_shape = (N, *batch_labels.shape[1:])
+                labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
+            # Support multi-dim predictions.
+            if predictions is None:
+                predictions_shape = (N, *batch_predictions.shape[1:])
+                predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device="cpu")
+
+            predictions[data_start:data_end].copy_(batch_predictions.float(), non_blocking=True)
+            labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
+
+            data_start = data_end
+
+            pbar.update(batch_size)
+
+        pbar.finish()
+
+        return predictions, labels
+
+    @torch.no_grad()
+    def get_predictions_labels(self, *, k: int, loader: data.DataLoader, device):
+        assert_no_shuffling_no_augmentations_dataloader(loader)
+
+        if k == 0:
+            return self._get_no_dropout_predictions_labels(loader=loader, device=device)
+
         self.to(device=device)
 
         N = len(loader.dataset)
-        num_classes = get_num_classes(loader.dataset)
-        predictions = torch.empty((N, num_samples, num_classes), dtype=torch.float, device="cpu")
+        predictions = None
         labels = None
 
-        pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
+        pbar = create_progress_bar(N * k, tqdm_args=dict(desc="get_predictions_labels", leave=False))
         pbar.start()
 
-        @toma.execute.range(0, num_samples, 128)
+        @toma.execute.range(0, k, 128)
         def get_prediction_batch(start, end):
+            nonlocal predictions
             nonlocal labels
 
             if start == 0:
@@ -87,17 +148,20 @@ class BayesianModule(Module):
             data_start = 0
             # TODO: ensure that the dataloader is not shuffling!
             for batch_x, batch_labels in loader:
-                # TODO: implement this in all the get_predictions variants?
-                if labels is None:
-                    labels_shape = (N, *batch_labels.shape[1:])
-                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
-
                 batch_x = batch_x.to(device=device)
-
                 batch_predictions = self(batch_x, num_sub_samples)
 
                 batch_size = len(batch_predictions)
                 data_end = data_start + batch_size
+
+                # Support multi-dim predictions.
+                if predictions is None:
+                    predictions_shape = (N, *batch_predictions.shape[1:])
+                    predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device="cpu")
+                # Support multi-dim labels.
+                if labels is None:
+                    labels_shape = (N, *batch_labels.shape[1:])
+                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
 
                 predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
                 if start == 0:
@@ -148,9 +212,14 @@ class _ConsistentMCDropout(Module):
             return input
 
         k = BayesianModule.k
+
+        # Disable dropout during evaluation if k=0 (i.e. no samples).
+        if not self.training and k == 0:
+            return input
+
         if self.training:
             # Create a new mask on each call and for each batch element.
-            k = input.shape[0]
+            k = input.shape[0] * max(k, 1)
             mask = self._create_mask(input, k)
         else:
             if self.mask is None:
@@ -249,7 +318,10 @@ class ConsistentMCDropout2d(_ConsistentMCDropout):
 
 
 class SamplerModel(Module):
-    """Wrap a `BayesianModule` to sample k MC dropout samples consistently."""
+    """Wrap a `BayesianModule` to sample k MC dropout samples consistently.
+
+    A forward pass returns: log probs BxKxC for a batch of B inputs, K MC dropout samples, and C classes.
+    """
 
     def __init__(self, bayesian_module: BayesianModule, k: int):
         super().__init__()
@@ -264,6 +336,7 @@ class SamplerModel(Module):
 
 
 def multi_sample_loss(loss):
+    """Wrap a loss function to expand the targets to work together with a SamplerModel."""
     @wraps(loss)
     def wrapped_loss(input_B_K_C, target_B_, *args, **kwargs):
         assert input_B_K_C.shape[0] == target_B_.shape[0]
@@ -316,113 +389,44 @@ class LogProbMeanPrediction(Module):
         return log_mean_probs
 
 
-@torch.no_grad()
-def get_predictions_labels(*, model: BayesianModule, num_samples, num_classes, loader, device: str):
-    # TODO: remove
-    model.to(device=device)
-
-    N = len(loader.dataset)
-    predictions = torch.empty((N, num_samples, num_classes), dtype=torch.float, device="cpu")
-    labels = torch.empty(N, dtype=torch.long, device="cpu")
-
-    pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-    pbar.start()
-
-    # TODO: check whether the dataloader is shuffling or not!
-
-    @toma.execute.range(0, num_samples, 128)
-    def get_prediction_batch(start, end):
-        if start == 0:
-            pbar.reset()
-
-        model.eval()
-
-        prediction_model = SamplerModel(model, end - start)
-
-        data_start = 0
-        for batch_x, batch_labels in loader:
-            batch_x = batch_x.to(device=device)
-
-            batch_predictions = prediction_model(batch_x)
-
-            batch_size = len(batch_predictions)
-            data_end = data_start + batch_size
-
-            predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
-            if start == 0:
-                labels[data_start:data_end].copy_(batch_labels.long(), non_blocking=True)
-
-            data_start = data_end
-
-            pbar.update(batch_size * (end - start))
-
-    pbar.finish()
-
-    return predictions, labels
-
-
-def get_predictions(*, model, num_samples, num_classes, loader, device: str):
-    # TODO: remove
-    predictions, _ = get_predictions_labels(
-        model=model, num_samples=num_samples, num_classes=num_classes, loader=loader, device=device
-    )
-
-    return predictions
-
-
 def get_log_mean_probs(log_probs_N_K_C):
+    # Arithmetic mean of the probs (valid MC dropout)
     log_mean_probs_N_C = log_probs_N_K_C.logsumexp(dim=1, keepdim=False) - np.log(log_probs_N_K_C.shape[1])
     return log_mean_probs_N_C
 
 
-@torch.no_grad()
-def get_module_predictions_labels(*, module: torch.nn.Module, loader: data.DataLoader, device):
-    module.to(device=device)
+def assert_no_shuffling_no_augmentations_dataloader(dataloader: data.DataLoader):
+    batch_x_A = None
+    batch_labels_A = None
+    batch_x_B = None
+    batch_labels_B = None
 
-    N = len(loader.dataset)
-    num_classes = get_num_classes(loader.dataset)
-    predictions = torch.empty((N, num_classes), dtype=torch.float, device="cpu")
-    labels = torch.empty(N, dtype=torch.long, device="cpu")
+    for batch_x_A, batch_labels_A in dataloader:
+        break
 
-    pbar = create_progress_bar(N, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-    pbar.start()
+    for batch_x_B, batch_labels_B in dataloader:
+        break
 
-    module.eval()
-
-    data_start = 0
-    for batch_x, batch_labels in loader:
-        batch_x = batch_x.to(device=device)
-        batch_predictions = module(batch_x)
-
-        batch_size = len(batch_predictions)
-        data_end = data_start + batch_size
-
-        predictions[data_start:data_end].copy_(batch_predictions.float(), non_blocking=True)
-        labels[data_start:data_end].copy_(batch_labels.long(), non_blocking=True)
-
-        data_start = data_end
-
-        pbar.update(batch_size)
-
-    pbar.finish()
-
-    return predictions, labels
+    assert batch_x_A == batch_x_B, "Batch inputs different. Augmentations enabled, or dataloader shuffles data?!"
+    assert batch_labels_A == batch_labels_B, "Batch labels different. Augmentations enabled, or dataloader shuffles data?!"
 
 
-def get_ensemble_predictions_labels(*, modules: [torch.nn.Module], loader: data.DataLoader, device):
+def get_bayesian_ensemble_predictions_labels(*, modules: List[BayesianModule], k: int, loader: data.DataLoader, device):
+    assert_no_shuffling_no_augmentations_dataloader(loader)
+
     ensemble_predictions = []
     ensemble_labels = None
 
     for module in modules:
-        predictions, labels = get_module_predictions_labels(module=module, loader=loader, device=device)
+        predictions, labels = module.get_predictions_labels(k=k, loader=loader, device=device)
 
         ensemble_predictions += [predictions]
         if ensemble_labels is not None:
-            assert all(ensemble_labels == labels)
+            assert torch.all(ensemble_labels == labels)
         else:
             ensemble_labels = labels
 
         module.to("cpu")
 
-    ensemble_predictions = torch.stack(ensemble_predictions, dim=1)
+    ensemble_predictions = torch.cat(ensemble_predictions, dim=1)
     return ensemble_predictions, ensemble_labels

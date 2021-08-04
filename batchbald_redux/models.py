@@ -4,13 +4,16 @@ __all__ = ['BayesianMNISTCNN', 'BayesianMNISTCNN_EBM', 'MnistOptimizerFactory']
 
 # Cell
 from dataclasses import dataclass
+from typing import Optional
 
 import torch
 import torch.nn
 import torch.optim
 from torch import nn as nn
-from torch.nn import functional as F
+from torch.nn import functional as F, Module
+from torch.utils.data import DataLoader
 
+from .black_box_model_training import train
 from .consistent_mc_dropout import (
     BayesianModule,
     ConsistentMCDropout,
@@ -20,6 +23,7 @@ from .consistent_mc_dropout import (
 from .model_optimizer_factory import ModelOptimizer, ModelOptimizerFactory
 
 # Cell
+from .trained_model import ModelTrainer, TrainedModel, TrainedBayesianModel
 
 
 class BayesianMNISTCNN(BayesianModule):
@@ -73,9 +77,69 @@ class BayesianMNISTCNN_EBM(BayesianModule):
 # Cell
 
 
-@dataclass
 class MnistOptimizerFactory(ModelOptimizerFactory):
     def create_model_optimizer(self) -> ModelOptimizer:
         model = BayesianMNISTCNN()
         optimizer = torch.optim.Adam(model.parameters(), weight_decay=5e-4)
         return ModelOptimizer(model=model, optimizer=optimizer)
+
+
+@dataclass
+class MnistModelTrainer(ModelTrainer):
+    num_training_samples: int
+    num_validation_samples: int
+    num_patience_epochs: int
+    max_training_epochs: int
+    device: str
+
+    @staticmethod
+    def create_model_optimizer() -> ModelOptimizer:
+        model = BayesianMNISTCNN()
+        optimizer = torch.optim.Adam(model.parameters(), weight_decay=5e-4)
+        return ModelOptimizer(model=model, optimizer=optimizer)
+
+    def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module], validation_loader: DataLoader,
+                    log) -> TrainedModel:
+        model_optimizer = self.create_model_optimizer()
+
+        train(
+            model=model_optimizer.model,
+            optimizer=model_optimizer.optimizer,
+            training_samples=self.num_training_samples,
+            validation_samples=self.num_validation_samples,
+            train_loader=train_loader,
+            train_augmentations=train_augmentations,
+            validation_loader=validation_loader,
+            patience=self.num_patience_epochs,
+            max_epochs=self.max_training_epochs,
+            device=self.device,
+            training_log=log,
+        )
+
+        return TrainedBayesianModel(model_optimizer.model)
+
+    def get_distilled(self, *, prediction_loader: DataLoader, train_augmentations: Optional[Module],
+                      validation_loader: DataLoader, log) -> TrainedModel:
+        model_optimizer = self.create_model_optimizer()
+
+        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
+
+        train(
+            model=model_optimizer.model,
+            optimizer=model_optimizer.optimizer,
+            loss=loss,
+            validation_loss=torch.nn.NLLLoss(),
+            training_samples=self.num_training_samples,
+            validation_samples=self.num_validation_samples,
+            train_loader=prediction_loader,
+            train_augmentations=train_augmentations,
+            validation_loader=validation_loader,
+            patience=self.num_patience_epochs,
+            max_epochs=self.max_training_epochs,
+            prefer_accuracy=True,
+            device=self.device,
+            training_log=log,
+        )
+
+        return TrainedBayesianModel(model_optimizer.model)
+
