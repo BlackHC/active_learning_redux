@@ -121,7 +121,6 @@ class AliasDataset(data.Dataset):
     def uniform_target(self, *, num_classes=None, dtype=None, device=None):
         return UniformTargetDataset(self, num_classes=num_classes, dtype=dtype, device=device)
 
-
 # Cell
 
 
@@ -407,7 +406,6 @@ class RandomLabelsDataset(ReplaceTargetsDataset):
         super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | randomize_labels{options}")
         self.options = options
 
-
 # Cell
 
 
@@ -499,7 +497,6 @@ class ImbalancedClassSplitDataset(SubsetAliasDataset):
         )
         super().__init__(dataset, indices, f"ImbalancedDataset(dataset={dataset}, {options})")
         self.options = options
-
 
 # Cell
 
@@ -605,7 +602,6 @@ def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtyp
     result.options = dict(num_classes=num_classes)
     result.alias = f"{dataset} | uniform_targets{result.options}"
     return result
-
 
 # Cell
 

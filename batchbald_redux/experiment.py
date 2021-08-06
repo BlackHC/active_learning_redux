@@ -21,26 +21,25 @@ from .acquisition_functions import (
     CandidateBatchComputer,
     EvalCandidateBatchComputer,
 )
-from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate_old, train, evaluate
+from .active_learning import ActiveLearningData
+from .black_box_model_training import evaluate
 from .dataset_challenges import (
     create_repeated_MNIST_dataset,
     get_base_dataset_index,
     get_target,
 )
 from .di import DependencyInjection
-from .model_optimizer_factory import ModelOptimizerFactory
-from .models import MnistOptimizerFactory, MnistModelTrainer
+from .models import MnistModelTrainer
 
 # Cell
 
-# From the BatchBALD Repo
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import TrainedBayesianModel, ModelTrainer
+from .trained_model import ModelTrainer
 
+# From the BatchBALD Repo
 mnist_initial_samples = [
     38043,
     40091,
@@ -133,31 +132,17 @@ class Experiment:
         #     active_learning_data.pool_dataset, 10, self.initial_set_size // 10
         # )
 
-        train_loader = torch.utils.data.DataLoader(
-            active_learning_data.training_dataset,
-            batch_size=64,
-            sampler=RandomFixedLengthSampler(active_learning_data.training_dataset, self.min_samples_per_epoch),
-            drop_last=True,
-        )
-        pool_loader = torch.utils.data.DataLoader(
-            active_learning_data.pool_dataset, batch_size=128, drop_last=False, shuffle=False
-        )
+        model_trainer = self.create_model_trainer()
 
-        validation_loader = torch.utils.data.DataLoader(validation_dataset, batch_size=128, drop_last=False)
-        test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, drop_last=False)
+        train_loader = model_trainer.get_train_dataloader(active_learning_data.training_dataset)
+        pool_loader = model_trainer.get_evaluation_dataloader(active_learning_data.pool_dataset)
+        validation_loader = model_trainer.get_evaluation_dataloader(validation_dataset)
+        test_loader = model_trainer.get_evaluation_dataloader(test_dataset)
 
         store["active_learning_steps"] = []
         active_learning_steps = store["active_learning_steps"]
 
         acquisition_function = self.create_acquisition_function()
-
-        model_trainer = MnistModelTrainer(
-            num_training_samples=self.num_training_samples,
-            num_validation_samples=self.num_validation_samples,
-            num_patience_epochs=self.num_patience_epochs,
-            max_training_epochs=self.max_training_epochs,
-            device=self.device
-        )
 
         # Active Training Loop
         while True:
