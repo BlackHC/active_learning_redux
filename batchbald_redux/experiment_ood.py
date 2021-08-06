@@ -109,7 +109,6 @@ def load_experiment_data(
 
     train_dataset, validation_dataset = train_validation_split(
         full_train_dataset=full_train_dataset,
-        full_validation_dataset=full_train_dataset,
         train_labels=full_train_dataset.get_targets().cpu(),
         validation_set_size=validation_set_size,
         validation_split_random_state=validation_split_random_state,

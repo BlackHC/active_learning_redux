@@ -29,6 +29,7 @@ class ActiveLearningData:
         self.training_mask = np.full((len(dataset),), False)
         self.pool_mask = np.full((len(dataset),), True)
 
+        # TODO: use dataset challenges here?
         self.training_dataset = data.Subset(self.base_dataset, None)
         self.pool_dataset = data.Subset(self.base_dataset, None)
 
