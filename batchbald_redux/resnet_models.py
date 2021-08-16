@@ -199,6 +199,16 @@ class BayesianResNet(BayesianModule):
             nn.Linear(256 * block.expansion, 256 * block.expansion),
             nn.Linear(256, num_classes),
         )
+        # self.fc = nn.Sequential(
+        #     nn.ReLU(),
+        #     nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #     ConsistentMCDropout(),
+        #     nn.Linear(256 * block.expansion, 128 * block.expansion),
+        #     ConsistentMCDropout(),
+        #     nn.Linear(128 * block.expansion, 128 * block.expansion),
+        #     nn.ReLU(),
+        #     nn.Linear(128 * block.expansion, num_classes),
+        # )
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

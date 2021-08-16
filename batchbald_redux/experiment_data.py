@@ -72,6 +72,7 @@ class ExperimentDataConfig:
             validation_set_size=self.validation_set_size,
             validation_split_random_state=self.validation_split_random_state,
             evaluation_set_size=self.evaluation_set_size,
+            add_dataset_noise=self.add_dataset_noise,
             ood_dataset_config=self.ood_dataset_config,
             device=self.device,
         )
@@ -139,7 +140,7 @@ def load_experiment_data(
             )
 
         if ood_dataset_config.ood_repetitions != 1:
-            ood_dataset = ood_dataset_config.ood_dataset * ood_repetitions
+            ood_dataset = ood_dataset * ood_dataset_config.ood_repetitions
 
         train_dataset = train_dataset + ood_dataset
     else:
