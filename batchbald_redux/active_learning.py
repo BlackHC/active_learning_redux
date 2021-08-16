@@ -123,4 +123,4 @@ class RandomFixedLengthSampler(data.Sampler):
         return iter((indices[: self.target_length] % len(self.dataset)).tolist())
 
     def __len__(self):
-        return self.target_length
+        return max(self.target_length, len(self.dataset))
