@@ -70,7 +70,7 @@ class PoolScorerCandidateBatchComputer(CandidateBatchComputer):
     def compute_candidate_batch(
         self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device, "cpu")
 
         return self.get_candidate_batch(log_probs_N_K_C, device)
 
@@ -161,7 +161,7 @@ class CoreSetPoolScorerCandidateBatchComputer(CandidateBatchComputer):
     def compute_candidate_batch(
         self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
+        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
 
         return self.get_candidate_batch(log_probs_N_K_C, labels_N, device)
 
@@ -239,8 +239,8 @@ class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
     def compute_candidate_batch(
         self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
-        log_eval_probs_N_K_C = eval_model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device)
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device, "cpu")
+        log_eval_probs_N_K_C = eval_model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device, "cpu")
 
         return self.get_candidate_batch(log_probs_N_K_C, log_eval_probs_N_K_C, device)
 
@@ -349,8 +349,8 @@ class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComput
     def compute_candidate_batch(
         self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
-        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device)
+        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
+        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
 
         # With high probability, this ensures that we are not shuffling the batches.
         assert torch.equal(training_labels_N, eval_labels_N)

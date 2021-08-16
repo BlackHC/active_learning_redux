@@ -78,7 +78,7 @@ class BayesianModule(Module):
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
     @torch.no_grad()
-    def _get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device):
+    def _get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device, storage_device):
         self.to(device=device)
         self.eval()
 
@@ -101,13 +101,13 @@ class BayesianModule(Module):
             # Support multi-dim labels.
             if labels is None:
                 labels_shape = (N, *batch_labels.shape[1:])
-                labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
+                labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
             # Support multi-dim predictions.
             if predictions is None:
                 predictions_shape = (N, *batch_predictions.shape[1:])
-                predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device="cpu")
+                predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
 
-            predictions[data_start:data_end].copy_(batch_predictions.float(), non_blocking=True)
+            predictions[data_start:data_end].copy_(batch_predictions, non_blocking=True)
             labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
 
             data_start = data_end
@@ -119,11 +119,11 @@ class BayesianModule(Module):
         return predictions, labels
 
     @torch.no_grad()
-    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device):
+    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device, storage_device):
         assert_no_shuffling_no_augmentations_dataloader(loader)
 
         if num_samples == 0:
-            return self._get_no_dropout_predictions_labels(loader=loader, device=device)
+            return self._get_no_dropout_predictions_labels(loader=loader, device=storage_device)
 
         self.to(device=device)
 
@@ -158,13 +158,13 @@ class BayesianModule(Module):
                 # Support multi-dim predictions.
                 if predictions is None:
                     predictions_shape = (N, *batch_predictions.shape[1:])
-                    predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device="cpu")
+                    predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
                 # Support multi-dim labels.
                 if labels is None:
                     labels_shape = (N, *batch_labels.shape[1:])
-                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device="cpu")
+                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
 
-                predictions[data_start:data_end, start:end].copy_(batch_predictions.float(), non_blocking=True)
+                predictions[data_start:data_end, start:end].copy_(batch_predictions, non_blocking=True)
                 if start == 0:
                     labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
 
@@ -209,13 +209,11 @@ class _ConsistentMCDropout(Module):
         return mask
 
     def forward(self, input: torch.Tensor):
-        if self.p == 0.0:
-            return input
-
         num_samples = BayesianModule.num_samples
 
-        # Disable dropout during evaluation if num_samples=0 (i.e. no samples).
-        if not self.training and num_samples == 0:
+        # Disable dropout during evaluation if num_samples is 0 (i.e. no samples).
+        # Or if the dropout rate is 0.
+        if self.p == 0.0 or num_samples == 0:
             return input
 
         if self.training:
@@ -412,6 +410,7 @@ def assert_no_shuffling_no_augmentations_dataloader(dataloader: data.DataLoader)
     assert torch.all(batch_labels_A == batch_labels_B), "Batch labels different. Augmentations enabled, or dataloader shuffles data?!"
 
 
+# TODO: remove this function?
 def get_bayesian_ensemble_predictions_labels(*, modules: List[BayesianModule], k: int, loader: data.DataLoader, device):
     assert_no_shuffling_no_augmentations_dataloader(loader)
 

@@ -38,6 +38,8 @@ class ExperimentData:
 
     ood_dataset: NamedDataset
 
+    device: str
+
 
 @dataclass
 class OoDDatasetConfig:
@@ -130,13 +132,16 @@ def load_experiment_data(
         train_dataset = train_dataset * id_repetitions
 
     if ood_dataset_config:
-        original_ood_dataset = get_dataset(ood_dataset_config.ood_dataset_name, root="data", normalize_like_cifar10=True).train
+        odd_split_dataset = get_dataset(ood_dataset_config.ood_dataset_name, root="data", normalize_like_cifar10=True, device_hint=device)
+        assert split_dataset.device == odd_split_dataset.device, (f"ID dataset resides on {split_dataset.device}, while OOD dataset is on {odd_split_dataset.device};"
+                                                                  "try to put both on \"cpu\"!")
+        original_ood_dataset = odd_split_dataset.train
         if ood_dataset_config.ood_exposure:
-            train_dataset = train_dataset.one_hot(device=device)
-            ood_dataset = original_ood_dataset.uniform_target(device=device, num_classes=train_dataset.get_num_classes())
+            train_dataset = train_dataset.one_hot(device=split_dataset.device)
+            ood_dataset = original_ood_dataset.uniform_target(device=split_dataset.device, num_classes=train_dataset.get_num_classes())
         else:
             ood_dataset = original_ood_dataset.constant_target(
-                target=torch.tensor(-1, device=device), num_classes=train_dataset.get_num_classes()
+                target=torch.tensor(-1, device=split_dataset.device), num_classes=train_dataset.get_num_classes()
             )
 
         if ood_dataset_config.ood_repetitions != 1:
@@ -167,4 +172,5 @@ def load_experiment_data(
         initial_training_set_indices=initial_training_set_indices,
         evaluation_set_indices=evaluation_set_indices,
         ood_dataset=original_ood_dataset,
+        device=split_dataset.device
     )

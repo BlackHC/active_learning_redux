@@ -20,22 +20,24 @@ from .consistent_mc_dropout import BayesianModule
 class TrainedModel:
     """Evaluate a trained model."""
 
-    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object):
+    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object, storage_device: object):
         raise NotImplementedError()
 
-    def get_log_probs_N_K_C(self, loader: DataLoader, num_samples: int, device: object):
-        return self.get_log_probs_N_K_C_labels_N(loader, num_samples, device)[0]
+    def get_log_probs_N_K_C(self, loader: DataLoader, num_samples: int, device: object, storage_device: object):
+        log_probs_N_K_C, labels = self.get_log_probs_N_K_C_labels_N(loader, num_samples, device, storage_device)
+        return log_probs_N_K_C
 
 
 @dataclass
 class TrainedBayesianModel(TrainedModel):
     model: BayesianModule
 
-    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object):
+    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object, storage_device: object):
         log_probs_N_K_C, labels_B = self.model.get_predictions_labels(
             num_samples=num_samples,
             loader=loader,
             device=device,
+            storage_device=storage_device
         )
 
         # NOTE: this wastes memory bandwidth, but is needed for ensembles where more than one model might not fit
@@ -49,7 +51,7 @@ class TrainedBayesianModel(TrainedModel):
 class TrainedBayesianEnsemble(TrainedModel):
     models: List[TrainedModel]
 
-    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object):
+    def get_log_probs_N_K_C_labels_N(self, loader: DataLoader, num_samples: int, device: object, storage_device: object):
         ensemble_size = len(self.models)
         member_num_samples = (num_samples + ensemble_size - 1) // ensemble_size
 
@@ -59,7 +61,7 @@ class TrainedBayesianEnsemble(TrainedModel):
         for model in self.models:
             log_probs_N_K_C, labels_B = model.get_log_probs_N_K_C_labels_N(loader=loader,
                                                                            num_samples=member_num_samples,
-                                                                           device=device)
+                                                                           device=device, storage_device=storage_device)
 
             ensemble_log_probs_N_K_C += [log_probs_N_K_C]
             if ensemble_labels_B is not None:
@@ -72,6 +74,9 @@ class TrainedBayesianEnsemble(TrainedModel):
 
 
 class ModelTrainer:
+    train_batch_size: int
+    evaluation_batch_size: int
+
     def get_train_dataloader(self, dataset: Dataset):
         raise NotImplementedError
 

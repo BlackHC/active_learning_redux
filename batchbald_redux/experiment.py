@@ -129,7 +129,7 @@ class Experiment:
                                                       log=iteration_log["training"])
 
             evaluation_metrics = evaluate(model=trained_model, num_samples=self.num_validation_samples,
-                                          loader=test_loader, device=self.device)
+                                          loader=test_loader, device=self.device, storage_device="cpu")
 
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")

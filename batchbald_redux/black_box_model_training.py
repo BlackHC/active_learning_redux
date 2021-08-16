@@ -504,8 +504,8 @@ def train_double_snapshots(
 # Cell
 
 
-def evaluate(*, model: TrainedModel, loader, num_samples, device, loss=None):
-    log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(loader=loader, num_samples=num_samples, device=device)
+def evaluate(*, model: TrainedModel, loader, num_samples, device, storage_device, loss=None):
+    log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(loader=loader, num_samples=num_samples, device=device, storage_device=storage_device)
 
 
     if loss is None:

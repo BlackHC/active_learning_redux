@@ -33,30 +33,23 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
     training_dataset: torch.utils.data.Dataset
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
-    training_batch_size: int
     trained_model: TrainedModel
     model_trainer: ModelTrainer
-    min_samples_per_epoch: int
+    dataset_device: object
     # TODO: remove the default?
     train_augmentations: nn.Module = None
 
     def __call__(self, *, training_log, device):
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
-        train_eval_loader = torch.utils.data.DataLoader(train_eval_dataset, batch_size=512, drop_last=False)
+        train_eval_loader = self.model_trainer.get_evaluation_dataloader(train_eval_dataset)
 
         eval_log_probs_N_C = get_log_mean_probs(
-            self.trained_model.get_log_probs_N_K_C(train_eval_loader, num_samples=self.num_pool_samples, device=device)
+            self.trained_model.get_log_probs_N_K_C(train_eval_loader, num_samples=self.num_pool_samples, device=device, storage_device=self.dataset_device)
         )
 
         eval_self_distillation_dataset = ReplaceTargetsDataset(dataset=train_eval_dataset, targets=eval_log_probs_N_C)
 
-        # TODO: Dataloaders should be part of the model trainer, too!
-        train_eval_self_distillation_loader = torch.utils.data.DataLoader(
-            eval_self_distillation_dataset,
-            batch_size=self.training_batch_size,
-            sampler=RandomFixedLengthSampler(eval_self_distillation_dataset, self.min_samples_per_epoch),
-            drop_last=True,
-        )
+        train_eval_self_distillation_loader = self.model_trainer.get_train_dataloader(eval_self_distillation_dataset)
 
         trained_model = self.model_trainer.get_distilled(
             prediction_loader=train_eval_self_distillation_loader,
@@ -70,16 +63,11 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
 @dataclass
 class TrainRandomLabelEvalModel(TrainEvalModel):
-    num_pool_samples: int
-    num_training_samples: int
-    num_validation_samples: int
-    num_patience_epochs: int
-    max_epochs: int
     training_dataset: torch.utils.data.Dataset
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
-    training_batch_size: int
     model_trainer: ModelTrainer
+    dataset_device: object
     # TODO: remove the default?
     train_augmentations: nn.Module = None
 
@@ -87,13 +75,11 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
         # TODO: support one_hot!
         # TODO: different seed needed!
         train_eval_dataset = torch.utils.data.ConcatDataset(
-            [self.training_dataset, RandomLabelsDataset(self.eval_dataset, seed=0)]
+            [self.training_dataset, RandomLabelsDataset(self.eval_dataset, seed=0, device=self.dataset_device)]
         )
-        train_eval_loader = torch.utils.data.DataLoader(
-            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
-        )
+        train_eval_loader = self.model_trainer.get_train_dataloader(train_eval_dataset)
 
-        trained_model = self.model_trainer.get_distilled(
+        trained_model = self.model_trainer.get_trained(
             prediction_loader=train_eval_loader,
             train_augmentations=self.train_augmentations,
             validation_loader=self.validation_loader,
@@ -105,26 +91,17 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
 
 @dataclass
 class TrainExplicitEvalModel(TrainEvalModel):
-    num_pool_samples: int
-    num_training_samples: int
-    num_validation_samples: int
-    num_patience_epochs: int
-    max_epochs: int
     training_dataset: torch.utils.data.Dataset
     eval_dataset: torch.utils.data.Dataset
     validation_loader: torch.utils.data.DataLoader
-    training_batch_size: int
     model_trainer: ModelTrainer
     # TODO: remove the default?
     train_augmentations: nn.Module = None
 
     def __call__(self, *, training_log, device):
-        # TODO: support one_hot!
-        # TODO: different seed needed!
+        # TODO: support one_hot!? For this we need to change the eval_dataset to also have one_hot applied in ExperimentData?
         train_eval_dataset = torch.utils.data.ConcatDataset([self.training_dataset, self.eval_dataset])
-        train_eval_loader = torch.utils.data.DataLoader(
-            train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
-        )
+        train_eval_loader = self.model_trainer.get_train_dataloader(train_eval_dataset)
 
         trained_model = self.model_trainer.get_trained(train_loader=train_eval_loader,
                                                        train_augmentations=self.train_augmentations,

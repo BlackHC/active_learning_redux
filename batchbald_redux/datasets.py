@@ -34,6 +34,7 @@ class SplitDataset:
     test: data.Dataset
 
     train_augmentations: nn.Sequential
+    device: str
 
 
 @dataclass
@@ -112,7 +113,8 @@ def get_SVHN(root, validation_set_size, validation_split_random_state, normalize
             f"SVHN (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "SVHN (Test)"),
-        nn.Sequential()
+        nn.Sequential(),
+        "cpu"
     )
 
 
@@ -158,7 +160,8 @@ def get_CIFAR10(root, validation_set_size, validation_split_random_state, normal
             f"CIFAR-10 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "CIFAR-10 (Test)"),
-        train_augmentations
+        train_augmentations,
+        "cpu"
     )
 
 
@@ -210,7 +213,8 @@ def get_CIFAR100(root, validation_set_size, validation_split_random_state, norma
             f"CIFAR-100 (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "CIFAR-100 (Test)"),
-        train_augmentations
+        train_augmentations,
+        "cpu"
     )
 
 
@@ -244,7 +248,8 @@ def get_MNIST(root, validation_set_size, validation_split_random_state, normaliz
             f"MNIST (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "MNIST (Test)"),
-        nn.Sequential()
+        nn.Sequential(),
+        device_hint
     )
 
 
@@ -278,7 +283,8 @@ def get_FashionMNIST(root, validation_set_size, validation_split_random_state, n
             f"FashionMNIST (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
         ),
         NamedDataset(test_dataset, "FashionMNIST (Test)"),
-        nn.Sequential()
+        nn.Sequential(),
+        device_hint
     )
 
 # Cell
