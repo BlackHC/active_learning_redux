@@ -126,11 +126,8 @@ class TrainExplicitEvalModel(TrainEvalModel):
             train_eval_dataset, batch_size=self.training_batch_size, drop_last=True, shuffle=True
         )
 
-        trained_model = self.model_trainer.get_trained(
-            train_loader=train_eval_loader,
-            train_augmentations=self.train_augmentations,
-            validation_loader=self.validation_loader,
-            log=training_log
-        )
+        trained_model = self.model_trainer.get_trained(train_loader=train_eval_loader,
+                                                       train_augmentations=self.train_augmentations,
+                                                       validation_loader=self.validation_loader, log=training_log)
 
         return trained_model

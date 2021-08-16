@@ -57,7 +57,9 @@ class TrainedBayesianEnsemble(TrainedModel):
         ensemble_labels_B = None
 
         for model in self.models:
-            log_probs_N_K_C, labels_B = model.get_log_probs_N_K_C_labels_N(loader=loader, num_samples=member_num_samples, device=device)
+            log_probs_N_K_C, labels_B = model.get_log_probs_N_K_C_labels_N(loader=loader,
+                                                                           num_samples=member_num_samples,
+                                                                           device=device)
 
             ensemble_log_probs_N_K_C += [log_probs_N_K_C]
             if ensemble_labels_B is not None:
@@ -78,12 +80,16 @@ class ModelTrainer:
         raise NotImplementedError
 
     def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module],
-                    validation_loader: DataLoader, log) -> TrainedModel:
+                    validation_loader: DataLoader, log, loss=None, validation_loss=None) -> TrainedModel:
         raise NotImplementedError
 
     def get_distilled(self, *, prediction_loader: DataLoader, train_augmentations: Optional[Module],
                       validation_loader: DataLoader, log) -> TrainedModel:
-        raise NotImplementedError
+        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
+        validation_loss = torch.nn.NLLLoss()
+        return self.get_trained(train_loader=prediction_loader, train_augmentations=train_augmentations,
+                                validation_loader=validation_loader, loss=loss, validation_loss=validation_loss, log=log)
+
 
 
 @dataclass
@@ -92,24 +98,14 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
     ensemble_size: int
 
     def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module],
-                    validation_loader: DataLoader, log) -> TrainedBayesianEnsemble:
+                    validation_loader: DataLoader, log, loss=None, validation_loss=None) -> TrainedBayesianEnsemble:
         models = []
 
         for i in range(self.ensemble_size):
             log[i] = {}
             model = self.model_trainer.get_trained(train_loader=train_loader, train_augmentations=train_augmentations,
-                                                   validation_loader=validation_loader, log=log[i])
+                                                   validation_loader=validation_loader, log=log[i], loss=loss,
+                                                   validation_loss=validation_loss)
             models += [model]
 
-        return TrainedBayesianEnsemble(models)
-
-    def get_distilled(self, *, prediction_loader: DataLoader, train_augmentations: Optional[Module],
-                      validation_loader: DataLoader, log) -> TrainedBayesianEnsemble:
-        models = []
-        for i in range(self.ensemble_size):
-            log[i] = {}
-            model = self.model_trainer.get_distilled(prediction_loader=prediction_loader,
-                                                     train_augmentations=train_augmentations,
-                                                     validation_loader=validation_loader, log=log[i])
-            models += [model]
         return TrainedBayesianEnsemble(models)

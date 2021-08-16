@@ -119,9 +119,14 @@ class MnistModelTrainer(ModelTrainer):
         )
         return evaluation_loader
 
-    def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module], validation_loader: DataLoader,
-                    log) -> TrainedModel:
+    def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module],
+                    validation_loader: DataLoader, log, loss=None, validation_loss=None) -> TrainedModel:
         model_optimizer = self.create_model_optimizer()
+
+        if loss is None:
+            loss = torch.nn.NLLLoss()
+        if validation_loss is None:
+            validation_loss = torch.nn.NLLLoss()
 
         train(
             model=model_optimizer.model,
@@ -133,31 +138,8 @@ class MnistModelTrainer(ModelTrainer):
             validation_loader=validation_loader,
             patience=self.num_patience_epochs,
             max_epochs=self.max_training_epochs,
-            device=self.device,
-            training_log=log,
-        )
-
-        return TrainedBayesianModel(model_optimizer.model)
-
-    def get_distilled(self, *, prediction_loader: DataLoader, train_augmentations: Optional[Module],
-                      validation_loader: DataLoader, log) -> TrainedModel:
-        model_optimizer = self.create_model_optimizer()
-
-        loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
-
-        train(
-            model=model_optimizer.model,
-            optimizer=model_optimizer.optimizer,
             loss=loss,
-            validation_loss=torch.nn.NLLLoss(),
-            training_samples=self.num_training_samples,
-            validation_samples=self.num_validation_samples,
-            train_loader=prediction_loader,
-            train_augmentations=train_augmentations,
-            validation_loader=validation_loader,
-            patience=self.num_patience_epochs,
-            max_epochs=self.max_training_epochs,
-            prefer_accuracy=True,
+            validation_loss=validation_loss,
             device=self.device,
             training_log=log,
         )
