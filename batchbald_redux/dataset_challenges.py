@@ -58,7 +58,7 @@ class AliasDataset(data.Dataset):
 
     def __mul__(self, factor):
         if int(factor) == factor:
-            return RepeatedDataset(self, num_repeats=factor)
+            return RepeatedDataset(self, num_repeats=int(factor))
         if factor < 1:
             return RandomSubsetDataset(self, factor=factor, seed=0)
         return RepeatedDataset(self, num_repeats=int(factor)) + RandomSubsetDataset(self, factor=factor % 1, seed=0)
