@@ -21,7 +21,7 @@ from .acquisition_functions import (
     EvalCandidateBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate, train
+from .black_box_model_training import evaluate_old, train
 from .dataset_challenges import (
     NamedDataset,
     create_repeated_MNIST_dataset,
@@ -41,7 +41,7 @@ from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import TrainedMCDropoutModel
+from .trained_model import TrainedBayesianModel
 
 # Cell
 
@@ -216,7 +216,7 @@ class Experiment:
                     training_log=iteration_log["training"],
                 )
 
-            evaluation_metrics = evaluate(
+            evaluation_metrics = evaluate_old(
                 model=model_optimizer.model,
                 num_samples=self.num_validation_samples,
                 loader=test_loader,
@@ -229,7 +229,7 @@ class Experiment:
                 print("Done.")
                 break
 
-            trained_model = TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=model_optimizer.model)
+            trained_model = TrainedBayesianModel(model=model_optimizer.model)
 
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)

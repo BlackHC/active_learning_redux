@@ -19,7 +19,6 @@ import numpy as np
 import torch
 import torch.utils.data as data
 import torchvision.datasets
-from fastcore.basics import patch
 
 from .fast_mnist import FastMNIST, FastFashionMNIST
 
@@ -34,7 +33,7 @@ def _wrap_alias(dataset: data.Dataset):
 
 class AliasDataset(data.Dataset):
     """
-    A dataset with an easier to understand alias. And convenience operators.
+    A dataset with an easier to understand alias. And convenience operators and methods.
     """
 
     dataset: data.Dataset
@@ -59,7 +58,7 @@ class AliasDataset(data.Dataset):
 
     def __mul__(self, factor):
         if int(factor) == factor:
-            return RepeatedDataset(self, num_repeats=factor)
+            return RepeatedDataset(self, num_repeats=int(factor))
         if factor < 1:
             return RandomSubsetDataset(self, factor=factor, seed=0)
         return RepeatedDataset(self, num_repeats=int(factor)) + RandomSubsetDataset(self, factor=factor % 1, seed=0)
@@ -78,6 +77,49 @@ class AliasDataset(data.Dataset):
 
     def get_targets(self, device=None):
         return get_targets(self.dataset)
+
+    def subset(self, indices: list):
+        return SubsetAliasDataset(self, indices)
+
+    def imbalance(self, *, class_counts: list, seed: int):
+        return ImbalancedDataset(self, class_counts=class_counts, seed=seed)
+
+    def override_targets(
+            self, *, targets: Union[list, torch.Tensor], indices: list = None, num_classes: int = None
+    ):
+        if not indices:
+            return ReplaceTargetsDataset(self, targets=targets, num_classes=num_classes)
+        return OverrideTargetsDataset(self, indices=indices, targets=targets, num_classes=num_classes)
+
+    def corrupt_labels(
+            self, *, size_corrupted: Union[float, int], seed: int, num_classes: int = None, device=None
+    ):
+        return CorruptedLabelsDataset(
+            self, size_corrupted=size_corrupted, seed=seed, num_classes=num_classes, device=device
+        )
+
+    def randomize_labels(self, *, seed: int, num_classes: int = None, device=None):
+        return RandomLabelsDataset(self, seed=seed, num_classes=num_classes, device=device)
+
+    def imbalance_dataset_split(
+            self, *, num_classes: int, majority_percentage: int, minority_percentage: int, seed: int
+    ):
+        return ImbalancedClassSplitDataset(
+            self,
+            num_classes=num_classes,
+            majority_percentage=majority_percentage,
+            minority_percentage=minority_percentage,
+            seed=seed,
+        )
+
+    def one_hot(self, *, dtype=None, device=None):
+        return OneHotDataset(self, dtype=dtype, device=device)
+
+    def constant_target(self, target: torch.Tensor, *, num_classes=None):
+        return ConstantTargetDataset(dataset=self, target=target, num_classes=num_classes)
+
+    def uniform_target(self, *, num_classes=None, dtype=None, device=None):
+        return UniformTargetDataset(self, num_classes=num_classes, dtype=dtype, device=device)
 
 # Cell
 
@@ -214,11 +256,6 @@ class SubsetAliasDataset(AliasDataset):
         return get_targets(self.dataset, device=device)[torch.as_tensor(self.indices)]
 
 
-@patch
-def subset(self: AliasDataset, indices: list):
-    return SubsetAliasDataset(self, indices)
-
-
 class ReplaceTargetsDataset(AliasDataset):
     targets: torch.Tensor
     num_classes: int
@@ -304,15 +341,6 @@ class OverrideTargetsDataset(AliasDataset):
         return torch.as_tensor(targets, device=device)
 
 
-@patch
-def override_targets(
-    self: AliasDataset, *, targets: Union[list, torch.Tensor], indices: list = None, num_classes: int = None
-):
-    if not indices:
-        return ReplaceTargetsDataset(self, targets=targets, num_classes=num_classes)
-    return OverrideTargetsDataset(self, indices=indices, targets=targets, num_classes=num_classes)
-
-
 class CorruptedLabelsDataset(AliasDataset):
     options: dict
     implementation: OverrideTargetsDataset
@@ -364,15 +392,6 @@ class CorruptedLabelsDataset(AliasDataset):
         return self.implementation.get_targets(device=device)
 
 
-@patch
-def corrupt_labels(
-    self: AliasDataset, *, size_corrupted: Union[float, int], seed: int, num_classes: int = None, device=None
-):
-    return CorruptedLabelsDataset(
-        self, size_corrupted=size_corrupted, seed=seed, num_classes=num_classes, device=device
-    )
-
-
 class RandomLabelsDataset(ReplaceTargetsDataset):
     options: dict
 
@@ -386,11 +405,6 @@ class RandomLabelsDataset(ReplaceTargetsDataset):
 
         super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | randomize_labels{options}")
         self.options = options
-
-
-@patch
-def randomize_labels(self: AliasDataset, *, seed: int, num_classes: int = None, device=None):
-    return RandomLabelsDataset(self, seed=seed, num_classes=num_classes, device=device)
 
 # Cell
 
@@ -455,11 +469,6 @@ class ImbalancedDataset(SubsetAliasDataset):
         self.options = options
 
 
-@patch
-def imbalance(self: AliasDataset, *, class_counts: list, seed: int):
-    return ImbalancedDataset(self, class_counts=class_counts, seed=seed)
-
-
 class ImbalancedClassSplitDataset(SubsetAliasDataset):
     options: dict
 
@@ -489,19 +498,6 @@ class ImbalancedClassSplitDataset(SubsetAliasDataset):
         super().__init__(dataset, indices, f"ImbalancedDataset(dataset={dataset}, {options})")
         self.options = options
 
-
-@patch
-def imbalance_dataset_split(
-    self: AliasDataset, *, num_classes: int, majority_percentage: int, minority_percentage: int, seed: int
-):
-    return ImbalancedClassSplitDataset(
-        self,
-        num_classes=num_classes,
-        majority_percentage=majority_percentage,
-        minority_percentage=minority_percentage,
-        seed=seed,
-    )
-
 # Cell
 
 # Convert label dataset to one hot
@@ -519,11 +515,6 @@ class OneHotDataset(ReplaceTargetsDataset):
 
         super().__init__(dataset, targets, num_classes=num_classes, alias=f"{dataset} | one_hot_targets{options}")
         self.options = options
-
-
-@patch
-def one_hot(self: AliasDataset, *, dtype=None, device=None):
-    return OneHotDataset(self, dtype=dtype, device=device)
 
 
 class RepeatedDataset(AliasDataset):
@@ -604,11 +595,6 @@ class ConstantTargetDataset(AliasDataset):
         return torch.as_tensor(self.target, device=device).expand(len(self), *self.target.shape)
 
 
-@patch
-def constant_target(self: AliasDataset, target: torch.Tensor, *, num_classes=None):
-    return ConstantTargetDataset(dataset=self, target=target, num_classes=num_classes)
-
-
 def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtype=None, device=None):
     num_classes = num_classes or get_num_classes(dataset)
     target = torch.ones(num_classes, dtype=dtype, device=device) / num_classes
@@ -616,11 +602,6 @@ def UniformTargetDataset(dataset: data.Dataset, *, num_classes: int = None, dtyp
     result.options = dict(num_classes=num_classes)
     result.alias = f"{dataset} | uniform_targets{result.options}"
     return result
-
-
-@patch
-def uniform_target(self: AliasDataset, *, num_classes=None, dtype=None, device=None):
-    return UniformTargetDataset(self, num_classes=num_classes, dtype=dtype, device=device)
 
 # Cell
 

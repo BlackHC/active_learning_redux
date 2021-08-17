@@ -21,7 +21,7 @@ from .acquisition_functions import (
     EvalCandidateBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate, train
+from .black_box_model_training import evaluate_old, train
 from .dataset_challenges import (
     AdditiveGaussianNoise,
     AliasDataset,
@@ -40,7 +40,7 @@ from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import TrainedMCDropoutModel
+from .trained_model import TrainedBayesianModel
 
 # Cell
 
@@ -109,7 +109,6 @@ def load_experiment_data(
 
     train_dataset, validation_dataset = train_validation_split(
         full_train_dataset=full_train_dataset,
-        full_validation_dataset=full_train_dataset,
         train_labels=full_train_dataset.get_targets().cpu(),
         validation_set_size=validation_set_size,
         validation_split_random_state=validation_split_random_state,
@@ -297,7 +296,7 @@ class OodExperiment:
                 validation_loss=validation_loss,
             )
 
-            evaluation_metrics = evaluate(
+            evaluation_metrics = evaluate_old(
                 model=model_optimizer.model,
                 num_samples=self.num_validation_samples,
                 loader=test_loader,
@@ -310,7 +309,7 @@ class OodExperiment:
                 print("Done.")
                 break
 
-            trained_model = TrainedMCDropoutModel(num_samples=self.num_pool_samples, model=model_optimizer.model)
+            trained_model = TrainedBayesianModel(model=model_optimizer.model)
 
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)

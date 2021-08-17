@@ -3,6 +3,7 @@
 __all__ = ['FastMNIST', 'FastFashionMNIST']
 
 # Cell
+from typing import Optional, Callable
 
 import torch
 import torch.utils.data as data
@@ -15,8 +16,13 @@ from torchvision.datasets import MNIST, FashionMNIST
 
 # From https://tinyurl.com/pytorch-fast-mnist
 class FastMNIST(MNIST):
-    def __init__(self, *args, device, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, root: str,
+                 train: bool = True,
+                 transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
+                 download: bool = False,
+                 *args, device, **kwargs):
+        super().__init__(root, train, transform, target_transform, download, *args, **kwargs)
 
         # Scale data to [0,1]
         self.data = self.data.unsqueeze(1).float().div(255)
@@ -41,8 +47,13 @@ class FastMNIST(MNIST):
 
 
 class FastFashionMNIST(FashionMNIST):
-    def __init__(self, *args, device, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, root: str,
+            train: bool = True,
+            transform: Optional[Callable] = None,
+            target_transform: Optional[Callable] = None,
+            download: bool = False,
+            *args, device, **kwargs):
+        super().__init__(root, train, transform, target_transform, download, *args, **kwargs)
 
         # Scale data to [0,1]
         self.data = self.data.unsqueeze(1).float().div(255)
