@@ -13,7 +13,6 @@ from blackhc.project.experiment import embedded_experiments
 from batchbald_redux import acquisition_functions
 from .unified_experiment import UnifiedExperiment
 
-
 # Cell
 
 configs = [

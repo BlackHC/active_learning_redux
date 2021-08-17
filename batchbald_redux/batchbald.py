@@ -153,7 +153,7 @@ def get_batch_bald_batch(
 
 # Cell
 
-
+# TODO: remove unused parameters!
 def get_bald_scores(log_probs_N_K_C: torch.Tensor, *, dtype=None, device=None) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
 
