@@ -4,6 +4,9 @@ __all__ = ['configs']
 
 # Cell
 
+import dataclasses
+import traceback
+
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
