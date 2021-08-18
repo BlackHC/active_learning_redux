@@ -6,7 +6,7 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
-           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores']
+           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch']
 
 # Cell
 import math
@@ -609,3 +609,50 @@ def get_coreset_eig_bald_scores(
     training_coreset = get_coreset_bald_scores(training_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
     eval_coreset = get_coreset_bald_scores(eval_log_probs_N_K_C, labels_N=labels_N, dtype=dtype, device=device)
     return training_coreset - eval_coreset
+
+# Cell
+
+def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:
+    N, K, C = log_probs_N_K_C.shape
+    batch_size = min(batch_size, N)
+
+    candidate_scores = []
+    candidate_indices = []
+
+    entropies_N = compute_entropy(log_probs_N_K_C)
+
+    # we start with BALD scores
+    scores_N = entropies_N - compute_conditional_entropy(log_probs_N_K_C)
+
+    last_score = 0.
+    for _ in range(batch_size):
+        # Pick the highest scorer.
+        # This is amenable to lazy greedy and lazier than lazy greedy, though we do not implement this here. (Yet)
+        candidate_score, candidate_index = scores_N.max(dim=0)
+        candidate_score += last_score
+        last_score = candidate_score
+
+        candidate_indices.append(candidate_index.item())
+        candidate_scores.append(candidate_score.item())
+
+        # Update the acquired item's score so it is not picked again.
+        scores_N[candidate_index] = -float("inf")
+
+        # Decrease scores for other items
+        joint_entropy_helper = joint_entropy.ExactJointEntropy.empty(K, device=device, dtype=dtype)
+        joint_entropy_helper.add_variables(log_probs_N_K_C[candidate_index: candidate_index+1])
+        joint_entropies_N = joint_entropy_helper.compute_batch(log_probs_N_K_C)
+        dual_mi_N = entropies_N + entropies_N[candidate_index] - joint_entropies_N
+
+        scores_N -= dual_mi_N
+
+    return CandidateBatch(candidate_scores, candidate_indices)
+
+
+# def get_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_probs_E_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
+#     """Implements naive EPIG: I[Y_acq; Y_eval | x_acq, X_eval]."""
+#     N, K, C = pool_log_probs_N_K_C.shape
+#     E, _, _ = eval_log_probs_E_K_C.shape
+#     assert pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:], "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
+#
+#     entropy_N_E =
