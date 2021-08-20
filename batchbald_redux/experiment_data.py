@@ -23,7 +23,6 @@ from .datasets import get_dataset
 
 # Cell
 
-
 @dataclass
 class ExperimentData:
     active_learning: ActiveLearningData
@@ -37,6 +36,9 @@ class ExperimentData:
     evaluation_set_indices: List[int]
 
     ood_dataset: NamedDataset
+
+    # TODO: replace this with dataset info on the targets
+    ood_exposure: bool
 
     device: str
 
@@ -132,11 +134,12 @@ def load_experiment_data(
         train_dataset = train_dataset * id_repetitions
 
     if ood_dataset_config:
+        ood_exposure = ood_dataset_config.ood_exposure
         odd_split_dataset = get_dataset(ood_dataset_config.ood_dataset_name, root="data", normalize_like_cifar10=True, device_hint=device)
         assert split_dataset.device == odd_split_dataset.device, (f"ID dataset resides on {split_dataset.device}, while OOD dataset is on {odd_split_dataset.device};"
                                                                   "try to put both on \"cpu\"!")
         original_ood_dataset = odd_split_dataset.train
-        if ood_dataset_config.ood_exposure:
+        if ood_exposure:
             train_dataset = train_dataset.one_hot(device=split_dataset.device)
             ood_dataset = original_ood_dataset.uniform_target(device=split_dataset.device, num_classes=train_dataset.get_num_classes())
         else:
@@ -150,6 +153,7 @@ def load_experiment_data(
         train_dataset = train_dataset + ood_dataset
     else:
         original_ood_dataset = None
+        ood_exposure = False
 
     if add_dataset_noise:
         train_dataset = AdditiveGaussianNoise(train_dataset, 0.1)
@@ -172,5 +176,6 @@ def load_experiment_data(
         initial_training_set_indices=initial_training_set_indices,
         evaluation_set_indices=evaluation_set_indices,
         ood_dataset=original_ood_dataset,
+        ood_exposure=ood_exposure,
         device=split_dataset.device
     )
