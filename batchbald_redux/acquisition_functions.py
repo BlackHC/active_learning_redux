@@ -4,8 +4,9 @@ __all__ = ['CandidateBatchComputer', 'Random', 'PoolScorerCandidateBatchComputer
            'SoftmaxBALD', 'RandomBALD', 'ThompsonBALD', 'SieveBALD', 'BatchBALD',
            'CoreSetPoolScorerCandidateBatchComputer', 'CoreSetBALD', 'TemperedCoreSetBALD', 'BatchCoreSetBALD',
            'EvalCandidateBatchComputer', 'EvaluationPoolScorerCandidateBatchComputer', 'EvalBALD', 'TemperedEvalBALD',
-           'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG', 'CoreSetEvaluationPoolScorerCandidateBatchComputer',
-           'CoreSetPIGBALD', 'TemperedCoreSetPIGBALD', 'CoreSetPIG', 'TemperedCoreSetPIG']
+           'TopKEPIG', 'SoftmaxEPIG', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG',
+           'CoreSetEvaluationPoolScorerCandidateBatchComputer', 'CoreSetPIGBALD', 'TemperedCoreSetPIGBALD',
+           'CoreSetPIG', 'TemperedCoreSetPIG']
 
 # Cell
 
@@ -32,7 +33,8 @@ from .batchbald import (
     get_thompson_bald_batch,
     get_top_k_scorers,
     get_top_random_scorers,
-    get_sieve_bald_batch
+    get_sieve_bald_batch,
+    get_real_naive_epig_scores
 )
 from .trained_model import TrainedModel
 
@@ -285,6 +287,35 @@ class EvalBALD(_EvalBALD):
 
 @dataclass
 class TemperedEvalBALD(_EvalBALD):
+    temperature: float
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_sampled_tempered_scorers(scores_N, batch_size=self.acquisition_size, temperature=self.temperature)
+
+# Cell
+
+
+@dataclass
+class _EPIG(EvaluationPoolScorerCandidateBatchComputer):
+    def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
+        scores_N = get_real_naive_epig_scores(pool_log_probs_N_K_C=log_probs_N_K_C, eval_log_probs_E_K_C=log_eval_probs_N_K_C, dtype=torch.double, device=device)
+
+        candidate_batch = self.extract_candidates(scores_N)
+
+        return candidate_batch
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        raise NotImplementedError()
+
+
+@dataclass
+class TopKEPIG(_EPIG):
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
+
+
+@dataclass
+class SoftmaxEPIG(_EPIG):
     temperature: float
 
     def extract_candidates(self, scores_N) -> CandidateBatch:
