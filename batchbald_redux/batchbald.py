@@ -6,7 +6,8 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
-           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch']
+           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'get_joint_probs_N_C_C',
+           'get_real_naive_epig_scores']
 
 # Cell
 import math
@@ -648,11 +649,46 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
 
     return CandidateBatch(candidate_scores, candidate_indices)
 
+# Cell
 
-# def get_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_probs_E_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
-#     """Implements naive EPIG: I[Y_acq; Y_eval | x_acq, X_eval]."""
-#     N, K, C = pool_log_probs_N_K_C.shape
-#     E, _, _ = eval_log_probs_E_K_C.shape
-#     assert pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:], "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
-#
-#     entropy_N_E =
+def get_joint_probs_N_C_C(pool_probs_N_K_C: torch.Tensor, single_eval_probs_K_C: torch.Tensor):
+    K = single_eval_probs_K_C.shape[0]
+
+    pool_log_probs_N_C_K = pool_probs_N_K_C.transpose(1,2)
+    joint_probs_N_C_C = pool_log_probs_N_C_K @ single_eval_probs_K_C / K
+    return joint_probs_N_C_C
+
+def get_real_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_probs_E_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
+    """Implements naive EPIG: I[Y_acq; Y_eval | x_acq, X_eval]."""
+    N, K, C = pool_log_probs_N_K_C.shape
+    E, _, _ = eval_log_probs_E_K_C.shape
+    assert pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:], "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
+
+    pool_probs_N_K_C = pool_log_probs_N_K_C.to(dtype=dtype, device=device).exp()
+    eval_probs_E_K_C = eval_log_probs_E_K_C.to(dtype=dtype, device=device).exp()
+
+    #print(pool_probs_N_K_C, eval_probs_E_K_C)
+
+    pool_probs_N_C = torch.mean(pool_probs_N_K_C, dim=1, keepdim=False)
+
+    # Split the MC dropout samples in 4 ranges.
+    total_scores_N = torch.zeros((N,), dtype=dtype, device="cpu")
+    for i_e in with_progress_bar(range(E), tqdm_args=dict(desc="Evaluation Set", leave=False)):
+        single_eval_probs_K_C = eval_probs_E_K_C[i_e]
+
+        joint_probs_N_C_C = get_joint_probs_N_C_C(pool_probs_N_K_C, single_eval_probs_K_C)
+
+        single_eval_probs_C = torch.mean(single_eval_probs_K_C, dim=0, keepdim=False)
+        #print(single_eval_probs_C)
+
+        nats_N_C_C = -torch.log(single_eval_probs_C)[None, None, :] -torch.log(pool_probs_N_C)[:, :, None] + torch.log(joint_probs_N_C_C)
+
+        weighted_nats_N_C_C = nats_N_C_C * joint_probs_N_C_C
+        scores_N = weighted_nats_N_C_C.sum((1,2), keepdim=False)
+
+        total_scores_N += scores_N.to(device="cpu", non_blocking=True)
+
+    total_scores_N /= E
+
+    return total_scores_N
+
