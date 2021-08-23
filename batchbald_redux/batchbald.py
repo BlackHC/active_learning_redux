@@ -667,11 +667,8 @@ def get_real_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_p
     pool_probs_N_K_C = pool_log_probs_N_K_C.to(dtype=dtype, device=device).exp()
     eval_probs_E_K_C = eval_log_probs_E_K_C.to(dtype=dtype, device=device).exp()
 
-    #print(pool_probs_N_K_C, eval_probs_E_K_C)
-
     pool_probs_N_C = torch.mean(pool_probs_N_K_C, dim=1, keepdim=False)
 
-    # Split the MC dropout samples in 4 ranges.
     total_scores_N = torch.zeros((N,), dtype=dtype, device="cpu")
     for i_e in with_progress_bar(range(E), tqdm_args=dict(desc="Evaluation Set", leave=False)):
         single_eval_probs_K_C = eval_probs_E_K_C[i_e]
@@ -679,7 +676,6 @@ def get_real_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_p
         joint_probs_N_C_C = get_joint_probs_N_C_C(pool_probs_N_K_C, single_eval_probs_K_C)
 
         single_eval_probs_C = torch.mean(single_eval_probs_K_C, dim=0, keepdim=False)
-        #print(single_eval_probs_C)
 
         nats_N_C_C = -torch.log(single_eval_probs_C)[None, None, :] -torch.log(pool_probs_N_C)[:, :, None] + torch.log(joint_probs_N_C_C)
 
@@ -691,4 +687,3 @@ def get_real_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_p
     total_scores_N /= E
 
     return total_scores_N
-

@@ -3,8 +3,8 @@
 __all__ = ['CandidateBatchComputer', 'Random', 'PoolScorerCandidateBatchComputer', 'BALD', 'TemperedBALD',
            'SoftmaxBALD', 'RandomBALD', 'ThompsonBALD', 'SieveBALD', 'BatchBALD',
            'CoreSetPoolScorerCandidateBatchComputer', 'CoreSetBALD', 'TemperedCoreSetBALD', 'BatchCoreSetBALD',
-           'EvalCandidateBatchComputer', 'EvaluationPoolScorerCandidateBatchComputer', 'EvalBALD', 'TemperedEvalBALD',
-           'TopKEPIG', 'SoftmaxEPIG', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG',
+           'EvalDatasetBatchComputer', 'EvalModelBatchComputer', 'EvaluationPoolScorerCandidateBatchComputer',
+           'EvalBALD', 'TemperedEvalBALD', 'EPIG', 'SoftmaxEPIG', 'BatchEvalBALD', 'EIG', 'BatchEIG', 'TemperedEIG',
            'CoreSetEvaluationPoolScorerCandidateBatchComputer', 'CoreSetPIGBALD', 'TemperedCoreSetPIGBALD',
            'CoreSetPIG', 'TemperedCoreSetPIG']
 
@@ -25,16 +25,16 @@ from .batchbald import (
     get_batch_eval_bald_batch,
     get_coreset_bald_scores,
     get_coreset_bald_scores_from_predictions,
-    get_coreset_eig_scores,
     get_coreset_eig_bald_scores,
+    get_coreset_eig_scores,
     get_eig_scores,
     get_eval_bald_scores,
+    get_real_naive_epig_scores,
     get_sampled_tempered_scorers,
+    get_sieve_bald_batch,
     get_thompson_bald_batch,
     get_top_k_scorers,
     get_top_random_scorers,
-    get_sieve_bald_batch,
-    get_real_naive_epig_scores
 )
 from .trained_model import TrainedModel
 
@@ -116,7 +116,9 @@ class SoftmaxBALD(_BALD):
     temperature: float
 
     def extract_candidates(self, scores_N) -> CandidateBatch:
-        return get_sampled_tempered_scorers(scores_N.exp(), batch_size=self.acquisition_size, temperature=self.temperature)
+        return get_sampled_tempered_scorers(
+            scores_N.exp(), batch_size=self.acquisition_size, temperature=self.temperature
+        )
 
 
 @dataclass
@@ -138,6 +140,7 @@ class ThompsonBALD(PoolScorerCandidateBatchComputer):
 
 # Cell
 
+
 @dataclass
 class SieveBALD(PoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
@@ -151,6 +154,7 @@ class SieveBALD(PoolScorerCandidateBatchComputer):
         return candidate_batch
 
 # Cell
+
 
 @dataclass
 class BatchBALD(PoolScorerCandidateBatchComputer):
@@ -177,7 +181,9 @@ class CoreSetPoolScorerCandidateBatchComputer(CandidateBatchComputer):
     def compute_candidate_batch(
         self, model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
+        log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(
+            pool_loader, self.num_pool_samples, device, "cpu"
+        )
 
         return self.get_candidate_batch(log_probs_N_K_C, labels_N, device)
 
@@ -237,7 +243,23 @@ class BatchCoreSetBALD(CoreSetPoolScorerCandidateBatchComputer):
 
 
 @dataclass
-class EvalCandidateBatchComputer:
+class EvalDatasetBatchComputer:
+    acquisition_size: int
+
+    def compute_candidate_batch(
+        self,
+        model: TrainedModel,
+        pool_loader: torch.utils.data.DataLoader,
+        eval_loader: torch.utils.data.DataLoader,
+        device,
+    ) -> CandidateBatch:
+        pass
+
+# Cell
+
+
+@dataclass
+class EvalModelBatchComputer:
     acquisition_size: int
 
     def compute_candidate_batch(
@@ -249,7 +271,7 @@ class EvalCandidateBatchComputer:
 
 
 @dataclass
-class EvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
+class EvaluationPoolScorerCandidateBatchComputer(EvalModelBatchComputer):
     num_pool_samples: int
 
     def compute_candidate_batch(
@@ -296,9 +318,25 @@ class TemperedEvalBALD(_EvalBALD):
 
 
 @dataclass
-class _EPIG(EvaluationPoolScorerCandidateBatchComputer):
-    def get_candidate_batch(self, log_probs_N_K_C, log_eval_probs_N_K_C, device) -> CandidateBatch:
-        scores_N = get_real_naive_epig_scores(pool_log_probs_N_K_C=log_probs_N_K_C, eval_log_probs_E_K_C=log_eval_probs_N_K_C, dtype=torch.double, device=device)
+class _EPIG(EvalDatasetBatchComputer):
+    num_pool_samples: int
+
+    def compute_candidate_batch(
+        self,
+        model: TrainedModel,
+        eval_loader: torch.utils.data.DataLoader,
+        pool_loader: torch.utils.data.DataLoader,
+        device,
+    ) -> CandidateBatch:
+        log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device, "cpu")
+        log_eval_probs_N_K_C = model.get_log_probs_N_K_C(eval_loader, self.num_pool_samples, device, "cpu")
+
+        scores_N = get_real_naive_epig_scores(
+            pool_log_probs_N_K_C=log_probs_N_K_C,
+            eval_log_probs_E_K_C=log_eval_probs_N_K_C,
+            dtype=torch.double,
+            device=device,
+        )
 
         candidate_batch = self.extract_candidates(scores_N)
 
@@ -309,7 +347,7 @@ class _EPIG(EvaluationPoolScorerCandidateBatchComputer):
 
 
 @dataclass
-class TopKEPIG(_EPIG):
+class EPIG(_EPIG):
     def extract_candidates(self, scores_N) -> CandidateBatch:
         return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
 
@@ -388,14 +426,18 @@ class TemperedEIG(_EIG):
 
 
 @dataclass
-class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComputer):
+class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalModelBatchComputer):
     num_pool_samples: int
 
     def compute_candidate_batch(
         self, model: TrainedModel, eval_model: TrainedModel, pool_loader: torch.utils.data.DataLoader, device
     ) -> CandidateBatch:
-        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
-        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(pool_loader, self.num_pool_samples, device, "cpu")
+        training_log_probs_N_K_C, training_labels_N = model.get_log_probs_N_K_C_labels_N(
+            pool_loader, self.num_pool_samples, device, "cpu"
+        )
+        eval_log_probs_N_K_C, eval_labels_N = eval_model.get_log_probs_N_K_C_labels_N(
+            pool_loader, self.num_pool_samples, device, "cpu"
+        )
 
         # With high probability, this ensures that we are not shuffling the batches.
         assert torch.equal(training_labels_N, eval_labels_N)
@@ -407,10 +449,17 @@ class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalCandidateBatchComput
 
 # Cell
 
+
 @dataclass
 class _CoreSetPIGBALD(CoreSetEvaluationPoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
-        scores_N = get_coreset_eig_bald_scores(training_log_probs_N_K_C=training_log_probs_N_K_C, eval_log_probs_N_K_C=eval_log_probs_N_K_C, labels_N=labels_N, dtype=torch.double, device=device)
+        scores_N = get_coreset_eig_bald_scores(
+            training_log_probs_N_K_C=training_log_probs_N_K_C,
+            eval_log_probs_N_K_C=eval_log_probs_N_K_C,
+            labels_N=labels_N,
+            dtype=torch.double,
+            device=device,
+        )
         candidate_batch = self.extract_candidates(scores_N)
 
         return candidate_batch
@@ -434,10 +483,17 @@ class TemperedCoreSetPIGBALD(_CoreSetPIGBALD):
 
 # Cell
 
+
 @dataclass
 class _CoreSetPIG(CoreSetEvaluationPoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
-        scores_N = get_coreset_eig_scores(training_log_probs_N_K_C=training_log_probs_N_K_C, eval_log_probs_N_K_C=eval_log_probs_N_K_C, labels_N=labels_N, dtype=torch.double, device=device)
+        scores_N = get_coreset_eig_scores(
+            training_log_probs_N_K_C=training_log_probs_N_K_C,
+            eval_log_probs_N_K_C=eval_log_probs_N_K_C,
+            labels_N=labels_N,
+            dtype=torch.double,
+            device=device,
+        )
         candidate_batch = self.extract_candidates(scores_N)
 
         return candidate_batch

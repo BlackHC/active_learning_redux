@@ -17,7 +17,7 @@ from blackhc.project.experiment import embedded_experiments
 import batchbald_redux.acquisition_functions as acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
-    EvalCandidateBatchComputer,
+    EvalModelBatchComputer,
 )
 from .active_learning import RandomFixedLengthSampler
 from .black_box_model_training import evaluate_old, train_with_schedule
@@ -43,7 +43,7 @@ from .experiment_data import ExperimentData, ExperimentDataConfig
 class Experiment:
     seed: int
     acquisition_function: Union[
-        Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
+        Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
     ]
 
     id_dataset_name: str = "CIFAR-10"
@@ -160,7 +160,7 @@ class Experiment:
 
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
-            elif isinstance(acquisition_function, EvalCandidateBatchComputer):
+            elif isinstance(acquisition_function, EvalModelBatchComputer):
                 current_max_epochs = len(iteration_log["training"]["epochs"])
 
                 if self.evaluation_set_size:

@@ -18,7 +18,7 @@ from torch.utils.data import Dataset
 import batchbald_redux.acquisition_functions as acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
-    EvalCandidateBatchComputer,
+    EvalModelBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate_old, train
@@ -86,7 +86,7 @@ class Experiment:
     repeated_mnist_repetitions: int = 1
     add_dataset_noise: bool = False
     acquisition_function: Union[
-        Type[CandidateBatchComputer], Type[EvalCandidateBatchComputer]
+        Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
     ] = acquisition_functions.BALD
     train_eval_model: TrainEvalModel = TrainSelfDistillationEvalModel
     model_optimizer_factory: Type[ModelOptimizerFactory] = MnistOptimizerFactory
@@ -216,7 +216,7 @@ class Experiment:
 
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
-            elif isinstance(acquisition_function, EvalCandidateBatchComputer):
+            elif isinstance(acquisition_function, EvalModelBatchComputer):
                 current_max_epochs = iteration_log["training"]["best_epoch"]
 
                 train_eval_model = self.create_train_eval_model(
