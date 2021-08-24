@@ -630,6 +630,9 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
         # Pick the highest scorer.
         # This is amenable to lazy greedy and lazier than lazy greedy, though we do not implement this here. (Yet)
         candidate_score, candidate_index = scores_N.max(dim=0)
+
+        # TODO: break here if candidate_score < 0 at this point!
+
         candidate_score += last_score
         last_score = candidate_score
 
