@@ -34,37 +34,63 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.SoftmaxBALD,
+        acquisition_functions.SieveBALD,
     ]
     for acquisition_size in [3000]
     for num_pool_samples in [100]
     for temperature in [1/64]
     for id_repetitions in [1,5,10,20]
-] + [
-    UnifiedExperiment(
-        seed=seed + 8945,
-        acquisition_function=acquisition_function,
-        acquisition_size=acquisition_size,
-        num_pool_samples=num_pool_samples,
-        initial_training_set_size=1000,
-        evaluation_set_size=0,
-        max_training_set=15000,
-        temperature=temperature,
-        id_repetitions=id_repetitions,
-        add_dataset_noise=True,
-        id_dataset_name="CIFAR-10",
-        ood_dataset_name=None,
-        ood_exposure=False,
-    )
-    for seed in range(5)
-    for acquisition_function in [
-        acquisition_functions.BALD,
-    ]
-    for acquisition_size in [3000]
-    for num_pool_samples in [100]
-    for temperature in [0]
-    for id_repetitions in [1,5,10,20]
 ]
+# +
+#     UnifiedExperiment(
+#         seed=seed + 8945,
+#         acquisition_function=acquisition_function,
+#         acquisition_size=acquisition_size,
+#         num_pool_samples=num_pool_samples,
+#         initial_training_set_size=1000,
+#         evaluation_set_size=0,
+#         max_training_set=15000,
+#         temperature=temperature,
+#         id_dataset_name="CIFAR-10",
+#         ood_dataset_name=None,
+#         ood_exposure=False,
+#         id_repetitions=id_repetitions,
+#         add_dataset_noise=True
+
+#     )
+#     for seed in range(5)
+#     for acquisition_function in [
+#         acquisition_functions.SoftmaxBALD,
+#     ]
+#     for acquisition_size in [3000]
+#     for num_pool_samples in [100]
+#     for temperature in [1/64]
+#     for id_repetitions in [1,5,10,20]
+# ] + [
+#     UnifiedExperiment(
+#         seed=seed + 8945,
+#         acquisition_function=acquisition_function,
+#         acquisition_size=acquisition_size,
+#         num_pool_samples=num_pool_samples,
+#         initial_training_set_size=1000,
+#         evaluation_set_size=0,
+#         max_training_set=15000,
+#         temperature=temperature,
+#         id_repetitions=id_repetitions,
+#         add_dataset_noise=True,
+#         id_dataset_name="CIFAR-10",
+#         ood_dataset_name=None,
+#         ood_exposure=False,
+#     )
+#     for seed in range(5)
+#     for acquisition_function in [
+#         acquisition_functions.BALD,
+#     ]
+#     for acquisition_size in [3000]
+#     for num_pool_samples in [100]
+#     for temperature in [0]
+#     for id_repetitions in [1,5,10,20]
+# ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
     for job_id, store in embedded_experiments(__file__, len(configs)):
