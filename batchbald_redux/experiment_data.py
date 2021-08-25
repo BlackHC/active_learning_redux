@@ -21,6 +21,7 @@ from .dataset_challenges import (
 )
 from .datasets import get_dataset
 
+
 # Cell
 
 @dataclass
@@ -83,16 +84,16 @@ class ExperimentDataConfig:
 
 
 def load_experiment_data(
-    *,
-    id_dataset_name: str,
-    id_repetitions: float,
-    initial_training_set_size: int,
-    validation_set_size: int,
-    validation_split_random_state: int,
-    evaluation_set_size: int,
-    add_dataset_noise: bool,
-    ood_dataset_config: Optional[OoDDatasetConfig],
-    device: str,
+        *,
+        id_dataset_name: str,
+        id_repetitions: float,
+        initial_training_set_size: int,
+        validation_set_size: int,
+        validation_split_random_state: int,
+        evaluation_set_size: int,
+        add_dataset_noise: bool,
+        ood_dataset_config: Optional[OoDDatasetConfig],
+        device: str,
 ) -> ExperimentData:
     split_dataset = get_dataset(
         id_dataset_name,
@@ -135,13 +136,16 @@ def load_experiment_data(
 
     if ood_dataset_config:
         ood_exposure = ood_dataset_config.ood_exposure
-        odd_split_dataset = get_dataset(ood_dataset_config.ood_dataset_name, root="data", normalize_like_cifar10=True, device_hint=device)
-        assert split_dataset.device == odd_split_dataset.device, (f"ID dataset resides on {split_dataset.device}, while OOD dataset is on {odd_split_dataset.device};"
-                                                                  "try to put both on \"cpu\"!")
+        odd_split_dataset = get_dataset(ood_dataset_config.ood_dataset_name, root="data", normalize_like_cifar10=True,
+                                        device_hint=device)
+        assert split_dataset.device == odd_split_dataset.device, (
+            f"ID dataset resides on {split_dataset.device}, while OOD dataset is on {odd_split_dataset.device};"
+            "try to put both on \"cpu\"!")
         original_ood_dataset = odd_split_dataset.train
         if ood_exposure:
             train_dataset = train_dataset.one_hot(device=split_dataset.device)
-            ood_dataset = original_ood_dataset.uniform_target(device=split_dataset.device, num_classes=train_dataset.get_num_classes())
+            ood_dataset = original_ood_dataset.uniform_target(device=split_dataset.device,
+                                                              num_classes=train_dataset.get_num_classes())
         else:
             ood_dataset = original_ood_dataset.constant_target(
                 target=torch.tensor(-1, device=split_dataset.device), num_classes=train_dataset.get_num_classes()
@@ -157,6 +161,9 @@ def load_experiment_data(
 
     if add_dataset_noise:
         train_dataset = AdditiveGaussianNoise(train_dataset, 0.1)
+    else:
+        if id_repetitions > 1 or (ood_dataset_config is not None and ood_dataset_config.ood_repetitions) > 1:
+            raise RuntimeError("`add_dataset_noise`==False, even though repeated id or ood data!")
 
     active_learning_data = ActiveLearningData(train_dataset)
 
