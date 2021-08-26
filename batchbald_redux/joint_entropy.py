@@ -47,7 +47,9 @@ class ExactJointEntropy(JointEntropy):
     def compute(self) -> torch.Tensor:
         probs_M = torch.mean(self.joint_probs_M_K, dim=1, keepdim=False)
         nats_M = -torch.log(probs_M) * probs_M
+        del probs_M
         entropy = torch.sum(nats_M)
+        del nats_M
         return entropy
 
     def add_variables(self, log_probs_N_K_C: torch.Tensor) -> "ExactJointEntropy":
@@ -138,7 +140,8 @@ def gather_expand(data, dim, index):
     data = data.expand(new_data_shape)
     index = index.expand(new_index_shape)
 
-    return torch.gather(data, dim, index)
+    result = torch.gather(data, dim, index)
+    return result
 
 
 gather_expand.DEBUG_CHECKS = False
@@ -175,8 +178,11 @@ class SampledJointEntropy(JointEntropy):
         expanded_probs_N_K_1_C = probs_N_K_C[:, :, None, :]
 
         probs_N_K_K_S = gather_expand(expanded_probs_N_K_1_C, dim=-1, index=expanded_choices_N_1_K_S)
+        assert expanded_probs_N_K_1_C.data_ptr() != probs_N_K_K_S.data_ptr()
+
         # exp sum log seems necessary to avoid 0s?
-        probs_K_K_S = torch.exp(torch.sum(torch.log(probs_N_K_K_S), dim=0, keepdim=False))
+        probs_K_K_S = torch.sum(probs_N_K_K_S.log_(), dim=0, keepdim=False).exp_()
+        del probs_N_K_K_S
         samples_K_M = probs_K_K_S.reshape((K, -1))
 
         samples_M_K = samples_K_M.t()
@@ -184,12 +190,13 @@ class SampledJointEntropy(JointEntropy):
 
     def compute(self) -> torch.Tensor:
         sampled_joint_probs_M = torch.mean(self.sampled_joint_probs_M_K, dim=1, keepdim=False)
-        nats_M = -torch.log(sampled_joint_probs_M)
+        nats_M = -sampled_joint_probs_M.log_()
         entropy = torch.mean(nats_M)
         return entropy
 
     def add_variables(self, log_probs_N_K_C: torch.Tensor, M2: int) -> "SampledJointEntropy":
         assert self.sampled_joint_probs_M_K.shape[1] == log_probs_N_K_C.shape[1]
+        K = log_probs_N_K_C.shape[1]
 
         sample_K_M1_1 = self.sampled_joint_probs_M_K.t()[:, :, None]
 
