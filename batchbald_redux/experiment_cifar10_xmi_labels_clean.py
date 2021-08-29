@@ -23,25 +23,20 @@ from .acquisition_functions import (
     EvalModelBatchComputer,
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
-from .black_box_model_training import evaluate_old, train, train_with_schedule
+from .black_box_model_training import evaluate
 from .dataset_challenges import (
-    NamedDataset,
-    create_repeated_MNIST_dataset,
-    get_balanced_sample_indices,
     get_base_dataset_index,
     get_target, AdditiveGaussianNoise, AliasDataset, get_balanced_sample_indices_by_class,
 )
 from .datasets import get_dataset
-from .datasets import train_validation_split
 from .di import DependencyInjection
-from .fast_mnist import FastMNIST
-from .model_optimizer_factory import ModelOptimizerFactory
 from .resnet_models import Cifar10BayesianResnetFactory
+from .resnet_models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import TrainedBayesianModel
+from .trained_model import ModelTrainer
 
 # Cell
 
@@ -179,7 +174,8 @@ def load_experiment_data(
     return ExperimentData(
         active_learning=active_learning_data,
         train_dataset=train_dataset,
-        train_augmentations=split_dataset.train_augmentations,
+        # NO AUGMENTATIONS!
+        train_augmentations=None,
         validation_dataset=split_dataset.validation,
         test_dataset=split_dataset.test,
         evaluation_dataset=evaluation_dataset,
@@ -216,10 +212,10 @@ class Experiment:
         Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
     ] = acquisition_functions.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
-    model_optimizer_factory: Type[ModelOptimizerFactory] = Cifar10BayesianResnetFactory
+    model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
     acquisition_function_args: dict = None
     temperature: float = 0.0
-    prefer_accuracy: bool = False
+    prefer_accuracy: bool = True
 
     def load_experiment_data(self) -> ExperimentData:
         di = DependencyInjection(vars(self))
@@ -235,6 +231,10 @@ class Experiment:
         config = {**vars(self), **runtime_config}
         di = DependencyInjection(config, [])
         return di.create_dataclass_type(self.train_eval_model)
+
+    def create_model_trainer(self) -> ModelTrainer:
+        di = DependencyInjection(vars(self))
+        return di.create_dataclass_type(self.model_trainer_factory)
 
     def run(self, store):
         torch.manual_seed(self.seed)
@@ -262,6 +262,9 @@ class Experiment:
         active_learning_steps = store["active_learning_steps"]
 
         acquisition_function = self.create_acquisition_function()
+        model_trainer = self.create_model_trainer()
+
+        loss = validation_loss = torch.nn.NLLLoss()
 
         # Active Training Loop
         while True:
@@ -274,31 +277,15 @@ class Experiment:
 
             iteration_log["training"] = {}
 
-            model_optimizer = self.model_optimizer_factory().create_model_optimizer()
+            trained_model = model_trainer.get_trained(train_loader=train_loader,
+                                                      train_augmentations=data.train_augmentations,
+                                                      validation_loader=validation_loader,
+                                                      log=iteration_log["training"], loss=loss,
+                                                      validation_loss=validation_loss)
 
-            if training_set_size > 0:
-                train_with_schedule(
-                    model=model_optimizer.model,
-                    optimizer=model_optimizer.optimizer,
-                    train_augmentations=data.train_augmentations,
-                    training_samples=self.num_training_samples,
-                    validation_samples=self.num_validation_samples,
-                    train_loader=train_loader,
-                    validation_loader=validation_loader,
-                    patience_schedule = self.patience_schedule,
-                    factor_schedule = self.factor_schedule,
-                    max_epochs=self.max_training_epochs,
-                    device=self.device,
-                    training_log=iteration_log["training"],
-                    prefer_accuracy=self.prefer_accuracy
-                )
+            evaluation_metrics = evaluate(model=trained_model, num_samples=self.num_validation_samples,
+                                          loader=test_loader, device=self.device, storage_device="cpu")
 
-            evaluation_metrics = evaluate_old(
-                model=model_optimizer.model,
-                num_samples=self.num_validation_samples,
-                loader=test_loader,
-                device=self.device,
-            )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
 
@@ -306,35 +293,8 @@ class Experiment:
                 print("Done.")
                 break
 
-            trained_model = TrainedBayesianModel(model=model_optimizer.model)
-
             if isinstance(acquisition_function, CandidateBatchComputer):
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
-            elif isinstance(acquisition_function, EvalModelBatchComputer):
-                current_max_epochs = iteration_log["training"]["best_epoch"]
-
-                if self.evaluation_set_size:
-                    eval_dataset = data.evaluation_dataset
-                else:
-                    eval_dataset = data.active_learning.pool_dataset
-
-                train_eval_model = self.create_train_eval_model(
-                    dict(
-                        max_epochs=current_max_epochs + 2,
-                        training_dataset=data.active_learning.training_dataset,
-                        eval_dataset=eval_dataset,
-                        validation_loader=validation_loader,
-                        trained_model=trained_model,
-                        train_augmentations=data.train_augmentations
-                    )
-                )
-
-                iteration_log["eval_training"] = {}
-                trained_eval_model = train_eval_model(training_log=iteration_log["eval_training"], device=self.device)
-
-                candidate_batch = acquisition_function.compute_candidate_batch(
-                    trained_model, trained_eval_model, pool_loader, device=self.device
-                )
             else:
                 raise ValueError(f"Unknown acquisition function {acquisition_function}!")
 
@@ -369,8 +329,8 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BALD,
         acquisition_functions.CoreSetBALD,
+        acquisition_functions.BALD,
         #acquisition_functions.Random,
     ]
     for acquisition_size in [1]
