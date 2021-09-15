@@ -113,11 +113,9 @@ class ActiveLearner:
                 candidate_batch = acquisition_function.compute_candidate_batch(trained_model, pool_loader, self.device)
             elif isinstance(acquisition_function, EvalDatasetBatchComputer):
                 if len(data.evaluation_dataset) > 0:
-                    eval_dataset = data.evaluation_dataset
+                    eval_loader = model_trainer.get_evaluation_dataloader(data.evaluation_dataset)
                 else:
-                    eval_dataset = data.active_learning.pool_dataset
-
-                eval_loader = model_trainer.get_evaluation_dataloader(eval_dataset)
+                    eval_loader = pool_loader
 
                 candidate_batch = acquisition_function.compute_candidate_batch(model=trained_model,
                                                                                pool_loader=pool_loader,
