@@ -329,12 +329,17 @@ class _EPIG(EvalDatasetBatchComputer):
         device,
     ) -> CandidateBatch:
         log_probs_N_K_C = model.get_log_probs_N_K_C(pool_loader, self.num_pool_samples, device, "cpu")
-        log_eval_probs_N_K_C = model.get_log_probs_N_K_C(eval_loader, self.num_pool_samples, device, "cpu")
+        if pool_loader == eval_loader:
+            log_eval_probs_N_K_C = log_probs_N_K_C
+        else:
+            log_eval_probs_N_K_C = model.get_log_probs_N_K_C(eval_loader, self.num_pool_samples, device, "cpu")
 
+        # NOTE: we are using floats all the way here. Hopefully this won't be two bad in the two variable case.
+        # torch.double vs torch.float is a 10x speed difference (enough to make double infeasible for exps).
         scores_N = get_real_naive_epig_scores(
             pool_log_probs_N_K_C=log_probs_N_K_C,
             eval_log_probs_E_K_C=log_eval_probs_N_K_C,
-            dtype=torch.double,
+            dtype=torch.float,
             device=device,
         )
 
