@@ -41,26 +41,26 @@ class BayesianModule(Module):
         super().__init__()
 
     # Returns B x K x ...
-    def forward(self, input_B: torch.Tensor, num_samples: int):
+    def forward(self, input_B: torch.Tensor, num_samples: int, return_embedding: bool=False):
         BayesianModule.num_samples = num_samples
 
         if num_samples == 0:
             # No MC dropout (0 samples).
-            features_B = self.deterministic_forward_impl(input_B)
-            output_B = self.mc_forward_impl(features_B)
+            features_B = self.deterministic_forward_impl(input_B, return_embedding=return_embedding)
+            output_B = self.mc_forward_impl(features_B, return_embedding=return_embedding)
             output_B_1 = BayesianModule.unflatten_tensor(output_B, 1)
             return output_B_1
 
-        features_B = self.deterministic_forward_impl(input_B)
+        features_B = self.deterministic_forward_impl(input_B, return_embedding=return_embedding)
         mc_features_BK = BayesianModule.mc_tensor(features_B, num_samples)
-        mc_output_BK = self.mc_forward_impl(mc_features_BK)
+        mc_output_BK = self.mc_forward_impl(mc_features_BK, return_embedding=return_embedding)
         mc_output_B_K = BayesianModule.unflatten_tensor(mc_output_BK, num_samples)
         return mc_output_B_K
 
-    def deterministic_forward_impl(self, input_B: torch.Tensor) -> torch.Tensor:
+    def deterministic_forward_impl(self, input_B: torch.Tensor, return_embedding: bool) -> torch.Tensor:
         return input_B
 
-    def mc_forward_impl(self, mc_features_BK: torch.Tensor) -> torch.Tensor:
+    def mc_forward_impl(self, mc_features_BK: torch.Tensor, return_embedding: bool) -> torch.Tensor:
         return mc_features_BK
 
     @staticmethod
@@ -78,16 +78,16 @@ class BayesianModule(Module):
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
     @torch.no_grad()
-    def get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device, storage_device):
-        return bmodule_get_no_dropout_predictions_labels(self, loader=loader, device=device, storage_device=storage_device)
-        
+    def get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device, storage_device, return_embedding=False):
+        return bmodule_get_no_dropout_predictions_labels(self, loader=loader, device=device, storage_device=storage_device, return_embedding=return_embedding)
+
     @torch.no_grad()
-    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device, storage_device):
-        return bmodule_get_predictions_labels(self, num_samples=num_samples, loader=loader, device=device, storage_device=storage_device)
+    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device, storage_device, return_embedding=False):
+        return bmodule_get_predictions_labels(self, num_samples=num_samples, loader=loader, device=device, storage_device=storage_device, return_embedding=return_embedding)
 
 # Externalized method so we can easily auto-reload it.
 @torch.no_grad()
-def bmodule_get_no_dropout_predictions_labels(self: BayesianModule, *, loader: data.DataLoader, device, storage_device):
+def bmodule_get_no_dropout_predictions_labels(self: BayesianModule, *, loader: data.DataLoader, device, storage_device, return_embedding=False):
     self.to(device=device)
     self.eval()
 
@@ -102,7 +102,7 @@ def bmodule_get_no_dropout_predictions_labels(self: BayesianModule, *, loader: d
 
     for batch_x, batch_labels in loader:
         batch_x = batch_x.to(device=device)
-        batch_predictions = self(batch_x, num_samples=0)
+        batch_predictions = self(batch_x, num_samples=0, return_embedding=return_embedding)
 
         batch_size = len(batch_predictions)
         data_end = data_start + batch_size
@@ -129,11 +129,11 @@ def bmodule_get_no_dropout_predictions_labels(self: BayesianModule, *, loader: d
 
 
 @torch.no_grad()
-def bmodule_get_predictions_labels(self: BayesianModule, *, num_samples: int, loader: data.DataLoader, device, storage_device):
+def bmodule_get_predictions_labels(self: BayesianModule, *, num_samples: int, loader: data.DataLoader, device, storage_device, return_embedding=False):
     assert_no_shuffling_no_augmentations_dataloader(loader)
 
     if num_samples == 0:
-        return self.get_no_dropout_predictions_labels(loader=loader, device=storage_device)
+        return self.get_no_dropout_predictions_labels(loader=loader, device=device, storage_device=storage_device, return_embedding=return_embedding)
 
     self.to(device=device)
 
@@ -159,10 +159,9 @@ def bmodule_get_predictions_labels(self: BayesianModule, *, num_samples: int, lo
         num_sub_samples = end - start
 
         data_start = 0
-        # TODO: ensure that the dataloader is not shuffling!
         for batch_x, batch_labels in loader:
             batch_x = batch_x.to(device=device)
-            batch_predictions = self(batch_x, num_sub_samples)
+            batch_predictions = self(batch_x, num_sub_samples, return_embedding=return_embedding)
 
             batch_size = len(batch_predictions)
             data_end = data_start + batch_size

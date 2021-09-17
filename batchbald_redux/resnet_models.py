@@ -260,7 +260,7 @@ class BayesianResNet(BayesianModule):
 
         return nn.Sequential(*layers)
 
-    def deterministic_forward_impl(self, x: Tensor):
+    def deterministic_forward_impl(self, x: Tensor, return_embedding: bool):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -276,9 +276,11 @@ class BayesianResNet(BayesianModule):
 
         return x
 
-    def mc_forward_impl(self, x: Tensor):
-        x = self.fc(x)
-        x = F.log_softmax(x, dim=-1)
+    def mc_forward_impl(self, x: Tensor, return_embedding: bool):
+        if not return_embedding:
+            x = self.fc(x)
+            x = F.log_softmax(x, dim=-1)
+
         return x
 
 
