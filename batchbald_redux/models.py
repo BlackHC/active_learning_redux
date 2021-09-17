@@ -16,9 +16,11 @@ from torch.utils.data import DataLoader, Dataset
 from .active_learning import RandomFixedLengthSampler
 from .black_box_model_training import train
 from .consistent_mc_dropout import (
+    GradEmbeddingType,
     BayesianModule,
     ConsistentMCDropout,
     ConsistentMCDropout2d,
+    freeze_encoder_context
 )
 
 from .model_optimizer_factory import ModelOptimizer, ModelOptimizerFactory
@@ -39,17 +41,18 @@ class BayesianMNISTCNN(BayesianModule):
         self.fc1_drop = ConsistentMCDropout()
         self.fc2 = nn.Linear(128, num_classes)
 
-    def mc_forward_impl(self, input: torch.Tensor, return_embedding: bool):
-        input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
-        input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
-        input = input.view(-1, 1024)
+    def mc_forward_impl(self, input: torch.Tensor, freeze_encoder: bool):
+        with freeze_encoder_context(freeze_encoder):
+            input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
+            input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
+            input = input.view(-1, 1024)
 
-        if not return_embedding:
-            input = F.relu(self.fc1_drop(self.fc1(input)))
-            input = self.fc2(input)
-            input = F.log_softmax(input, dim=1)
+        embedding = input
+        input = F.relu(self.fc1_drop(self.fc1(input)))
+        input = self.fc2(input)
+        input = F.log_softmax(input, dim=1)
 
-        return input
+        return input, embedding
 
 # Cell
 
@@ -68,14 +71,17 @@ class BayesianMNISTCNN_EBM(BayesianModule):
         self.fc1_drop = ConsistentMCDropout()
         self.fc2 = nn.Linear(128, num_classes)
 
-    def mc_forward_impl(self, input: torch.Tensor):
-        input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
-        input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
-        input = input.view(-1, 1024)
+    def mc_forward_impl(self, input: torch.Tensor, freeze_encoder: bool):
+        with freeze_encoder_context(freeze_encoder):
+            input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
+            input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
+            input = input.view(-1, 1024)
+
+        embedding = input
         input = F.relu(self.fc1_drop(self.fc1(input)))
         input = self.fc2(input)
 
-        return input
+        return input, embedding
 
 # Cell
 

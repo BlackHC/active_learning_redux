@@ -18,6 +18,7 @@ from .black_box_model_training import train_with_cosine_annealing, train_with_sc
 from .consistent_mc_dropout import (
     BayesianModule,
     ConsistentMCDropout,
+    freeze_encoder_context
 )
 from .model_optimizer_factory import ModelOptimizer, ModelOptimizerFactory
 
@@ -260,28 +261,30 @@ class BayesianResNet(BayesianModule):
 
         return nn.Sequential(*layers)
 
-    def deterministic_forward_impl(self, x: Tensor, return_embedding: bool):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
+    def deterministic_forward_impl(self, x: Tensor, freeze_encoder: bool):
+        with freeze_encoder_context(freeze_encoder):
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu(x)
+            x = self.maxpool(x)
 
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+            x = self.layer1(x)
+            x = self.layer2(x)
+            x = self.layer3(x)
+            x = self.layer4(x)
 
-        x = self.avgpool(x)
-        x = x.reshape(x.size(0), -1)
-
-        return x
-
-    def mc_forward_impl(self, x: Tensor, return_embedding: bool):
-        if not return_embedding:
-            x = self.fc(x)
-            x = F.log_softmax(x, dim=-1)
+            x = self.avgpool(x)
+            x = x.reshape(x.size(0), -1)
 
         return x
+
+    def mc_forward_impl(self, x: Tensor, freeze_encoder: bool):
+        embedding = x
+
+        x = self.fc(x)
+        x = F.log_softmax(x, dim=-1)
+
+        return x, embedding
 
 
 def _bayesian_resnet(arch, block, layers, cifar_mod, pretrained, progress, **kwargs):
