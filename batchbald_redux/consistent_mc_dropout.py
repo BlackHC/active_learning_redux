@@ -78,103 +78,115 @@ class BayesianModule(Module):
         return input.unsqueeze(1).expand(mc_shape).flatten(0, 1)
 
     @torch.no_grad()
-    def _get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device, storage_device):
-        self.to(device=device)
+    def get_no_dropout_predictions_labels(self, *, loader: data.DataLoader, device, storage_device):
+        return bmodule_get_no_dropout_predictions_labels(self, loader=loader, device=device, storage_device=storage_device)
+        
+    @torch.no_grad()
+    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device, storage_device):
+        return bmodule_get_predictions_labels(self, num_samples=num_samples, loader=loader, device=device, storage_device=storage_device)
+
+# Externalized method so we can easily auto-reload it.
+@torch.no_grad()
+def bmodule_get_no_dropout_predictions_labels(self: BayesianModule, *, loader: data.DataLoader, device, storage_device):
+    self.to(device=device)
+    self.eval()
+
+    N = len(loader.dataset)
+    predictions = None
+    labels = None
+
+    pbar = create_progress_bar(N, tqdm_args=dict(desc="get_no_dropout_predictions_labels", leave=False))
+    pbar.start()
+
+    data_start = 0
+
+    for batch_x, batch_labels in loader:
+        batch_x = batch_x.to(device=device)
+        batch_predictions = self(batch_x, num_samples=0)
+
+        batch_size = len(batch_predictions)
+        data_end = data_start + batch_size
+
+        # Support multi-dim labels.
+        if labels is None:
+            labels_shape = (N, *batch_labels.shape[1:])
+            labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
+        # Support multi-dim predictions.
+        if predictions is None:
+            predictions_shape = (N, *batch_predictions.shape[1:])
+            predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
+
+        predictions[data_start:data_end].copy_(batch_predictions, non_blocking=True)
+        labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
+
+        data_start = data_end
+
+        pbar.update(batch_size)
+
+    pbar.finish()
+
+    return predictions, labels
+
+
+@torch.no_grad()
+def bmodule_get_predictions_labels(self: BayesianModule, *, num_samples: int, loader: data.DataLoader, device, storage_device):
+    assert_no_shuffling_no_augmentations_dataloader(loader)
+
+    if num_samples == 0:
+        return self.get_no_dropout_predictions_labels(loader=loader, device=storage_device)
+
+    self.to(device=device)
+
+    N = len(loader.dataset)
+    predictions = None
+    labels = None
+
+    pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
+    pbar.start()
+
+    @toma.execute.range(0, num_samples, 128)
+    def get_prediction_batch(start, end):
+        nonlocal predictions
+        nonlocal labels
+
+        if start == 0:
+            predictions = None
+            labels = None
+            pbar.reset()
+
         self.eval()
 
-        N = len(loader.dataset)
-        predictions = None
-        labels = None
-
-        pbar = create_progress_bar(N, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-        pbar.start()
+        num_sub_samples = end - start
 
         data_start = 0
-
+        # TODO: ensure that the dataloader is not shuffling!
         for batch_x, batch_labels in loader:
             batch_x = batch_x.to(device=device)
-            batch_predictions = self(batch_x, num_samples=0)
+            batch_predictions = self(batch_x, num_sub_samples)
 
             batch_size = len(batch_predictions)
             data_end = data_start + batch_size
 
+            # Support multi-dim predictions.
+            if predictions is None:
+                predictions_shape = (N, num_samples, *batch_predictions.shape[2:])
+                predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
             # Support multi-dim labels.
             if labels is None:
                 labels_shape = (N, *batch_labels.shape[1:])
                 labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
-            # Support multi-dim predictions.
-            if predictions is None:
-                predictions_shape = (N, *batch_predictions.shape[1:])
-                predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
 
-            predictions[data_start:data_end].copy_(batch_predictions, non_blocking=True)
-            labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
+            predictions[data_start:data_end, start:end].copy_(batch_predictions, non_blocking=True)
+            if start == 0:
+                labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
 
             data_start = data_end
 
-            pbar.update(batch_size)
+            pbar.update(batch_size * num_sub_samples)
 
-        pbar.finish()
+    pbar.finish()
 
-        return predictions, labels
-
-    @torch.no_grad()
-    def get_predictions_labels(self, *, num_samples: int, loader: data.DataLoader, device, storage_device):
-        assert_no_shuffling_no_augmentations_dataloader(loader)
-
-        if num_samples == 0:
-            return self._get_no_dropout_predictions_labels(loader=loader, device=storage_device)
-
-        self.to(device=device)
-
-        N = len(loader.dataset)
-        predictions = None
-        labels = None
-
-        pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-        pbar.start()
-
-        @toma.execute.range(0, num_samples, 128)
-        def get_prediction_batch(start, end):
-            nonlocal predictions
-            nonlocal labels
-
-            if start == 0:
-                pbar.reset()
-
-            self.eval()
-
-            num_sub_samples = end - start
-
-            data_start = 0
-            # TODO: ensure that the dataloader is not shuffling!
-            for batch_x, batch_labels in loader:
-                batch_x = batch_x.to(device=device)
-                batch_predictions = self(batch_x, num_sub_samples)
-
-                batch_size = len(batch_predictions)
-                data_end = data_start + batch_size
-
-                # Support multi-dim predictions.
-                if predictions is None:
-                    predictions_shape = (N, *batch_predictions.shape[1:])
-                    predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
-                # Support multi-dim labels.
-                if labels is None:
-                    labels_shape = (N, *batch_labels.shape[1:])
-                    labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
-
-                predictions[data_start:data_end, start:end].copy_(batch_predictions, non_blocking=True)
-                if start == 0:
-                    labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
-
-                data_start = data_end
-
-                pbar.update(batch_size * num_sub_samples)
-
-        pbar.finish()
-
-        return predictions, labels
+    return predictions, labels
 
 # Cell
 
