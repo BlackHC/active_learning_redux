@@ -208,10 +208,10 @@ def bmodule_get_embeddings(
     N = len(loader.dataset)
     embeddings = None
 
-    pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-    pbar.start()
-
     real_num_samples = max(num_samples, 1)
+
+    pbar = create_progress_bar(N * real_num_samples, tqdm_args=dict(desc="get_embeddings", leave=False))
+    pbar.start()
 
     @toma.execute.range(0, real_num_samples, 128)
     def get_prediction_batch(start, end):
@@ -264,26 +264,20 @@ def bmodule_get_grad_embeddings(
     self.to(device=device)
 
     N = len(loader.dataset)
-    #predictions = None
     grad_embeddings = None
-    #labels = None
-
-    pbar = create_progress_bar(N * num_samples, tqdm_args=dict(desc="get_predictions_labels", leave=False))
-    pbar.start()
-
-    real_num_samples = max(num_samples, 1)
 
     wrapped_loss = multi_sample_loss(loss)
 
+    real_num_samples = max(num_samples, 1)
+
+    pbar = create_progress_bar(N * real_num_samples, tqdm_args=dict(desc="get_grad_embeddings", leave=False))
+    pbar.start()
+
     @toma.execute.range(0, real_num_samples, 128)
     def get_prediction_batch(start, end):
-        #nonlocal predictions
-        #nonlocal labels
         nonlocal grad_embeddings
 
         if start == 0:
-            #predictions = None
-            #labels = None
             grad_embeddings = None
             pbar.reset()
 
@@ -311,14 +305,6 @@ def bmodule_get_grad_embeddings(
             batch_size = len(batch_predictions)
             data_end = data_start + batch_size
 
-            # Support multi-dim predictions.
-            # if predictions is None:
-            #     predictions_shape = (N, real_num_samples, *batch_predictions.shape[2:])
-            #     predictions = torch.empty(predictions_shape, dtype=batch_predictions.dtype, device=storage_device)
-            # Support multi-dim labels.
-            # if labels is None:
-            #     labels_shape = (N, *batch_labels.shape[1:])
-            #     labels = torch.empty(labels_shape, dtype=batch_labels.dtype, device=storage_device)
             if grad_embeddings is None:
                 grad_embedding_shape = grad_embedding_type.get_grad_embedding_shape(
                     N, real_num_samples, batch_embeddings, batch_loss_grad
@@ -326,10 +312,6 @@ def bmodule_get_grad_embeddings(
                 grad_embeddings = torch.empty(
                     grad_embedding_shape, dtype=batch_embeddings.dtype, device=storage_device
                 )
-
-            # predictions[data_start:data_end, start:end].copy_(batch_predictions, non_blocking=True)
-            # if start == 0:
-            #     labels[data_start:data_end].copy_(batch_labels, non_blocking=True)
 
             batch_grad_embedding = grad_embedding_type.get_grad_embedding(batch_embeddings, batch_loss_grad)
             grad_embeddings[data_start:data_end, start:end].copy_(batch_grad_embedding, non_blocking=True)
