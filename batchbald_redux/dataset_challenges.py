@@ -13,7 +13,7 @@ __all__ = ['AliasDataset', 'DatasetIndex', 'get_base_dataset_index', 'get_num_cl
 
 import bisect
 from dataclasses import dataclass
-from typing import List, Optional, Union, Dict, Type
+from typing import List, Optional, Union, Dict, Type, Set
 
 import numpy as np
 import torch
@@ -101,16 +101,18 @@ class AliasDataset(data.Dataset):
     def randomize_labels(self, *, seed: int, num_classes: int = None, device=None):
         return RandomLabelsDataset(self, seed=seed, num_classes=num_classes, device=device)
 
-    def imbalance_dataset_split(
-            self, *, num_classes: int, majority_percentage: int, minority_percentage: int, seed: int
-    ):
-        return ImbalancedClassSplitDataset(
-            self,
-            num_classes=num_classes,
-            majority_percentage=majority_percentage,
-            minority_percentage=minority_percentage,
-            seed=seed,
-        )
+    # def imbalance_dataset_split(
+    #         self, *, num_majority_classes: int, majority_percentage: int, minority_percentage: int, seed: int
+    # ):
+    #     return ImbalancedClassSplitDataset(
+    #         self,
+    #         num_majority_classes=num_majority_classes,
+    #         majority_percentage=majority_percentage,
+    #         minority_percentage=minority_percentage,
+    #         seed=seed,
+    #     )
+    def imbalance_subsample(self, *, minority_classes: Set[int], minority_percentage: float, seed: int):
+        return ImbalancedClassSplitDataset(self, minority_classes=minority_classes, minority_percentage=minority_percentage, seed=seed)
 
     def one_hot(self, *, dtype=None, device=None):
         return OneHotDataset(self, dtype=dtype, device=device)
@@ -411,7 +413,7 @@ class RandomLabelsDataset(ReplaceTargetsDataset):
 
 def get_class_indices_by_class(
     dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator
-) -> Dict[int, int]:
+) -> Dict[int, List[int]]:
     class_counts = list(class_counts)
 
     subset_indices = {label: [] for label in range(len(class_counts))}
@@ -473,29 +475,38 @@ class ImbalancedClassSplitDataset(SubsetAliasDataset):
     options: dict
 
     def __init__(
-        self, dataset: data.Dataset, *, num_classes: int, majority_percentage: int, minority_percentage: int, seed: int
+        self, dataset: data.Dataset, *, minority_classes: Set[int], minority_percentage: float, seed: int
     ):
-        assert (num_classes % 2) == 0
+        num_samples = len(dataset)
+        num_classes = get_num_classes(dataset)
+        assert len(minority_classes) < num_classes
 
-        num_samples_per_class = len(dataset) // num_classes
-        num_samples_majority = num_samples_per_class * majority_percentage // 100
-        num_samples_minority = num_samples_per_class * minority_percentage // 100
+        samples_per_class = num_samples // num_classes
+        class_counts = [
+            int(samples_per_class * minority_percentage / 100) if i in minority_classes else
+            samples_per_class
+            for i in range(num_classes)]
 
+        # num_samples_per_class = len(dataset) // num_classes
+        # num_samples_majority = num_samples_per_class * majority_percentage // 100
+        # num_samples_minority = num_samples_per_class * minority_percentage // 100
+        #
         generator = np.random.default_rng(seed)
 
-        class_counts = [num_samples_majority] * (num_classes // 2) + [num_samples_minority] * (num_classes // 2)
-        class_counts = generator.permuted(class_counts)
+        # class_counts = [num_samples_majority] * num_majority_classes + [num_samples_minority] * (num_classes - num_majority_classes)
+        # class_counts = list(generator.permuted(class_counts))
 
         indices = get_class_indices(dataset, class_counts=class_counts, generator=generator)
 
         options = dict(
-            num_classes=num_classes,
-            majority_percentage=majority_percentage,
+            # num_majority_classes=num_majority_classes,
+            # majority_percentage=majority_percentage,
+            minority_classes=minority_classes,
             minority_percentage=minority_percentage,
             seed=seed,
             class_counts=class_counts,
         )
-        super().__init__(dataset, indices, f"ImbalancedDataset(dataset={dataset}, {options})")
+        super().__init__(dataset, indices, f"ImbalancedClassSplitDataset(dataset={dataset}, {options})")
         self.options = options
 
 # Cell

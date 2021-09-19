@@ -7,26 +7,29 @@ __all__ = ['ActiveLearner', 'UnifiedExperiment', 'configs']
 import dataclasses
 import traceback
 from dataclasses import dataclass
-from typing import Type, Union, Optional
+from typing import Optional, Type, Union
 
 import torch
 import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
-import batchbald_redux.acquisition_functions as acquisition_functions
+from batchbald_redux import acquisition_functions
+from batchbald_redux import baseline_acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
+    EvalDatasetBatchComputer,
     EvalModelBatchComputer,
-    EvalDatasetBatchComputer
 )
 from .black_box_model_training import evaluate
-from .dataset_challenges import (
-    get_base_dataset_index,
-    get_target,
-)
+from .dataset_challenges import get_base_dataset_index, get_target
 from .di import DependencyInjection
-from .experiment_data import ExperimentData, ExperimentDataConfig, OoDDatasetConfig
+from .experiment_data import (
+    ExperimentData,
+    ExperimentDataConfig,
+    OoDDatasetConfig,
+    StandardExperimentDataConfig,
+)
 from .models import MnistModelTrainer
 from .resnet_models import Cifar10ModelTrainer
 from .train_eval_model import (
@@ -36,6 +39,7 @@ from .train_eval_model import (
 from .trained_model import ModelTrainer
 
 # Cell
+
 
 @dataclass
 class ActiveLearner:
@@ -72,7 +76,8 @@ class ActiveLearner:
 
         num_iterations = 0
         max_iterations = int(
-            1.5 * (self.max_training_set - len(data.active_learning.training_dataset)) / self.acquisition_size)
+            1.5 * (self.max_training_set - len(data.active_learning.training_dataset)) / self.acquisition_size
+        )
 
         # Active Training Loop
         while True:
@@ -94,14 +99,22 @@ class ActiveLearner:
             else:
                 loss = validation_loss = torch.nn.NLLLoss()
 
-            trained_model = model_trainer.get_trained(train_loader=train_loader,
-                                                      train_augmentations=data.train_augmentations,
-                                                      validation_loader=validation_loader,
-                                                      log=iteration_log["training"], loss=loss,
-                                                      validation_loss=validation_loss)
+            trained_model = model_trainer.get_trained(
+                train_loader=train_loader,
+                train_augmentations=data.train_augmentations,
+                validation_loader=validation_loader,
+                log=iteration_log["training"],
+                loss=loss,
+                validation_loss=validation_loss,
+            )
 
-            evaluation_metrics = evaluate(model=trained_model, num_samples=self.num_validation_samples,
-                                          loader=test_loader, device=self.device, storage_device="cpu")
+            evaluation_metrics = evaluate(
+                model=trained_model,
+                num_samples=self.num_validation_samples,
+                loader=test_loader,
+                device=self.device,
+                storage_device="cpu",
+            )
             iteration_log["evaluation_metrics"] = evaluation_metrics
             print(f"Perf after training {evaluation_metrics}")
 
@@ -117,10 +130,9 @@ class ActiveLearner:
                 else:
                     eval_loader = pool_loader
 
-                candidate_batch = acquisition_function.compute_candidate_batch(model=trained_model,
-                                                                               pool_loader=pool_loader,
-                                                                               eval_loader=eval_loader,
-                                                                               device=self.device)
+                candidate_batch = acquisition_function.compute_candidate_batch(
+                    model=trained_model, pool_loader=pool_loader, eval_loader=eval_loader, device=self.device
+                )
             elif isinstance(acquisition_function, EvalModelBatchComputer):
                 if len(data.evaluation_dataset) > 0:
                     eval_dataset = data.evaluation_dataset
@@ -136,7 +148,9 @@ class ActiveLearner:
                     validation_loader=validation_loader,
                     trained_model=trained_model,
                     storage_device=data.device,
-                    device=self.device, training_log=iteration_log["eval_training"])
+                    device=self.device,
+                    training_log=iteration_log["eval_training"],
+                )
 
                 candidate_batch = acquisition_function.compute_candidate_batch(
                     trained_model, trained_eval_model, pool_loader, device=self.device
@@ -179,16 +193,7 @@ class ActiveLearner:
 class UnifiedExperiment:
     seed: int
 
-    id_dataset_name: str
-    ood_dataset_name: Optional[str]
-    ood_exposure: bool
-    initial_training_set_size: int = 20
-    validation_set_size: int = 1024
-    evaluation_set_size: int = 1024
-    id_repetitions: float = 1
-    ood_repetitions: float = 1
-    add_dataset_noise: bool = False
-    validation_split_random_state: int = 0
+    experiment_data_config: ExperimentDataConfig
 
     acquisition_size: int = 5
     max_training_set: int = 200
@@ -200,20 +205,14 @@ class UnifiedExperiment:
     num_training_samples: int = 1
 
     device: str = "cuda"
-    acquisition_function: Union[
-        Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
-    ] = acquisition_functions.BALD
+    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = acquisition_functions.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
 
     temperature: float = 0.0
 
     def load_experiment_data(self) -> ExperimentData:
-        di = DependencyInjection(vars(self), [])
-        odc: OoDDatasetConfig = di.create_dataclass_type(
-            OoDDatasetConfig) if self.ood_dataset_name is not None else None
-        edc: ExperimentDataConfig = di.create_dataclass_type(ExperimentDataConfig, ood_dataset_config=odc)
-        return edc.load()
+        return self.experiment_data_config.load(self.device)
 
     # Simple Dependency Injection
     def create_acquisition_function(self):
@@ -241,10 +240,16 @@ class UnifiedExperiment:
         model_trainer = self.create_model_trainer()
         train_eval_model = self.create_train_eval_model()
 
-        active_learner = ActiveLearner(acquisition_size=self.acquisition_size, max_training_set=self.max_training_set,
-                                       num_validation_samples=self.num_validation_samples,
-                                       acquisition_function=acquisition_function, train_eval_model=train_eval_model,
-                                       model_trainer=model_trainer, data=data, device=self.device)
+        active_learner = ActiveLearner(
+            acquisition_size=self.acquisition_size,
+            max_training_set=self.max_training_set,
+            num_validation_samples=self.num_validation_samples,
+            acquisition_function=acquisition_function,
+            train_eval_model=train_eval_model,
+            model_trainer=model_trainer,
+            data=data,
+            device=self.device,
+        )
 
         active_learner(store)
 
@@ -253,13 +258,21 @@ class UnifiedExperiment:
 configs = [
     UnifiedExperiment(
         seed=seed + 1234,
-        ood_exposure=ood_exposure,
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name=id_dataset_name,
+            id_repetitions=1,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=evaluation_set_size,
+            add_dataset_noise=False,
+            ood_dataset_config=OoDDatasetConfig(
+                ood_dataset_name=ood_dataset_name, ood_repetitions=1, ood_exposure=ood_exposure
+            ),
+        ),
         acquisition_function=acquisition_function,
         acquisition_size=5,
         num_pool_samples=num_pool_samples,
-        evaluation_set_size=evaluation_set_size,
-        id_dataset_name=id_dataset_name,
-        ood_dataset_name=ood_dataset_name,
     )
     for seed in range(3)
     for acquisition_function in [acquisition_functions.BatchEvalBALD, acquisition_functions.BatchBALD]

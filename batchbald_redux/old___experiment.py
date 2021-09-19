@@ -30,7 +30,7 @@ from .dataset_challenges import (
 )
 from .di import DependencyInjection
 from .models import MnistModelTrainer
-from .experiment_data import ExperimentData, ExperimentDataConfig
+from .experiment_data import ExperimentData, StandardExperimentDataConfig
 
 # Cell
 
@@ -69,14 +69,14 @@ class Experiment:
     temperature: float = 0.0
 
     def load_dataset(self) -> (ActiveLearningData, Dataset, Dataset):
-        experiment_data_config = ExperimentDataConfig(id_dataset_name="MNIST",
-                                                      id_repetitions=self.repeated_mnist_repetitions,
-                                                      initial_training_set_size=self.initial_set_size,
-                                                      evaluation_set_size=0,
-                                                      validation_split_random_state=0,
-                                                      validation_set_size=self.validation_set_size,
-                                                      add_dataset_noise=self.add_dataset_noise, ood_dataset_config=None,
-                                                      device=self.device)
+        experiment_data_config = StandardExperimentDataConfig(id_dataset_name="MNIST",
+                                                              id_repetitions=self.repeated_mnist_repetitions,
+                                                              initial_training_set_size=self.initial_set_size,
+                                                              evaluation_set_size=0,
+                                                              validation_split_random_state=0,
+                                                              validation_set_size=self.validation_set_size,
+                                                              add_dataset_noise=self.add_dataset_noise, ood_dataset_config=None,
+                                                              device=self.device)
         experiment_data = experiment_data_config.load()
 
         return experiment_data.active_learning, experiment_data.validation_dataset, experiment_data.test_dataset

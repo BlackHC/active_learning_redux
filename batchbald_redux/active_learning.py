@@ -94,6 +94,10 @@ class ActiveLearningData:
         self.remove_base_indices(base_indices)
         return data.Subset(self.base_dataset, base_indices)
 
+
+    def __repr__(self):
+        return f"ActiveLearningData(base_dataset={self.base_dataset}, num_training_samples={len(self.training_dataset)}, num_pool_samples={len(self.pool_dataset)})"
+
 # Cell
 
 

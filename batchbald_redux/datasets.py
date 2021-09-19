@@ -29,9 +29,9 @@ class SplitDataset:
     num_classes: int
     options: dict
 
-    train: data.Dataset
-    validation: data.Dataset
-    test: data.Dataset
+    train: NamedDataset
+    validation: NamedDataset
+    test: NamedDataset
 
     train_augmentations: nn.Sequential
     device: str
@@ -306,7 +306,7 @@ def get_dataset(
     validation_split_random_state=0,
     normalize_like_cifar10=False,
     device_hint=None
-):
+) -> SplitDataset:
     root = root if root is not None else "./"
     validation_set_size = validation_set_size if validation_set_size is not None else 0
     validation_split_random_state = validation_split_random_state if validation_split_random_state is not None else 0

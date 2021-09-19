@@ -11,7 +11,9 @@ from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
 from batchbald_redux import acquisition_functions
+from batchbald_redux import baseline_acquisition_functions
 from .unified_experiment import UnifiedExperiment
+from .experiment_data import StandardExperimentDataConfig
 
 from .models import MnistModelTrainer
 
@@ -19,26 +21,30 @@ from .models import MnistModelTrainer
 
 configs = [
     UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=id_repetitions > 1,
+            ood_dataset_config=None,
+        ),
         seed=seed + 8945,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        initial_training_set_size=20,
-        evaluation_set_size=0,
         max_training_set=120,
-        id_dataset_name="MNIST",
-        ood_dataset_name=None,
-        ood_exposure=False,
-        id_repetitions=id_repetitions,
-        add_dataset_noise=True,
         model_trainer_factory=MnistModelTrainer
     )
-    for seed in range(5)
     for acquisition_function in [
+        baseline_acquisition_functions.BADGE,
         acquisition_functions.EPIG,
         acquisition_functions.EvalBALD,
         acquisition_functions.BALD,
     ]
+    for seed in range(5)
     for acquisition_size in [1]
     for num_pool_samples in [100]
     for id_repetitions in [1]
