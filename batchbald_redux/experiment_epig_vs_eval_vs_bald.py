@@ -40,6 +40,32 @@ configs = [
     )
     for acquisition_function in [
         baseline_acquisition_functions.BADGE,
+    ]
+    for seed in range(5)
+    for acquisition_size in [2, 5, 20]
+    for num_pool_samples in [100]
+    for id_repetitions in [1]
+] + [
+    UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=id_repetitions > 1,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 8945,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=120,
+        model_trainer_factory=MnistModelTrainer
+    )
+    for acquisition_function in [
+        baseline_acquisition_functions.BADGE,
         acquisition_functions.EPIG,
         acquisition_functions.EvalBALD,
         acquisition_functions.BALD,
