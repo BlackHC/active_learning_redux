@@ -23,10 +23,10 @@ from .unified_experiment import UnifiedExperiment
 configs = [
     UnifiedExperiment(
         experiment_data_config=OODClassesDistributionExperimentDataConfig(dataset_name="CIFAR-10", repetitions=1,
-                                                                          initial_training_set_size=400,
-                                                                          validation_set_size=4096,
+                                                                          initial_training_set_size=40,
+                                                                          validation_set_size=4000,
                                                                           validation_split_random_state=0,
-                                                                          evaluation_set_size=0,
+                                                                          evaluation_set_size=4000,
                                                                           add_dataset_noise=False,
                                                                           ood_exposure=ood_exposure, ood_repetitions=1,
                                                                           ood_classes={2, 3, 4, 5, 6, 7}),
@@ -34,7 +34,7 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=14000,
+        max_training_set=15000,
     )
     for seed in range(5)
     for acquisition_function in [
@@ -44,7 +44,7 @@ configs = [
         baseline_acquisition_functions.BADGE,
         acquisition_functions.Random
     ]
-    for acquisition_size in [1000]
+    for acquisition_size in [800]
     for num_pool_samples in [50]
     for ood_exposure in [False, True]
 ]
