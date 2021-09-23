@@ -19,13 +19,13 @@ from .unified_experiment import UnifiedExperiment
 
 configs = [
     UnifiedExperiment(
-        experiment_data_config=StandardExperimentDataConfig(id_dataset_name="CIFAR-10", id_repetitions=1,
+        experiment_data_config=StandardExperimentDataConfig(id_dataset_name=id_dataset, id_repetitions=1,
                                                                           initial_training_set_size=100,
                                                                           validation_set_size=4000,
                                                                           validation_split_random_state=0,
                                                                           evaluation_set_size=4000,
                                                                           add_dataset_noise=False,
-                                                                          ood_dataset_config=OoDDatasetConfig(ood_dataset_name="SVHN", ood_repetitions=1, ood_exposure=ood_exposure)
+                                                                          ood_dataset_config=OoDDatasetConfig(ood_dataset_name=ood_dataset, ood_repetitions=1, ood_exposure=ood_exposure)
                                                                           ),
         seed=seed + 4658,
         acquisition_function=acquisition_function,
