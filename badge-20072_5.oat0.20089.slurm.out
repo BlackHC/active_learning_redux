@@ -1,0 +1,2308 @@
+-m batchbald_redux.experiment_epig_vs_eval_vs_bald --id=%SLURM_ARRAY_TASK_ID
+SBATCH node: oat0.cs.ox.ac.uk
++ . /users/andsch/github/hello-slurm/bin/../include/oatcloud/_sbatch_config.sh
+++ export PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export LOCAL_SCRATCH=/scratch-ssd/andsch
+++ LOCAL_SCRATCH=/scratch-ssd/andsch
+++ export CONDA_PKGS_DIRS=/scratch-ssd/andsch/conda_pkgs_cache
+++ CONDA_PKGS_DIRS=/scratch-ssd/andsch/conda_pkgs_cache
+++ export TMPDIR=/scratch-ssd/andsch/tmp
+++ TMPDIR=/scratch-ssd/andsch/tmp
+++ mkdir -p /scratch-ssd/andsch/tmp
+++ export CONDA_ENVS_PATH=/scratch-ssd/andsch/tmp/conda_envs
+++ CONDA_ENVS_PATH=/scratch-ssd/andsch/tmp/conda_envs
+++ export FASTAI_HOME=/scratch-ssd/andsch/.fastai
+++ FASTAI_HOME=/scratch-ssd/andsch/.fastai
++ export PYTHON_VERSION=3.8
++ PYTHON_VERSION=3.8
++ export CURRENT_CONDA_ENV_PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++ CURRENT_CONDA_ENV_PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++ trap cleanup EXIT
++ ARGS=("${@//%SLURM_ARRAY_TASK_ID/$SLURM_ARRAY_TASK_ID}")
++ /users/andsch/github/hello-slurm/bin/../include/_run_locked.sh /users/andsch/github/hello-slurm/bin/../include/_setup.sh
+Waiting for lock /scratch-ssd/andsch/tmp/run_locked_andsch at Sun Sep 19 23:59:34 BST 2021
+(will force acquire the lock in 3 minutes)
+/usr/bin/lockfile
+Lock acquired at Sun Sep 19 23:59:34 BST 2021
+Node oat0.cs.ox.ac.uk
++ . /users/andsch/github/hello-slurm/bin/../include/oatcloud/_setup_config.sh
+++ mkdir -p /scratch-ssd/andsch/tmp
+++ /users/andsch/github/hello-slurm/bin/../include/oatcloud/mount_scratch.sh
++ export BUILD_DIR=/scratch-ssd/andsch/tmp/pip-build
++ BUILD_DIR=/scratch-ssd/andsch/tmp/pip-build
++ conda config --add channels conda-forge
+Warning: 'conda-forge' already in 'channels' list, moving to the top
++ conda config --set channel_priority flexible
++ conda create -q -y -p /scratch-ssd/andsch/tmp/conda_envs/job-20089 python=3.8
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /scratch-ssd/andsch/tmp/conda_envs/job-20089
+
+  added / updated specs:
+    - python=3.8
+
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      conda-forge/linux-64::_libgcc_mutex-0.1-conda_forge
+  _openmp_mutex      conda-forge/linux-64::_openmp_mutex-4.5-1_gnu
+  ca-certificates    conda-forge/linux-64::ca-certificates-2021.5.30-ha878542_0
+  ld_impl_linux-64   conda-forge/linux-64::ld_impl_linux-64-2.36.1-hea4e1c9_2
+  libffi             conda-forge/linux-64::libffi-3.4.2-h9c3ff4c_1
+  libgcc-ng          conda-forge/linux-64::libgcc-ng-11.2.0-h1d223b6_8
+  libgomp            conda-forge/linux-64::libgomp-11.2.0-h1d223b6_8
+  libstdcxx-ng       conda-forge/linux-64::libstdcxx-ng-11.2.0-he4da1e4_8
+  ncurses            conda-forge/linux-64::ncurses-6.2-h58526e2_4
+  openssl            conda-forge/linux-64::openssl-1.1.1l-h7f98852_0
+  pip                conda-forge/noarch::pip-21.2.4-pyhd8ed1ab_0
+  python             conda-forge/linux-64::python-3.8.12-hb7a2778_0_cpython
+  python_abi         conda-forge/linux-64::python_abi-3.8-2_cp38
+  readline           conda-forge/linux-64::readline-8.1-h46c0cb4_0
+  setuptools         conda-forge/linux-64::setuptools-58.0.4-py38h578d9bd_0
+  sqlite             conda-forge/linux-64::sqlite-3.36.0-h9cd32fc_1
+  tk                 conda-forge/linux-64::tk-8.6.11-h27826a3_1
+  wheel              conda-forge/noarch::wheel-0.37.0-pyhd8ed1ab_1
+  xz                 conda-forge/linux-64::xz-5.2.5-h516909a_1
+  zlib               conda-forge/linux-64::zlib-1.2.11-h516909a_1010
+
+
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
++ source activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ _CONDA_ROOT=/scratch-ssd/oatml/miniconda3
+++ . /scratch-ssd/oatml/miniconda3/etc/profile.d/conda.sh
++++ export CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ '[' -z x ']'
+++ conda activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ '[' 2 -lt 1 ']'
+++ local cmd=activate
+++ shift
+++ case "$cmd" in
+++ __conda_activate activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ '[' -n '' ']'
+++ local cmd=activate
+++ shift
+++ local ask_conda
+++ CONDA_INTERNAL_OLDPATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ __add_sys_prefix_to_path
+++ '[' -n '' ']'
++++ dirname /scratch-ssd/oatml/miniconda3/bin/conda
+++ SYSP=/scratch-ssd/oatml/miniconda3/bin
++++ dirname /scratch-ssd/oatml/miniconda3/bin
+++ SYSP=/scratch-ssd/oatml/miniconda3
+++ '[' -n '' ']'
+++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
++++ PS1=
++++ /scratch-ssd/oatml/miniconda3/bin/conda shell.posix activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ ask_conda='PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_PREFIX='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export CONDA_EXE='\''/scratch-ssd/oatml/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/scratch-ssd/oatml/miniconda3/bin/python'\''
+export CONDA_PREFIX_1='\''/scratch-ssd/oatml/miniconda3'\'''
+++ rc=0
+++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ eval 'PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_PREFIX='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export CONDA_EXE='\''/scratch-ssd/oatml/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/scratch-ssd/oatml/miniconda3/bin/python'\''
+export CONDA_PREFIX_1='\''/scratch-ssd/oatml/miniconda3'\'''
++++ PS1='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ export PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++++ PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++++ export CONDA_PREFIX=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ CONDA_PREFIX=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ export CONDA_SHLVL=2
++++ CONDA_SHLVL=2
++++ export CONDA_DEFAULT_ENV=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ CONDA_DEFAULT_ENV=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ export 'CONDA_PROMPT_MODIFIER=(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ CONDA_PROMPT_MODIFIER='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ export CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ export CONDA_PREFIX_1=/scratch-ssd/oatml/miniconda3
++++ CONDA_PREFIX_1=/scratch-ssd/oatml/miniconda3
+++ '[' 0 '!=' 0 ']'
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
++ : slurm-conda.yml
++ : _setup.sh
++ test -f _setup.sh
++ test -f slurm-conda.yml
++ conda install -y pytorch=1.8.1 torchvision cudatoolkit=10.2 ignite -c pytorch
++ '[' 8 -lt 1 ']'
++ local cmd=install
++ shift
++ case "$cmd" in
++ CONDA_INTERNAL_OLDPATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ __add_sys_prefix_to_path
++ '[' -n '' ']'
+++ dirname /scratch-ssd/oatml/miniconda3/bin/conda
++ SYSP=/scratch-ssd/oatml/miniconda3/bin
+++ dirname /scratch-ssd/oatml/miniconda3/bin
++ SYSP=/scratch-ssd/oatml/miniconda3
++ '[' -n '' ']'
++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH
++ /scratch-ssd/oatml/miniconda3/bin/conda install -y pytorch=1.8.1 torchvision cudatoolkit=10.2 ignite -c pytorch
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.9.2
+  latest version: 4.10.3
+
+Please update conda by running
+
+    $ conda update -n base -c defaults conda
+
+
+
+## Package Plan ##
+
+  environment location: /scratch-ssd/andsch/tmp/conda_envs/job-20089
+
+  added / updated specs:
+    - cudatoolkit=10.2
+    - ignite
+    - pytorch=1.8.1
+    - torchvision
+
+
+The following NEW packages will be INSTALLED:
+
+  blas               pkgs/main/linux-64::blas-1.0-mkl
+  bzip2              conda-forge/linux-64::bzip2-1.0.8-h7f98852_4
+  cudatoolkit        conda-forge/linux-64::cudatoolkit-10.2.89-h8f6ccaa_8
+  ffmpeg             pytorch/linux-64::ffmpeg-4.3-hf484d3e_0
+  freetype           conda-forge/linux-64::freetype-2.10.4-h0708190_1
+  gmp                conda-forge/linux-64::gmp-6.2.1-h58526e2_0
+  gnutls             conda-forge/linux-64::gnutls-3.6.13-h85f3911_1
+  ignite             pytorch/noarch::ignite-0.4.6-py_0
+  intel-openmp       pkgs/main/linux-64::intel-openmp-2021.3.0-h06a4308_3350
+  jpeg               pkgs/main/linux-64::jpeg-9b-h024ee3a_2
+  lame               conda-forge/linux-64::lame-3.100-h7f98852_1001
+  lcms2              pkgs/main/linux-64::lcms2-2.12-h3be6417_0
+  libiconv           conda-forge/linux-64::libiconv-1.16-h516909a_0
+  libpng             conda-forge/linux-64::libpng-1.6.37-h21135ba_2
+  libtiff            pkgs/main/linux-64::libtiff-4.2.0-h85742a9_0
+  libuv              conda-forge/linux-64::libuv-1.42.0-h7f98852_0
+  libwebp-base       conda-forge/linux-64::libwebp-base-1.2.1-h7f98852_0
+  lz4-c              conda-forge/linux-64::lz4-c-1.9.3-h9c3ff4c_1
+  mkl                pkgs/main/linux-64::mkl-2021.3.0-h06a4308_520
+  mkl-service        conda-forge/linux-64::mkl-service-2.4.0-py38h497a2fe_0
+  mkl_fft            pkgs/main/linux-64::mkl_fft-1.3.0-py38h42c9631_2
+  mkl_random         conda-forge/linux-64::mkl_random-1.2.2-py38h1abd341_0
+  nettle             conda-forge/linux-64::nettle-3.6-he412f7d_0
+  ninja              conda-forge/linux-64::ninja-1.10.2-h4bd325d_0
+  numpy              pkgs/main/linux-64::numpy-1.20.3-py38hf144106_0
+  numpy-base         pkgs/main/linux-64::numpy-base-1.20.3-py38h74d4b33_0
+  olefile            conda-forge/noarch::olefile-0.46-pyh9f0ad1d_1
+  openh264           conda-forge/linux-64::openh264-2.1.1-h780b84a_0
+  openjpeg           conda-forge/linux-64::openjpeg-2.4.0-hb52868f_1
+  pillow             pkgs/main/linux-64::pillow-8.3.1-py38h2c7a002_0
+  pytorch            pytorch/linux-64::pytorch-1.8.1-py3.8_cuda10.2_cudnn7.6.5_0
+  six                conda-forge/noarch::six-1.16.0-pyh6c4a22f_0
+  torchvision        pytorch/linux-64::torchvision-0.9.1-py38_cu102
+  typing_extensions  conda-forge/noarch::typing_extensions-3.10.0.0-pyha770c72_0
+  zstd               conda-forge/linux-64::zstd-1.4.9-ha95c52a_0
+
+
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... By downloading and using the CUDA Toolkit conda packages, you accept the terms and conditions of the CUDA End User License Agreement (EULA): https://docs.nvidia.com/cuda/eula/index.html
+
+done
++ local t1=0
++ PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ '[' 0 = 0 ']'
++ __conda_reactivate
++ local ask_conda
++ CONDA_INTERNAL_OLDPATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ __add_sys_prefix_to_path
++ '[' -n '' ']'
+++ dirname /scratch-ssd/oatml/miniconda3/bin/conda
++ SYSP=/scratch-ssd/oatml/miniconda3/bin
+++ dirname /scratch-ssd/oatml/miniconda3/bin
++ SYSP=/scratch-ssd/oatml/miniconda3
++ '[' -n '' ']'
++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH
+++ PS1='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
+++ /scratch-ssd/oatml/miniconda3/bin/conda shell.posix reactivate
++ ask_conda='PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\'''
++ PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ eval 'PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\'''
+++ PS1='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
+++ export PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export CONDA_SHLVL=2
+++ CONDA_SHLVL=2
+++ export 'CONDA_PROMPT_MODIFIER=(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
+++ CONDA_PROMPT_MODIFIER='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ test -f setup.py
++ pip install -e .
+Obtaining file:///auto/users/andsch/github/active_learning_redux
+Requirement already satisfied: torch in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from batchbald-redux==2.0.1) (1.8.1)
+Requirement already satisfied: torchvision in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from batchbald-redux==2.0.1) (0.9.1)
+Requirement already satisfied: numpy in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from batchbald-redux==2.0.1) (1.20.3)
+Collecting blackhc.progress-bar~=1.1
+  Using cached blackhc.progress_bar-1.1.0-py3-none-any.whl (5.4 kB)
+Collecting blackhc.project~=2.4
+  Using cached blackhc.project-2.4.0-py3-none-any.whl (9.2 kB)
+Collecting toma<2
+  Using cached toma-1.1.0-py3-none-any.whl (9.6 kB)
+Collecting laaos~=2.1.1
+  Using cached laaos-2.1.1-py3-none-any.whl (7.8 kB)
+Collecting pynvml
+  Using cached pynvml-11.0.0-py3-none-any.whl (46 kB)
+Collecting fastcore
+  Using cached fastcore-1.3.26-py3-none-any.whl (56 kB)
+Collecting sklearn
+  Using cached sklearn-0.0-py2.py3-none-any.whl
+Collecting kornia
+  Using cached kornia-0.5.11-py2.py3-none-any.whl (336 kB)
+Collecting tqdm
+  Using cached tqdm-4.62.2-py2.py3-none-any.whl (76 kB)
+Collecting fs.sshfs
+  Using cached fs.sshfs-1.0.0-py2.py3-none-any.whl (23 kB)
+Collecting gitpython
+  Using cached GitPython-3.1.24-py3-none-any.whl (180 kB)
+Collecting psutil
+  Using cached psutil-5.8.0-cp38-cp38-manylinux2010_x86_64.whl (296 kB)
+Collecting packaging
+  Using cached packaging-21.0-py3-none-any.whl (40 kB)
+Requirement already satisfied: pip in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from fastcore->batchbald-redux==2.0.1) (21.2.4)
+Collecting paramiko~=2.0
+  Using cached paramiko-2.7.2-py2.py3-none-any.whl (206 kB)
+Collecting fs~=2.2
+  Using cached fs-2.4.13-py2.py3-none-any.whl (131 kB)
+Requirement already satisfied: setuptools>=38.3.0 in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from fs.sshfs->blackhc.project~=2.4->batchbald-redux==2.0.1) (58.0.4)
+Collecting property-cached~=1.6
+  Using cached property_cached-1.6.4-py2.py3-none-any.whl (7.8 kB)
+Requirement already satisfied: six~=1.10 in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from fs.sshfs->blackhc.project~=2.4->batchbald-redux==2.0.1) (1.16.0)
+Collecting pytz
+  Using cached pytz-2021.1-py2.py3-none-any.whl (510 kB)
+Collecting appdirs~=1.4.3
+  Using cached appdirs-1.4.4-py2.py3-none-any.whl (9.6 kB)
+Collecting cryptography>=2.5
+  Using cached cryptography-3.4.8-cp36-abi3-manylinux_2_24_x86_64.whl (3.0 MB)
+Collecting bcrypt>=3.1.3
+  Using cached bcrypt-3.2.0-cp36-abi3-manylinux2010_x86_64.whl (63 kB)
+Collecting pynacl>=1.0.1
+  Using cached PyNaCl-1.4.0-cp35-abi3-manylinux1_x86_64.whl (961 kB)
+Collecting cffi>=1.1
+  Using cached cffi-1.14.6-cp38-cp38-manylinux1_x86_64.whl (411 kB)
+Collecting pycparser
+  Using cached pycparser-2.20-py2.py3-none-any.whl (112 kB)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from gitpython->blackhc.project~=2.4->batchbald-redux==2.0.1) (3.10.0.0)
+Collecting gitdb<5,>=4.0.1
+  Using cached gitdb-4.0.7-py3-none-any.whl (63 kB)
+Collecting smmap<5,>=3.0.1
+  Using cached smmap-4.0.0-py2.py3-none-any.whl (24 kB)
+Collecting pyparsing>=2.0.2
+  Using cached pyparsing-2.4.7-py2.py3-none-any.whl (67 kB)
+Collecting scikit-learn
+  Using cached scikit_learn-0.24.2-cp38-cp38-manylinux2010_x86_64.whl (24.9 MB)
+Collecting joblib>=0.11
+  Using cached joblib-1.0.1-py3-none-any.whl (303 kB)
+Collecting scipy>=0.19.1
+  Using cached scipy-1.7.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl (28.4 MB)
+Collecting threadpoolctl>=2.0.0
+  Using cached threadpoolctl-2.2.0-py3-none-any.whl (12 kB)
+Requirement already satisfied: pillow>=4.1.1 in /scratch-ssd/andsch/tmp/conda_envs/job-20089/lib/python3.8/site-packages (from torchvision->batchbald-redux==2.0.1) (8.3.1)
+Installing collected packages: pycparser, cffi, smmap, pytz, pynacl, cryptography, bcrypt, appdirs, threadpoolctl, scipy, pyparsing, property-cached, paramiko, joblib, gitdb, fs, tqdm, scikit-learn, psutil, packaging, laaos, gitpython, fs.sshfs, toma, sklearn, pynvml, kornia, fastcore, blackhc.project, blackhc.progress-bar, batchbald-redux
+  Running setup.py develop for batchbald-redux
+Successfully installed appdirs-1.4.4 batchbald-redux-2.0.1 bcrypt-3.2.0 blackhc.progress-bar-1.1.0 blackhc.project-2.4.0 cffi-1.14.6 cryptography-3.4.8 fastcore-1.3.26 fs-2.4.13 fs.sshfs-1.0.0 gitdb-4.0.7 gitpython-3.1.24 joblib-1.0.1 kornia-0.5.11 laaos-2.1.1 packaging-21.0 paramiko-2.7.2 property-cached-1.6.4 psutil-5.8.0 pycparser-2.20 pynacl-1.4.0 pynvml-11.0.0 pyparsing-2.4.7 pytz-2021.1 scikit-learn-0.24.2 scipy-1.7.1 sklearn-0.0 smmap-4.0.0 threadpoolctl-2.2.0 toma-1.1.0 tqdm-4.62.2
+Lock released at Mon Sep 20 00:00:01 BST 2021
++ /users/andsch/github/hello-slurm/bin/../include/_run_experiment.sh -m batchbald_redux.experiment_epig_vs_eval_vs_bald --id=5
+Node oat0.cs.ox.ac.uk
++ source activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ _CONDA_ROOT=/scratch-ssd/oatml/miniconda3
+++ . /scratch-ssd/oatml/miniconda3/etc/profile.d/conda.sh
++++ export CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ '[' -z x ']'
+++ conda activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ '[' 2 -lt 1 ']'
+++ local cmd=activate
+++ shift
+++ case "$cmd" in
+++ __conda_activate activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ '[' -n '' ']'
+++ local cmd=activate
+++ shift
+++ local ask_conda
+++ CONDA_INTERNAL_OLDPATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ __add_sys_prefix_to_path
+++ '[' -n '' ']'
++++ dirname /scratch-ssd/oatml/miniconda3/bin/conda
+++ SYSP=/scratch-ssd/oatml/miniconda3/bin
++++ dirname /scratch-ssd/oatml/miniconda3/bin
+++ SYSP=/scratch-ssd/oatml/miniconda3
+++ '[' -n '' ']'
+++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
++++ PS1=
++++ /scratch-ssd/oatml/miniconda3/bin/conda shell.posix activate /scratch-ssd/andsch/tmp/conda_envs/job-20089
+++ ask_conda='PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_PREFIX='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export CONDA_EXE='\''/scratch-ssd/oatml/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/scratch-ssd/oatml/miniconda3/bin/python'\''
+export CONDA_PREFIX_1='\''/scratch-ssd/oatml/miniconda3'\'''
+++ rc=0
+++ PATH=/scratch-ssd/oatml/miniconda3/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ eval 'PS1='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export PATH='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'\''
+export CONDA_PREFIX='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''/scratch-ssd/andsch/tmp/conda_envs/job-20089'\''
+export CONDA_PROMPT_MODIFIER='\''(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '\''
+export CONDA_EXE='\''/scratch-ssd/oatml/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/scratch-ssd/oatml/miniconda3/bin/python'\''
+export CONDA_PREFIX_1='\''/scratch-ssd/oatml/miniconda3'\'''
++++ PS1='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ export PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++++ PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089/bin:/scratch-ssd/oatml/miniconda3/bin:/users/andsch/github/hello-slurm/bin:/users/andsch/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++++ export CONDA_PREFIX=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ CONDA_PREFIX=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ export CONDA_SHLVL=2
++++ CONDA_SHLVL=2
++++ export CONDA_DEFAULT_ENV=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ CONDA_DEFAULT_ENV=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++++ export 'CONDA_PROMPT_MODIFIER=(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ CONDA_PROMPT_MODIFIER='(/scratch-ssd/andsch/tmp/conda_envs/job-20089) '
++++ export CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ CONDA_EXE=/scratch-ssd/oatml/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/scratch-ssd/oatml/miniconda3/bin/python
++++ export CONDA_PREFIX_1=/scratch-ssd/oatml/miniconda3
++++ CONDA_PREFIX_1=/scratch-ssd/oatml/miniconda3
+++ '[' 0 '!=' 0 ']'
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
++ python -m batchbald_redux.experiment_epig_vs_eval_vs_bald --id=5
+Appended /auto/users/andsch/github/active_learning_redux/src to paths
+Switched to directory /auto/users/andsch/github/active_learning_redux
+Command line:
+/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_epig_vs_eval_vs_bald.py|--id=5
+GitHub URL: d0ee3cee4c19828e8417095b19463259ccd655a5
+Commit: d0ee3cee4c19828e8417095b19463259ccd655a5
+Results stored in /auto/users/andsch/github/active_learning_redux/batchbald_redux/results/experiment_epig_vs_eval_vs_bald_job_5_2021-09-20-000002.py
+Job id: 5/35
+Worker id: 5/35
+UnifiedExperiment(seed=8951, experiment_data_config=StandardExperimentDataConfig(id_dataset_name='MNIST', id_repetitions=1, initial_training_set_size=20, validation_set_size=4096, validation_split_random_state=0, evaluation_set_size=0, add_dataset_noise=False, ood_dataset_config=None), acquisition_size=20, max_training_set=120, max_training_epochs=300, num_pool_samples=100, num_validation_samples=20, num_training_samples=1, device='cuda', acquisition_function=<class 'batchbald_redux.baseline_acquisition_functions.BADGE'>, train_eval_model=<class 'batchbald_redux.train_eval_model.TrainSelfDistillationEvalModel'>, model_trainer_factory=<class 'batchbald_redux.models.MnistModelTrainer'>, temperature=0.0)
+Creating: BADGE(
+	acquisition_size=20
+)
+Creating: MnistModelTrainer(
+	device=cuda,
+	num_training_samples=1,
+	num_validation_samples=20,
+	max_training_epochs=300
+)
+Creating: TrainSelfDistillationEvalModel(
+	num_pool_samples=100
+)
+Training set size 20:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+27.18it/s total: 0.59s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.65it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.89it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.63it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.89it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.98it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.42it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.09it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.26it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.14it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.13it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+45.94it/s total: 0.35s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.08it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.38it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.01it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+45.74it/s total: 0.35s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.11it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.30it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.16it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.59it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.57it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.03it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.11it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.77it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.14it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.18it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.99it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.05it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.09it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.12it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.13it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.49it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.70it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.70849609375)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.48it/s total: 0.34s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   1s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+324223.20it/s total: 0.62s
+Perf after training {'accuracy': 0.7151, 'crossentropy': tensor(1.1285)}
+55884 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   1s|0s   <   1s|1s   <   1s|1s   <   0s|1s   <   0s|1s   <   0s|2s   <   0s|2s   <   0s|
+24113.62it/s total: 2.32s
+#Samps	Total Distance
+1	7837491.590766907
+2	6699926.704457119
+3	6354521.173226193
+4	5644139.684733227
+5	5290483.115444973
+6	4875312.137167767
+7	4665524.033352688
+8	4319754.764686258
+9	4302980.809964807
+10	4285144.970210702
+11	4166345.2283621514
+12	3637982.0078879083
+13	3635718.282969543
+14	3524555.9852371556
+15	3513421.0169792515
+16	3186028.6800995213
+17	3168516.556301151
+18	3166742.3039856297
+19	3162888.987930332
+CandidateBatch(scores=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], indices=[41400, 49236, 5716, 49124, 22376, 39965, 811, 41512, 5268, 1340, 8173, 20189, 34372, 4332, 25915, 27914, 5571, 31327, 29112, 17451])
+[('id', 41418), ('id', 49256), ('id', 5718), ('id', 49144), ('id', 22383), ('id', 39982), ('id', 811), ('id', 41530), ('id', 5270), ('id', 1340), ('id', 8175), ('id', 20195), ('id', 34388), ('id', 4333), ('id', 25926), ('id', 27927), ('id', 5573), ('id', 31341), ('id', 29125), ('id', 17456)]
+Acquiring (label, score)s: 0 (0.0), 8 (0.0), 4 (0.0), 9 (0.0), 7 (0.0), 7 (0.0), 2 (0.0), 5 (0.0), 3 (0.0), 3 (0.0), 0 (0.0), 8 (0.0), 3 (0.0), 1 (0.0), 4 (0.0), 6 (0.0), 0 (0.0), 5 (0.0), 2 (0.0), 4 (0.0)
+Training set size 40:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+42.69it/s total: 0.37s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.04it/s total: 0.35s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.37it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.54it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.74it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.63it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.80it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.74it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.94it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.33it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.26it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.20it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.21it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.18it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.19it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.12it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.28it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.23it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.43it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.40it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.89it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.21it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.85it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.53it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.93it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.79it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.78173828125)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.75it/s total: 0.34s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+374114.28it/s total: 0.53s
+Perf after training {'accuracy': 0.7761, 'crossentropy': tensor(0.7676)}
+55864 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   1s|0s   <   1s|1s   <   1s|1s   <   0s|1s   <   0s|1s   <   0s|2s   <   0s|2s   <   0s|
+24598.89it/s total: 2.27s
+#Samps	Total Distance
+1	6897147.956752777
+2	5452612.293506622
+3	5210744.7634391785
+4	5116014.903259277
+5	5073394.004526138
+6	4874804.205493927
+7	4337244.0505867
+8	4335998.796815872
+9	4035813.943488819
+10	3784187.1555440254
+11	3456348.6921937293
+12	3205500.8823983497
+13	2946006.7936742133
+14	2926242.7804353065
+15	2825441.22160886
+16	2803020.2233693427
+17	2770164.0077531165
+18	2761767.2632462806
+19	2750993.0689367903
+CandidateBatch(scores=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], indices=[40413, 14586, 39577, 5285, 21610, 5496, 7434, 35597, 48799, 5790, 9915, 10038, 27982, 12459, 31750, 16965, 27027, 45759, 22599, 292])
+[('id', 40446), ('id', 14597), ('id', 39609), ('id', 5291), ('id', 21626), ('id', 5502), ('id', 7442), ('id', 35629), ('id', 48837), ('id', 5798), ('id', 9924), ('id', 10047), ('id', 28007), ('id', 12470), ('id', 31778), ('id', 16976), ('id', 27050), ('id', 45796), ('id', 22616), ('id', 292)]
+Acquiring (label, score)s: 0 (0.0), 2 (0.0), 4 (0.0), 6 (0.0), 0 (0.0), 5 (0.0), 9 (0.0), 0 (0.0), 7 (0.0), 8 (0.0), 3 (0.0), 3 (0.0), 0 (0.0), 8 (0.0), 9 (0.0), 0 (0.0), 5 (0.0), 8 (0.0), 7 (0.0), 2 (0.0)
+Training set size 60:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+43.76it/s total: 0.37s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.69it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.17it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.89it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.25it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.42it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.35it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.41it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.22it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.60it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.41it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.03it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.08it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.38it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.07it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.19it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.28it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.15it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.58it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.39it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.23it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.95it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.09it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.65it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.81it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.94it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.06it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.35it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.10it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.74it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.40it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.04it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.30it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.10it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.23it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.35it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.12it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.12it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.16it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.08it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.22it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.10it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.38it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.28it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.93it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.36it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.03it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.95it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.09it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.46it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.832275390625)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.08it/s total: 0.34s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+373190.23it/s total: 0.54s
+Perf after training {'accuracy': 0.8352, 'crossentropy': tensor(0.6172)}
+55844 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   1s|0s   <   1s|1s   <   1s|1s   <   0s|1s   <   0s|1s   <   0s|2s   <   0s|2s   <   0s|
+24813.31it/s total: 2.25s
+#Samps	Total Distance
+1	8054195.931846619
+2	5814496.7385520935
+3	5535492.082363129
+4	5520651.594093323
+5	5214909.259845734
+6	4989920.923511505
+7	4591630.352443695
+8	4556669.005064011
+9	4332421.2192726135
+10	4250144.860412598
+11	4166226.827115454
+12	4148430.68072198
+13	3966363.436405879
+14	3642677.980025035
+15	3608562.33114503
+16	3584324.493752223
+17	3550820.097838145
+18	3486760.1784484205
+19	3464265.609938365
+CandidateBatch(scores=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], indices=[11899, 26238, 32622, 51926, 15527, 35943, 15892, 32970, 45125, 24001, 17890, 22018, 44285, 9199, 24892, 47472, 39113, 36286, 5337, 40606])
+[('id', 11917), ('id', 26273), ('id', 32666), ('id', 51986), ('id', 15547), ('id', 35991), ('id', 15912), ('id', 33015), ('id', 45180), ('id', 24031), ('id', 17913), ('id', 22045), ('id', 44339), ('id', 9213), ('id', 24925), ('id', 47529), ('id', 39161), ('id', 36334), ('id', 5345), ('id', 40657)]
+Acquiring (label, score)s: 0 (0.0), 1 (0.0), 3 (0.0), 3 (0.0), 4 (0.0), 3 (0.0), 2 (0.0), 4 (0.0), 2 (0.0), 8 (0.0), 0 (0.0), 3 (0.0), 4 (0.0), 6 (0.0), 3 (0.0), 8 (0.0), 3 (0.0), 0 (0.0), 9 (0.0), 5 (0.0)
+Training set size 80:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+43.81it/s total: 0.37s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.20it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.01it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+43.28it/s total: 0.37s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.58it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.40it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.66it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.35it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.83it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.07it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.03it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.59it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.78it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.94it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.41it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.11it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.92it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.65it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.54it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.12it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.17it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.92it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.75it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.73it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.93it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.09it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.79it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.67it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.04it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.00it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.17it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.77it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.47it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.11it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.68it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.75it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.60it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.23it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.13it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.38it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.66it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.06it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.27it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.30it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.05it/s total: 0.35s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.70it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.55it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.15it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.13it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.07it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.63it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+47.54it/s total: 0.34s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.13it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.15it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.8583984375)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+46.02it/s total: 0.35s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+374258.65it/s total: 0.53s
+Perf after training {'accuracy': 0.8658, 'crossentropy': tensor(0.5146)}
+55824 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   1s|0s   <   1s|1s   <   1s|1s   <   0s|1s   <   0s|1s   <   0s|2s   <   0s|2s   <   0s|
+24560.01it/s total: 2.27s
+#Samps	Total Distance
+1	7997344.870439529
+2	6901013.928331375
+3	5942156.310598373
+4	5628668.002471924
+5	4648060.185696602
+6	4547186.0810709
+7	4489040.520583153
+8	4466967.135727324
+9	4268269.828342833
+10	4255671.73018495
+11	4227128.912277617
+12	4018372.428316511
+13	3962976.0085014477
+14	3819374.7386606485
+15	3793681.964349583
+16	3773451.230396107
+17	3655074.567943409
+18	3651666.5545461923
+19	3624784.4469679147
+CandidateBatch(scores=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], indices=[38847, 41005, 10566, 36303, 24950, 1148, 44423, 4430, 8507, 5775, 9928, 24655, 29231, 54374, 28941, 41002, 36527, 20440, 15095, 10042])
+[('id', 38909), ('id', 41072), ('id', 10584), ('id', 36365), ('id', 24992), ('id', 1150), ('id', 44494), ('id', 4435), ('id', 8522), ('id', 5787), ('id', 9945), ('id', 24696), ('id', 29281), ('id', 54454), ('id', 28990), ('id', 41069), ('id', 36589), ('id', 20472), ('id', 15118), ('id', 10060)]
+Acquiring (label, score)s: 0 (0.0), 5 (0.0), 3 (0.0), 6 (0.0), 1 (0.0), 8 (0.0), 0 (0.0), 8 (0.0), 9 (0.0), 9 (0.0), 6 (0.0), 4 (0.0), 3 (0.0), 7 (0.0), 5 (0.0), 3 (0.0), 5 (0.0), 3 (0.0), 8 (0.0), 4 (0.0)
+Training set size 100:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+48.46it/s total: 0.33s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.09it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.14it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.98it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.00it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+50.91it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.15it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.63it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.96it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.81it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.11it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+50.73it/s total: 0.32s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.45it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.52it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.63it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.69it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+53.52it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.13it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.95it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.68it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.38it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.55it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.98it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.70it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.38it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.67it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.72it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.46it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.65it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.43it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.81it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.83it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.53it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.70it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.44it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.64it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.44it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+50.07it/s total: 0.32s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.16it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.44it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.57it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.44it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.40it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.64it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.33it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.50it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.57it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.50it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.41it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.18it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.25it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.55it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.53it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.65it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.44it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.28it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.63it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.41it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.56it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.56it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.51it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.47it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.55it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.57it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.41it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.57it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.32it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.80it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.40it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.86181640625)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.76it/s total: 0.31s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+373086.99it/s total: 0.54s
+Perf after training {'accuracy': 0.8701, 'crossentropy': tensor(0.4591)}
+55804 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   2s|0s   <   1s|0s   <   1s|0s   <   1s|1s   <   1s|1s   <   0s|1s   <   0s|1s   <   0s|2s   <   0s|2s   <   0s|
+25160.98it/s total: 2.22s
+#Samps	Total Distance
+1	7237277.255630493
+2	5800082.720478058
+3	5469136.949079514
+4	5466925.521760941
+5	4821505.26958847
+6	4589312.498336792
+7	4502517.18009758
+8	4274614.826343536
+9	4272637.752674103
+10	4006088.6675491333
+11	3853518.381422043
+12	3848356.358736038
+13	3846253.1858844757
+14	3559224.205181122
+15	3363568.731513977
+16	3331361.2877864838
+17	3327023.226175308
+18	3315280.5157389296
+19	3260085.840358223
+CandidateBatch(scores=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], indices=[16132, 28548, 14122, 49951, 49307, 38834, 41637, 9241, 1137, 36105, 46863, 42753, 5889, 12908, 55026, 10467, 25880, 1020, 21346, 50890])
+[('id', 16165), ('id', 28608), ('id', 14151), ('id', 50049), ('id', 49405), ('id', 38912), ('id', 41725), ('id', 9261), ('id', 1139), ('id', 36179), ('id', 46956), ('id', 42841), ('id', 5905), ('id', 12937), ('id', 55126), ('id', 10491), ('id', 25934), ('id', 1022), ('id', 21387), ('id', 50988)]
+Acquiring (label, score)s: 0 (0.0), 3 (0.0), 7 (0.0), 5 (0.0), 6 (0.0), 3 (0.0), 0 (0.0), 9 (0.0), 2 (0.0), 7 (0.0), 8 (0.0), 6 (0.0), 5 (0.0), 1 (0.0), 4 (0.0), 3 (0.0), 2 (0.0), 4 (0.0), 0 (0.0), 0 (0.0)
+Training set size 120:
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+49.25it/s total: 0.32s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.94it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+50.61it/s total: 0.32s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.89it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.05it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.16it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.95it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.16it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.58it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.04it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.76it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.53it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.68it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.57it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.73it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.19it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+53.19it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.52it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.45it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.43it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.68it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.56it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.20it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 1 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.52it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 2 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.51it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 3 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 4 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.58it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 5 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.61it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 6 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.39it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 7 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.70it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 8 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.55it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 9 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.58it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 10 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.66it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 11 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 12 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.42it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 13 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.62it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 14 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.56it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 15 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.55it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 16 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.51it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 17 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.48it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 18 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+52.80it/s total: 0.30s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 19 / 20
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+50.98it/s total: 0.31s
+Training
+16 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|RestoringEarlyStopping: 20 / 20
+RestoringEarlyStopping: Out of patience
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.865234375)
+RestoringEarlyStopping: Restoring optimizer.
+0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+51.77it/s total: 0.31s
+200000 iterations:
+|    10%    |    20%    |    30%    |    40%    |    50%    |    60%    |    70%    |    80%    |    90%    |   100%    |
+|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|0s   <   0s|
+373732.25it/s total: 0.54s
+Perf after training {'accuracy': 0.8684, 'crossentropy': tensor(0.4309)}
+Done.
++ cleanup
++ /users/andsch/github/hello-slurm/bin/../include/_cleanup.sh /scratch-ssd/andsch/tmp/conda_envs/job-20089
+Node oat0.cs.ox.ac.uk
++ CURRENT_CONDA_ENV_PATH=/scratch-ssd/andsch/tmp/conda_envs/job-20089
++ conda env remove -q -y -p /scratch-ssd/andsch/tmp/conda_envs/job-20089
+
+Remove all packages in environment /scratch-ssd/andsch/tmp/conda_envs/job-20089:
+
