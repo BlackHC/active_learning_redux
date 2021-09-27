@@ -34,7 +34,7 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=15000,
+        max_training_set=11000,
     )
     for seed in range(5)
     for acquisition_function in [
