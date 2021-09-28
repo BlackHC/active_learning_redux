@@ -11,36 +11,63 @@ from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
 from batchbald_redux import acquisition_functions
+from batchbald_redux import baseline_acquisition_functions
+from .experiment_data import StandardExperimentDataConfig, OoDDatasetConfig
 from .unified_experiment import UnifiedExperiment
 
 # Cell
 
 configs = [
-    UnifiedExperiment(
-        seed=seed + 8945,
-        acquisition_function=acquisition_function,
-        acquisition_size=acquisition_size,
-        num_pool_samples=num_pool_samples,
-        initial_training_set_size=1000,
-        evaluation_set_size=0,
-        max_training_set=15000,
-        temperature=temperature,
-        id_dataset_name="CIFAR-10",
-        ood_dataset_name=None,
-        ood_exposure=False,
-        id_repetitions=id_repetitions,
-        add_dataset_noise=True
-
-    )
-    for seed in range(5)
-    for acquisition_function in [
-        acquisition_functions.SieveBALD,
+        UnifiedExperiment(
+            experiment_data_config=StandardExperimentDataConfig(id_dataset_name="CIFAR-10", id_repetitions=id_repetitions,
+                                                                  initial_training_set_size=1000,
+                                                                  validation_set_size=1024,
+                                                                  validation_split_random_state=0,
+                                                                  evaluation_set_size=0,
+                                                                  add_dataset_noise=True,
+                                                                  ood_dataset_config=None
+                                                                  ),
+            seed=seed + 8945,
+            acquisition_function=acquisition_function,
+            acquisition_size=acquisition_size,
+            num_pool_samples=num_pool_samples,
+            max_training_set=15000,
+            temperature=temperature,
+        )
+        for seed in range(5)
+        for acquisition_function in [
+            baseline_acquisition_functions.BADGE,
+        ]
+        for acquisition_size in [3000]
+        for num_pool_samples in [100]
+        for temperature in [0]
+        for id_repetitions in [1,5,10,20]
     ]
-    for acquisition_size in [3000]
-    for num_pool_samples in [100]
-    for temperature in [1/64]
-    for id_repetitions in [1,5,10,20]
-]
+#     UnifiedExperiment(
+#         seed=seed + 8945,
+#         acquisition_function=acquisition_function,
+#         acquisition_size=acquisition_size,
+#         num_pool_samples=num_pool_samples,
+#         initial_training_set_size=1000,
+#         evaluation_set_size=0,
+#         max_training_set=15000,
+#         temperature=temperature,
+#         id_dataset_name="CIFAR-10",
+#         ood_dataset_name=None,
+#         ood_exposure=False,
+#         id_repetitions=id_repetitions,
+#         add_dataset_noise=True
+
+#     )
+#     for seed in range(5)
+#     for acquisition_function in [
+#         acquisition_functions.SieveBALD,
+#     ]
+#     for acquisition_size in [3000]
+#     for num_pool_samples in [100]
+#     for temperature in [1/64]
+#     for id_repetitions in [1,5,10,20]
+# ]
 # +
 #     UnifiedExperiment(
 #         seed=seed + 8945,
