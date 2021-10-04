@@ -35,6 +35,7 @@ from .batchbald import (
     get_thompson_bald_batch,
     get_top_k_scorers,
     get_top_random_scorers,
+    BootstrapType
 )
 from .trained_model import TrainedModel
 
@@ -320,6 +321,8 @@ class TemperedEvalBALD(_EvalBALD):
 @dataclass
 class _EPIG(EvalDatasetBatchComputer):
     num_pool_samples: int
+    epig_bootstrap_type: BootstrapType
+    epig_bootstrap_factor: float
 
     def compute_candidate_batch(
         self,
@@ -337,6 +340,8 @@ class _EPIG(EvalDatasetBatchComputer):
         # NOTE: we are using floats all the way here. Hopefully this won't be two bad in the two variable case.
         # torch.double vs torch.float is a 10x speed difference (enough to make double infeasible for exps).
         scores_N = get_real_naive_epig_scores(
+            bootstrap_type=self.epig_bootstrap_type,
+            bootstrap_factor=self.epig_bootstrap_factor,
             pool_log_probs_N_K_C=log_probs_N_K_C,
             eval_log_probs_E_K_C=log_eval_probs_N_K_C,
             dtype=torch.float,

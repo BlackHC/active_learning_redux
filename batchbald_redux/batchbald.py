@@ -7,17 +7,18 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
            'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'get_joint_probs_N_C_C',
-           'get_real_naive_epig_scores']
+           'BootstrapType', 'get_real_naive_epig_scores']
 
 # Cell
 import math
 from dataclasses import dataclass
+from enum import Enum
 from typing import List
 
 import numpy as np
 import torch
+from blackhc.progress_bar import create_progress_bar, with_progress_bar
 from toma import toma
-from blackhc.progress_bar import with_progress_bar, create_progress_bar
 
 from batchbald_redux import joint_entropy
 
@@ -28,6 +29,8 @@ def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
 
     entropies_N = torch.empty(N, dtype=torch.double)
+
+    log_probs_N_K_C = log_probs_N_K_C.to(torch.double)
 
     pbar = create_progress_bar(N, tqdm_args=dict(desc="Conditional Entropy", leave=False))
     pbar.start()
@@ -48,6 +51,8 @@ def compute_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
     N, K, C = log_probs_N_K_C.shape
 
     entropies_N = torch.empty(N, dtype=torch.double)
+
+    log_probs_N_K_C = log_probs_N_K_C.to(torch.double)
 
     pbar = create_progress_bar(N, tqdm_args=dict(desc="Entropy", leave=False))
     pbar.start()
@@ -370,7 +375,7 @@ def get_sampled_tempered_scorers(exp_scores_N: torch.Tensor, *, temperature: flo
     N = len(exp_scores_N)
     batch_size = min(batch_size, N)
 
-    tempered_scores_N = exp_scores_N ** (1/temperature)
+    tempered_scores_N = exp_scores_N ** (1 / temperature)
     tempered_scores_N[exp_scores_N < 0] = 0.0
     partition_constant = tempered_scores_N.sum()
     p = tempered_scores_N / partition_constant
@@ -462,6 +467,7 @@ def get_batch_eig_batch(
     return CandidateBatch(candidate_scores, candidate_indices)
 
 # Cell
+
 
 def get_coreset_bald_scores_from_predictions(
     log_probs_N_K_C: torch.Tensor, target_probs_N_C: torch.Tensor, *, dtype=None, device=None
@@ -569,11 +575,14 @@ def get_batch_coreset_bald_batch(
 
 # Cell
 
+
 def get_coreset_eig_scores(
-        *,
-        training_log_probs_N_K_C: torch.Tensor,
-        eval_log_probs_N_K_C: torch.Tensor,
-        labels_N: torch.Tensor, dtype=None, device=None
+    *,
+    training_log_probs_N_K_C: torch.Tensor,
+    eval_log_probs_N_K_C: torch.Tensor,
+    labels_N: torch.Tensor,
+    dtype=None,
+    device=None
 ) -> torch.Tensor:
     # We want to compute I[y_eval; y_batch].
     # I[y_eval; y_train] = H[y_batch] - H[y_batch|y_eval]
@@ -589,8 +598,8 @@ def get_coreset_eig_scores(
 
     eval_log_probs_N_K = (
         joint_entropy.gather_expand(eval_log_probs_N_K_C, dim=2, index=labels_N_1_1)
-            .squeeze(2)
-            .to(dtype=dtype, device=device)
+        .squeeze(2)
+        .to(dtype=dtype, device=device)
     )
     eval_log_prob_mean_N = torch.logsumexp(eval_log_probs_N_K, dim=1) - np.log(K)
 
@@ -600,10 +609,12 @@ def get_coreset_eig_scores(
 
 
 def get_coreset_eig_bald_scores(
-        *,
-        training_log_probs_N_K_C: torch.Tensor,
-        eval_log_probs_N_K_C: torch.Tensor,
-        labels_N: torch.Tensor, dtype=None, device=None
+    *,
+    training_log_probs_N_K_C: torch.Tensor,
+    eval_log_probs_N_K_C: torch.Tensor,
+    labels_N: torch.Tensor,
+    dtype=None,
+    device=None
 ) -> torch.Tensor:
     # We want to compute I[y_eval; y_batch; W].
     # I[y_eval; y_batch; W] = I[y_batch; W] - I[y_batch; W|y_eval]
@@ -612,6 +623,7 @@ def get_coreset_eig_bald_scores(
     return training_coreset - eval_coreset
 
 # Cell
+
 
 def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:
     N, K, C = log_probs_N_K_C.shape
@@ -625,7 +637,7 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
     # we start with BALD scores
     scores_N = entropies_N - compute_conditional_entropy(log_probs_N_K_C)
 
-    last_score = 0.
+    last_score = 0.0
     for _ in range(batch_size):
         # Pick the highest scorer.
         # This is amenable to lazy greedy and lazier than lazy greedy, though we do not implement this here. (Yet)
@@ -644,7 +656,7 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
 
         # Decrease scores for other items
         joint_entropy_helper = joint_entropy.ExactJointEntropy.empty(K, device=device, dtype=dtype)
-        joint_entropy_helper.add_variables(log_probs_N_K_C[candidate_index: candidate_index+1])
+        joint_entropy_helper.add_variables(log_probs_N_K_C[candidate_index : candidate_index + 1])
         joint_entropies_N = joint_entropy_helper.compute_batch(log_probs_N_K_C)
         dual_mi_N = entropies_N + entropies_N[candidate_index] - joint_entropies_N
 
@@ -654,40 +666,93 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
 
 # Cell
 
+
 def get_joint_probs_N_C_C(pool_probs_N_K_C: torch.Tensor, single_eval_probs_K_C: torch.Tensor):
     K = single_eval_probs_K_C.shape[0]
 
-    pool_log_probs_N_C_K = pool_probs_N_K_C.transpose(1,2)
+    pool_log_probs_N_C_K = pool_probs_N_K_C.transpose(1, 2)
     joint_probs_N_C_C = pool_log_probs_N_C_K @ single_eval_probs_K_C / K
     return joint_probs_N_C_C
 
 
+class BootstrapType(Enum):
+    NO_BOOTSTRAP = 0
+    SINGLE_BOOTSTRAP = 1
+    PER_POINT_BOOTSTRAP = 2
+    FAST_PER_POINT_BOOTSTRAP = 3
+
+
 @torch.no_grad()
-def get_real_naive_epig_scores(*, pool_log_probs_N_K_C: torch.Tensor, eval_log_probs_E_K_C: torch.Tensor, dtype=None, device=None) -> torch.Tensor:
+def get_real_naive_epig_scores(
+    *,
+    bootstrap_type=BootstrapType.NO_BOOTSTRAP,
+    bootstrap_factor=1.0,
+    pool_log_probs_N_K_C: torch.Tensor,
+    eval_log_probs_E_K_C: torch.Tensor,
+    dtype=None,
+    device=None,
+) -> torch.Tensor:
     """Implements naive EPIG: I[Y_acq; Y_eval | x_acq, X_eval]."""
     # I[Y_acq; Y_eval | x_acq, X_eval] = H[Y_acq | x_acq] + E_p(x_eval)[H[Y_eval | x_eval] - H[Y_acq, Y_eval | x_acq, x_eval]]
     N, K, C = pool_log_probs_N_K_C.shape
     E, _, _ = eval_log_probs_E_K_C.shape
-    assert pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:], "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
+    assert (
+        pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:]
+    ), "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
 
-    eval_label_uncertainty = compute_entropy(eval_log_probs_E_K_C).mean(dim=0, keepdim=False)
-    pool_entropies_N = compute_entropy(pool_log_probs_N_K_C)
+    pool_entropies_N = compute_entropy(pool_log_probs_N_K_C).to(device=device)
 
     pool_probs_N_K_C = pool_log_probs_N_K_C.to(dtype=dtype, device=device).exp()
     eval_probs_E_K_C = eval_log_probs_E_K_C.to(dtype=dtype, device=device).exp()
 
-    total_joint_entropies_N = torch.zeros((N,), dtype=dtype, device="cpu")
+    total_joint_entropies_N = torch.zeros((N,), dtype=dtype, device=device)
 
-    for i_e in with_progress_bar(range(E), tqdm_args=dict(desc="Evaluation Set", leave=False)):
-        single_eval_probs_K_C = eval_probs_E_K_C[i_e]
+    if bootstrap_type != BootstrapType.PER_POINT_BOOTSTRAP:
+        eval_label_uncertainty = compute_entropy(eval_log_probs_E_K_C).mean(dim=0, keepdim=False)
 
-        joint_probs_N_C_C = get_joint_probs_N_C_C(pool_probs_N_K_C, single_eval_probs_K_C)
-        weighted_nats_N_C_C = joint_probs_N_C_C * -torch.log(joint_probs_N_C_C)
-        joint_entropy_N = weighted_nats_N_C_C.sum((1,2), keepdim=False)
-        del weighted_nats_N_C_C
+        if bootstrap_type == BootstrapType.NO_BOOTSTRAP:
+            eval_range = range(E)
+        elif bootstrap_type == BootstrapType.SINGLE_BOOTSTRAP:
+            num_eval_samples = int(E * bootstrap_factor)
+            eval_range = torch.multinomial(torch.tensor(1.0).expand(E), num_samples=num_eval_samples, replacement=True)
+        else:
+            raise ValueError(f"Unknown bootstrap {bootstrap_type}")
 
-        total_joint_entropies_N += joint_entropy_N.to(device="cpu", non_blocking=True)
+        for i_e in with_progress_bar(eval_range, tqdm_args=dict(desc="Evaluation Set", leave=False)):
+            single_eval_probs_K_C = eval_probs_E_K_C[i_e]
 
-    total_scores_N = pool_entropies_N + eval_label_uncertainty - total_joint_entropies_N/E
+            joint_probs_N_C_C = get_joint_probs_N_C_C(pool_probs_N_K_C, single_eval_probs_K_C)
+            weighted_nats_N_C_C = joint_probs_N_C_C * -torch.log(joint_probs_N_C_C)
+            joint_entropy_N = weighted_nats_N_C_C.sum((1, 2), keepdim=False)
+            del weighted_nats_N_C_C
 
-    return total_scores_N
+            total_joint_entropies_N += joint_entropy_N
+
+        total_scores_N = pool_entropies_N - total_joint_entropies_N / E + eval_label_uncertainty
+    elif bootstrap_type == BootstrapType.PER_POINT_BOOTSTRAP:
+        eval_label_uncertainty_E = compute_entropy(eval_log_probs_E_K_C)
+
+        total_scores_N = pool_entropies_N
+
+        for i_n in with_progress_bar(range(N), tqdm_args=dict(desc="Pool Set", leave=False)):
+            single_pool_probs_K_C = pool_probs_N_K_C[i_n]
+
+            num_eval_samples = int(E * bootstrap_factor)
+            eval_indices = torch.multinomial(
+                torch.tensor(1.0).expand(E), num_samples=num_eval_samples, replacement=True
+            )
+            # For debugging:
+            # num_eval_samples = E
+            # eval_indices = torch.tensor(list(range(E)))
+
+            sampled_eval_probs_F_K_C = eval_probs_E_K_C[eval_indices]
+
+            joint_probs_F_C_C = get_joint_probs_N_C_C(sampled_eval_probs_F_K_C, single_pool_probs_K_C)
+            weighted_nats_F_C_C = joint_probs_F_C_C * -torch.log(joint_probs_F_C_C)
+            avg_joint_entropy = weighted_nats_F_C_C.sum() / num_eval_samples
+            del weighted_nats_F_C_C
+
+            eval_label_uncertainty = eval_label_uncertainty_E[eval_indices].mean(dim=0, keepdim=False)
+            total_scores_N[i_n] += eval_label_uncertainty - avg_joint_entropy
+
+    return total_scores_N.to(device="cpu", non_blocking=True)

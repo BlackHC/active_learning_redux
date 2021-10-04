@@ -210,6 +210,8 @@ class UnifiedExperiment:
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
 
     temperature: float = 0.0
+    epig_bootstrap_type: acquisition_functions.BootstrapType = acquisition_functions.BootstrapType.NO_BOOTSTRAP
+    epig_bootstrap_factor: float = 1.
 
     def load_experiment_data(self) -> ExperimentData:
         return self.experiment_data_config.load(self.device)
