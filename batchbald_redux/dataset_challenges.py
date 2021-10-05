@@ -13,14 +13,14 @@ __all__ = ['AliasDataset', 'DatasetIndex', 'get_base_dataset_index', 'get_num_cl
 
 import bisect
 from dataclasses import dataclass
-from typing import List, Optional, Union, Dict, Type, Set
+from typing import Dict, List, Optional, Set, Type, Union
 
 import numpy as np
 import torch
 import torch.utils.data as data
 import torchvision.datasets
 
-from .fast_mnist import FastMNIST, FastFashionMNIST
+from .fast_mnist import FastFashionMNIST, FastMNIST
 
 # Cell
 
@@ -84,16 +84,12 @@ class AliasDataset(data.Dataset):
     def imbalance(self, *, class_counts: list, seed: int):
         return ImbalancedDataset(self, class_counts=class_counts, seed=seed)
 
-    def override_targets(
-            self, *, targets: Union[list, torch.Tensor], indices: list = None, num_classes: int = None
-    ):
+    def override_targets(self, *, targets: Union[list, torch.Tensor], indices: list = None, num_classes: int = None):
         if not indices:
             return ReplaceTargetsDataset(self, targets=targets, num_classes=num_classes)
         return OverrideTargetsDataset(self, indices=indices, targets=targets, num_classes=num_classes)
 
-    def corrupt_labels(
-            self, *, size_corrupted: Union[float, int], seed: int, num_classes: int = None, device=None
-    ):
+    def corrupt_labels(self, *, size_corrupted: Union[float, int], seed: int, num_classes: int = None, device=None):
         return CorruptedLabelsDataset(
             self, size_corrupted=size_corrupted, seed=seed, num_classes=num_classes, device=device
         )
@@ -112,7 +108,9 @@ class AliasDataset(data.Dataset):
     #         seed=seed,
     #     )
     def imbalance_subsample(self, *, minority_classes: Set[int], minority_percentage: float, seed: int):
-        return ImbalancedClassSplitDataset(self, minority_classes=minority_classes, minority_percentage=minority_percentage, seed=seed)
+        return ImbalancedClassSplitDataset(
+            self, minority_classes=minority_classes, minority_percentage=minority_percentage, seed=seed
+        )
 
     def one_hot(self, *, dtype=None, device=None):
         return OneHotDataset(self, dtype=dtype, device=device)
@@ -148,11 +146,15 @@ def get_base_dataset_index(dataset: data.Dataset, index: int) -> DatasetIndex:
         return get_base_dataset_index(dataset.dataset, int(dataset.indices[index]))
     elif isinstance(dataset, data.TensorDataset):
         return DatasetIndex(dataset, int(index))
-    elif isinstance(dataset, torchvision.datasets.MNIST):
-        return DatasetIndex(dataset, int(index))
-    elif isinstance(dataset, torchvision.datasets.CIFAR10):
-        return DatasetIndex(dataset, int(index))
-    elif isinstance(dataset, torchvision.datasets.SVHN):
+    elif isinstance(
+        dataset,
+        (
+            torchvision.datasets.MNIST,
+            torchvision.datasets.CIFAR10,
+            torchvision.datasets.SVHN,
+            torchvision.datasets.ImageFolder,
+        ),
+    ):
         return DatasetIndex(dataset, int(index))
     elif isinstance(dataset, AliasDataset):
         return dataset.get_base_dataset_index(index)
@@ -165,9 +167,9 @@ def get_num_classes(dataset: data.Dataset) -> int:
         return get_num_classes(dataset.datasets[0])
     elif isinstance(dataset, data.Subset):
         return get_num_classes(dataset.dataset)
-    elif isinstance(dataset, torchvision.datasets.MNIST):
-        return len(dataset.classes)
-    elif isinstance(dataset, torchvision.datasets.CIFAR10):
+    elif isinstance(
+        dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)
+    ):
         return len(dataset.classes)
     elif isinstance(dataset, torchvision.datasets.SVHN):
         return 10
@@ -195,9 +197,7 @@ def get_target(dataset, index: int, *, device=None):
         target = get_target(dataset.dataset, dataset.indices[index], device=device)
     elif isinstance(dataset, data.TensorDataset):
         target = dataset.tensors[1][index]
-    elif isinstance(dataset, torchvision.datasets.MNIST):
-        target = dataset.targets[index]
-    elif isinstance(dataset, torchvision.datasets.CIFAR10):
+    elif isinstance(dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)):
         target = dataset.targets[index]
     elif isinstance(dataset, torchvision.datasets.SVHN):
         target = dataset.labels[index]
@@ -216,9 +216,7 @@ def get_targets(dataset, *, device=None) -> torch.Tensor:
         return get_targets(dataset.dataset, device=device)[torch.as_tensor(dataset.indices)]
     elif isinstance(dataset, data.TensorDataset):
         return torch.as_tensor(dataset.tensors[1], device=device)
-    elif isinstance(dataset, torchvision.datasets.MNIST):
-        return torch.as_tensor(dataset.targets, device=device)
-    elif isinstance(dataset, torchvision.datasets.CIFAR10):
+    elif isinstance(dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)):
         return torch.as_tensor(dataset.targets, device=device)
     elif isinstance(dataset, torchvision.datasets.SVHN):
         return torch.as_tensor(dataset.labels, device=device)
@@ -474,18 +472,16 @@ class ImbalancedDataset(SubsetAliasDataset):
 class ImbalancedClassSplitDataset(SubsetAliasDataset):
     options: dict
 
-    def __init__(
-        self, dataset: data.Dataset, *, minority_classes: Set[int], minority_percentage: float, seed: int
-    ):
+    def __init__(self, dataset: data.Dataset, *, minority_classes: Set[int], minority_percentage: float, seed: int):
         num_samples = len(dataset)
         num_classes = get_num_classes(dataset)
         assert len(minority_classes) < num_classes
 
         samples_per_class = num_samples // num_classes
         class_counts = [
-            int(samples_per_class * minority_percentage / 100) if i in minority_classes else
-            samples_per_class
-            for i in range(num_classes)]
+            int(samples_per_class * minority_percentage / 100) if i in minority_classes else samples_per_class
+            for i in range(num_classes)
+        ]
 
         # num_samples_per_class = len(dataset) // num_classes
         # num_samples_majority = num_samples_per_class * majority_percentage // 100
@@ -691,12 +687,14 @@ def load_dataset(f, map_location=None, **kwargs):
 # Cell
 
 
-def create_named_mnist(mnist_type: Union[Type[FastMNIST], Type[FastFashionMNIST]], root: str,
-           *,
-        train: bool = True,
-        download: bool = False,
-        device = None
-        ):
+def create_named_mnist(
+    mnist_type: Union[Type[FastMNIST], Type[FastFashionMNIST]],
+    root: str,
+    *,
+    train: bool = True,
+    download: bool = False,
+    device=None,
+):
     dataset = mnist_type(root=root, train=train, download=download, device=device)
     name = f"{mnist_type.__name__} {'Train' if train else 'Test'} ({len(dataset)} samples)"
     return NamedDataset(dataset, name)
