@@ -183,14 +183,7 @@ def get_CINIC10(
 
     # NOTE: these are not correct mean and std for SVHN, but are commonly used
     normalize = CIFAR10_NORMALIZE if normalize_like_cifar10 else CINIC10_NORMALIZE
-    transform = transforms.Compose([transforms.ToTensor(), normalize])
-
-    dataset_transform = transforms.Compose(
-        [
-            transforms.ToTensor(),
-            CIFAR10_NORMALIZE,
-        ]
-    )
+    dataset_transform = transforms.Compose([transforms.ToTensor(), normalize])
 
     train_augmentations = nn.Sequential(
         K.RandomCrop((32, 32), padding=4),
@@ -201,7 +194,7 @@ def get_CINIC10(
         root, split="train", transform=dataset_transform, download=True, imagenet_only=imagenet_only
     )
     validation_dataset = CINIC10(
-        root, split="valid", transform=dataset_transform, download=True, imagenet_only=imagenet_only
+        root, split="valid", transform=dataset_transform, download=False, imagenet_only=imagenet_only
     )
 
     full_train_dataset = torch.utils.data.ConcatDataset([train_dataset, validation_dataset])
@@ -213,7 +206,7 @@ def get_CINIC10(
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = CINIC10(root, split="valid", transform=dataset_transform, download=True, imagenet_only=imagenet_only)
+    test_dataset = CINIC10(root, split="test", transform=dataset_transform, download=False, imagenet_only=imagenet_only)
 
     return SplitDataset(
         input_size,
