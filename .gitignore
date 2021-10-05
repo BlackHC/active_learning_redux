@@ -141,8 +141,4 @@ checklink/cookies.txt
 
 /.virtual_documents/
 /.lsp_symlink/
-/data/FastMNIST
-/data/CIFAR10/
-/data/CIFAR100/
-/data/FastFashionMNIST/
-/data/SVHN/
+/data/

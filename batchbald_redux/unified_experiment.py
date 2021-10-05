@@ -214,6 +214,7 @@ class UnifiedExperiment:
     epig_bootstrap_factor: float = 1.
 
     def load_experiment_data(self) -> ExperimentData:
+        print(self.experiment_data_config)
         return self.experiment_data_config.load(self.device)
 
     # Simple Dependency Injection
