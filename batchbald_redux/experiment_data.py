@@ -3,7 +3,8 @@
 __all__ = ['ExperimentData', 'ExperimentDataConfig', 'OoDDatasetConfig', 'StandardExperimentDataConfig',
            'load_standard_experiment_data', 'ImbalancedTestDistributionExperimentDataConfig',
            'load_imbalanced_experiment_data', 'OODClassesDistributionExperimentDataConfig',
-           'load_ood_classes_experiment_data']
+           'load_ood_classes_experiment_data', 'CinicCifarShiftExperimentDataConfig',
+           'load_cinic_cifar_shift_experiment_data']
 
 # Cell
 
@@ -21,6 +22,7 @@ from .dataset_challenges import (
     AdditiveGaussianNoise,
     AliasDataset,
     NamedDataset,
+    get_balanced_sample_indices,
     get_balanced_sample_indices_by_class,
     get_class_indices,
     get_class_indices_by_class,
@@ -409,8 +411,12 @@ def load_ood_classes_experiment_data(
     id_indices = [index for index, target in enumerate(train_targets) if int(target) not in ood_classes]
     ood_indices = [index for index, target in enumerate(train_targets) if int(target) in ood_classes]
 
-    original_ood_dataset = NamedDataset(split_dataset.train.subset(ood_indices), f"{split_dataset.train}[target in {ood_classes}]")
-    id_dataset = AliasDataset(split_dataset.train.subset(id_indices), f"{split_dataset.train}[target not in {ood_classes}]")
+    original_ood_dataset = NamedDataset(
+        split_dataset.train.subset(ood_indices), f"{split_dataset.train}[target in {ood_classes}]"
+    )
+    id_dataset = AliasDataset(
+        split_dataset.train.subset(id_indices), f"{split_dataset.train}[target not in {ood_classes}]"
+    )
 
     # If we reduce the train set, we need to do so before picking the initial train set.
     if repetitions < 1:
@@ -491,4 +497,103 @@ def load_ood_classes_experiment_data(
         ood_dataset=original_ood_dataset,
         ood_exposure=ood_exposure,
         device=split_dataset.device,
+    )
+
+# Cell
+
+
+@dataclass
+class CinicCifarShiftExperimentDataConfig(ExperimentDataConfig):
+    """CINIC-10 as train set, CIFAR-10 as test/eval set."""
+
+    train_imagenet_only: bool
+
+    initial_training_set_size: int
+
+    validation_set_size: int
+    validation_split_random_state: int
+
+    evaluation_set_size: int
+
+    def load(self, device) -> ExperimentData:
+        return load_cinic_cifar_shift_experiment_data(
+            train_imagenet_only=self.train_imagenet_only,
+            initial_training_set_size=self.initial_training_set_size,
+            validation_set_size=self.validation_set_size,
+            validation_split_random_state=self.validation_split_random_state,
+            evaluation_set_size=self.evaluation_set_size,
+            device=device,
+        )
+
+
+def load_cinic_cifar_shift_experiment_data(
+    *,
+    train_imagenet_only: bool,
+    initial_training_set_size: int,
+    validation_set_size: int,
+    validation_split_random_state: int,
+    evaluation_set_size: int,
+    device: str,
+) -> ExperimentData:
+    split_imagenet_cinic10_dataset = get_dataset(
+        name="IMAGENET-CINIC-10",
+        root="data",
+        validation_set_size=0,
+        validation_split_random_state=validation_split_random_state,
+        normalize_like_cifar10=True,
+        device_hint=device,
+    )
+
+    split_cifar10_dataset = get_dataset(
+        name="CIFAR-10",
+        root="data",
+        validation_set_size=validation_set_size,
+        validation_split_random_state=validation_split_random_state,
+        normalize_like_cifar10=True,
+        device_hint=device,
+    )
+
+    assert split_imagenet_cinic10_dataset.device == split_cifar10_dataset.device
+
+    train_dataset = split_imagenet_cinic10_dataset.train
+    validation_dataset = split_cifar10_dataset.validation
+    test_dataset = split_cifar10_dataset.test
+
+    num_classes = split_cifar10_dataset.train.get_num_classes()
+    evaluation_set_samples_per_class = evaluation_set_size // num_classes
+    balanced_evaluation_indices = get_balanced_sample_indices(
+        split_cifar10_dataset.train,
+        num_classes=num_classes,
+        samples_per_class=evaluation_set_samples_per_class,
+        seed=validation_split_random_state,
+    )
+
+    evaluation_dataset, cifar10_train_dataset = split_cifar10_dataset.train.split(balanced_evaluation_indices)
+
+    # If we add CIFAR-10 back, exclude the evaluation samples.
+    if not train_imagenet_only:
+        train_dataset += cifar10_train_dataset
+
+    initial_samples_per_class = initial_training_set_size // num_classes
+    balanced_initial_indices = get_balanced_sample_indices(
+        train_dataset,
+        num_classes=num_classes,
+        samples_per_class=initial_samples_per_class,
+        seed=validation_split_random_state,
+    )
+
+    active_learning_data = ActiveLearningData(train_dataset)
+    active_learning_data.acquire_base_indices(balanced_initial_indices)
+
+    return ExperimentData(
+        active_learning=active_learning_data,
+        validation_dataset=validation_dataset,
+        test_dataset=test_dataset,
+        evaluation_dataset=evaluation_dataset,
+        train_augmentations=split_imagenet_cinic10_dataset.train_augmentations,
+        initial_training_set_indices=balanced_initial_indices,
+        evaluation_set_indices=balanced_evaluation_indices,
+        ood_dataset=None,
+        ood_exposure=False,
+        device=split_imagenet_cinic10_dataset.device,
     )
