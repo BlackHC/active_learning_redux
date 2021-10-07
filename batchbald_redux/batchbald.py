@@ -6,8 +6,9 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
-           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'get_joint_probs_N_C_C',
-           'BootstrapType', 'get_real_naive_epig_scores']
+           'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'BootstrapType',
+           'get_joint_probs_N_C_C', 'get_joint_probs_N_C_EC_transposed', 'get_joint_probs_N_C_C_transposed',
+           'get_real_naive_epig_scores']
 
 # Cell
 import math
@@ -38,6 +39,7 @@ def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
     @toma.execute.chunked(log_probs_N_K_C, 65536)
     def compute(log_probs_n_K_C, start: int, end: int):
         nats_n_K_C = log_probs_n_K_C * torch.exp(log_probs_n_K_C)
+        nats_n_K_C[torch.isnan(nats_n_K_C)] = 0.0
 
         entropies_N[start:end].copy_(-torch.sum(nats_n_K_C, dim=(1, 2)) / K)
         pbar.update(end - start)
@@ -61,6 +63,7 @@ def compute_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
     def compute(log_probs_n_K_C, start: int, end: int):
         mean_log_probs_n_C = torch.logsumexp(log_probs_n_K_C, dim=1) - math.log(K)
         nats_n_C = mean_log_probs_n_C * torch.exp(mean_log_probs_n_C)
+        nats_n_C[torch.isnan(nats_n_C)] = 0.0
 
         entropies_N[start:end].copy_(-torch.sum(nats_n_C, dim=1))
         pbar.update(end - start)
@@ -666,21 +669,40 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
 
 # Cell
 
-
-def get_joint_probs_N_C_C(pool_probs_N_K_C: torch.Tensor, single_eval_probs_K_C: torch.Tensor):
-    K = single_eval_probs_K_C.shape[0]
-
-    pool_log_probs_N_C_K = pool_probs_N_K_C.transpose(1, 2)
-    joint_probs_N_C_C = pool_log_probs_N_C_K @ single_eval_probs_K_C / K
-    return joint_probs_N_C_C
-
-
 class BootstrapType(Enum):
     NO_BOOTSTRAP = 0
     SINGLE_BOOTSTRAP = 1
     PER_POINT_BOOTSTRAP = 2
     FAST_PER_POINT_BOOTSTRAP = 3
 
+# Cell
+
+
+def get_joint_probs_N_C_C(pool_probs_N_K_C: torch.Tensor, single_eval_probs_K_C: torch.Tensor):
+    K = single_eval_probs_K_C.shape[0]
+
+    pool_log_probs_N_C_K = pool_probs_N_K_C.transpose(1, 2).contiguous()
+    joint_probs_N_C_C = pool_log_probs_N_C_K @ single_eval_probs_K_C / K
+    return joint_probs_N_C_C
+
+
+def get_joint_probs_N_C_EC_transposed(pool_probs_N_C_K: torch.Tensor, eval_probs_E_K_C: torch.Tensor):
+    N, C, K = pool_probs_N_C_K.shape
+    E, K, C = eval_probs_E_K_C.shape
+    # joint_probs_N_C_C = torch.empty(N, C, C, dtype=pool_probs_N_C_K.dtype, device=pool_probs_N_C_K.device)
+    # for joint_probs_C_C, pool_probs_C_K in zip(joint_probs_N_C_C.split(4096), pool_probs_N_C_K.split(4096)):
+    #     joint_probs = pool_probs_C_K @ single_eval_probs_K_C / K
+    #     joint_probs_C_C.copy_(joint_probs, non_blocking=True)
+    eval_probs_K_EC = eval_probs_E_K_C.transpose(0, 1).reshape(K, E * C)
+    #joint_probs_N_C_EC = pool_probs_N_C_K.contiguous() @ eval_probs_K_EC.contiguous() / K
+    joint_probs_N_C_EC = pool_probs_N_C_K @ eval_probs_K_EC / K
+    return joint_probs_N_C_EC
+
+
+def get_joint_probs_N_C_C_transposed(pool_probs_N_C_K: torch.Tensor, single_eval_probs_K_C: torch.Tensor):
+    K = single_eval_probs_K_C.shape[0]
+    joint_probs_N_C_C = pool_probs_N_C_K @ single_eval_probs_K_C / K
+    return joint_probs_N_C_C
 
 @torch.no_grad()
 def get_real_naive_epig_scores(
@@ -700,36 +722,52 @@ def get_real_naive_epig_scores(
         pool_log_probs_N_K_C.shape[1:] == pool_log_probs_N_K_C.shape[1:]
     ), "{pool_log_probs_N_K_C.shape[1:]} != {pool_log_probs_N_K_C.shape[1:]}"
 
-    pool_entropies_N = compute_entropy(pool_log_probs_N_K_C).to(device=device)
-
-    pool_probs_N_K_C = pool_log_probs_N_K_C.to(dtype=dtype, device=device).exp()
-    eval_probs_E_K_C = eval_log_probs_E_K_C.to(dtype=dtype, device=device).exp()
+    pool_entropies_N = compute_entropy(pool_log_probs_N_K_C).to(device=device, non_blocking=True)
 
     total_joint_entropies_N = torch.zeros((N,), dtype=dtype, device=device)
 
     if bootstrap_type != BootstrapType.PER_POINT_BOOTSTRAP:
+        pool_probs_N_C_K = pool_log_probs_N_K_C.to(dtype=dtype, device=device, non_blocking=True).exp().transpose(1, 2).contiguous()
+        #eval_probs_E_K_C = eval_log_probs_E_K_C.to(device=device, non_blocking=True).exp()
+
         eval_label_uncertainty = compute_entropy(eval_log_probs_E_K_C).mean(dim=0, keepdim=False)
 
         if bootstrap_type == BootstrapType.NO_BOOTSTRAP:
-            eval_range = range(E)
+            num_eval_samples = E
+            eval_range = list(range(E))
         elif bootstrap_type == BootstrapType.SINGLE_BOOTSTRAP:
             num_eval_samples = int(E * bootstrap_factor)
             eval_range = torch.multinomial(torch.tensor(1.0).expand(E), num_samples=num_eval_samples, replacement=True)
         else:
             raise ValueError(f"Unknown bootstrap {bootstrap_type}")
 
-        for i_e in with_progress_bar(eval_range, tqdm_args=dict(desc="Evaluation Set", leave=False)):
-            single_eval_probs_K_C = eval_probs_E_K_C[i_e]
+        pbar = create_progress_bar(num_eval_samples, tqdm_args=dict(desc="Evaluation Set", leave=False))
+        pbar.start()
 
-            joint_probs_N_C_C = get_joint_probs_N_C_C(pool_probs_N_K_C, single_eval_probs_K_C)
-            weighted_nats_N_C_C = joint_probs_N_C_C * -torch.log(joint_probs_N_C_C)
-            joint_entropy_N = weighted_nats_N_C_C.sum((1, 2), keepdim=False)
-            del weighted_nats_N_C_C
+        @toma.execute.batch(1024)
+        def loop(batchsize: int):
+            pbar.reset()
 
-            total_joint_entropies_N += joint_entropy_N
+            nonlocal total_joint_entropies_N
+            for chunked_eval_log_probs_e_K_C in eval_log_probs_E_K_C[eval_range].split(batchsize):
+                chunked_eval_probs_e_K_C = chunked_eval_log_probs_e_K_C.to(dtype=dtype, device=device, non_blocking=True).exp()
+                joint_probs_N_E_EC = get_joint_probs_N_C_EC_transposed(pool_probs_N_C_K, chunked_eval_probs_e_K_C)
+                weighted_nats_N_C_EC = joint_probs_N_E_EC * -torch.log(joint_probs_N_E_EC)
+                weighted_nats_N_C_EC[torch.isnan(weighted_nats_N_C_EC)] = 0.0
+                joint_entropy_N = weighted_nats_N_C_EC.sum((1, 2), keepdim=False)
+                del weighted_nats_N_C_EC
+
+                total_joint_entropies_N += joint_entropy_N
+
+                pbar.update(len(chunked_eval_probs_e_K_C))
+
+        pbar.finish()
 
         total_scores_N = pool_entropies_N - total_joint_entropies_N / E + eval_label_uncertainty
     elif bootstrap_type == BootstrapType.PER_POINT_BOOTSTRAP:
+        pool_probs_N_K_C = pool_log_probs_N_K_C.to(dtype=dtype, device=device).exp()
+        eval_probs_E_C_K = eval_log_probs_E_K_C.to(dtype=dtype, device=device).exp().transpose(1, 2).contiguous()
+
         eval_label_uncertainty_E = compute_entropy(eval_log_probs_E_K_C)
 
         total_scores_N = pool_entropies_N
@@ -745,10 +783,11 @@ def get_real_naive_epig_scores(
             # num_eval_samples = E
             # eval_indices = torch.tensor(list(range(E)))
 
-            sampled_eval_probs_F_K_C = eval_probs_E_K_C[eval_indices]
+            sampled_eval_probs_F_C_K = eval_probs_E_C_K[eval_indices]
 
-            joint_probs_F_C_C = get_joint_probs_N_C_C(sampled_eval_probs_F_K_C, single_pool_probs_K_C)
+            joint_probs_F_C_C = get_joint_probs_N_C_C_transposed(sampled_eval_probs_F_C_K, single_pool_probs_K_C)
             weighted_nats_F_C_C = joint_probs_F_C_C * -torch.log(joint_probs_F_C_C)
+            weighted_nats_F_C_C[torch.isnan(weighted_nats_F_C_C)] = 0.0
             avg_joint_entropy = weighted_nats_F_C_C.sum() / num_eval_samples
             del weighted_nats_F_C_C
 

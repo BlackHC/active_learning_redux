@@ -47,6 +47,7 @@ class ExactJointEntropy(JointEntropy):
     def compute(self) -> torch.Tensor:
         probs_M = torch.mean(self.joint_probs_M_K, dim=1, keepdim=False)
         nats_M = -torch.log(probs_M) * probs_M
+        nats_M[torch.isnan(nats_M)] = 0.
         del probs_M
         entropy = torch.sum(nats_M)
         del nats_M
@@ -98,8 +99,11 @@ class ExactJointEntropy(JointEntropy):
                 )
             probs_b_M_C /= K
 
+            nats_b_M_C = -torch.log(probs_b_M_C) * probs_b_M_C
+            nats_b_M_C[torch.isnan(nats_b_M_C)] = 0.
+
             output_entropies_B[start:end].copy_(
-                torch.sum(-torch.log(probs_b_M_C) * probs_b_M_C, dim=(1, 2)), non_blocking=True
+                torch.sum(nats_b_M_C, dim=(1, 2)), non_blocking=True
             )
 
             pbar.update(end - start)
@@ -191,6 +195,7 @@ class SampledJointEntropy(JointEntropy):
     def compute(self) -> torch.Tensor:
         sampled_joint_probs_M = torch.mean(self.sampled_joint_probs_M_K, dim=1, keepdim=False)
         nats_M = -sampled_joint_probs_M.log_()
+        nats_M[torch.isnan(nats_M)] = 0.
         entropy = torch.mean(nats_M)
         return entropy
 

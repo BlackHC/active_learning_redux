@@ -27,8 +27,10 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "get_coreset_eig_scores": "01_batchbald.ipynb",
          "get_coreset_eig_bald_scores": "01_batchbald.ipynb",
          "get_sieve_bald_batch": "01_batchbald.ipynb",
-         "get_joint_probs_N_C_C": "01_batchbald.ipynb",
          "BootstrapType": "01_batchbald.ipynb",
+         "get_joint_probs_N_C_C": "01_batchbald.ipynb",
+         "get_joint_probs_N_C_EC_transposed": "01_batchbald.ipynb",
+         "get_joint_probs_N_C_C_transposed": "01_batchbald.ipynb",
          "get_real_naive_epig_scores": "01_batchbald.ipynb",
          "JointEntropy": "02_joint_entropy_computation.ipynb",
          "ExactJointEntropy": "02_joint_entropy_computation.ipynb",
@@ -201,7 +203,8 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "compute_entropy_from_probs": "09g_experiment_xmi_labels_clean.ipynb",
          "load_experiment_data": "09g_experiment_cifar10_xmi_labels_clean.ipynb",
          "DependencyInjection": "Z_dependency_injection.ipynb",
-         "T": "Z_dependency_injection.ipynb"}
+         "T": "Z_dependency_injection.ipynb",
+         "logmatmulexp": "Z_logmatmulexp.ipynb"}
 
 modules = ["batchbald.py",
            "joint_entropy.py",
@@ -237,7 +240,8 @@ modules = ["batchbald.py",
            "experiment_xmi_labels.py",
            "experiment_cifar10_xmi_labels_clean.py",
            "experiment_xmi_labels_clean.py",
-           "di.py"]
+           "di.py",
+           "logmatmulexp.py"]
 
 doc_url = "https://blackhc.github.io/batchbald_redux/"
 
