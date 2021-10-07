@@ -31,17 +31,17 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=15000,
+        max_training_set=5000 #15000,
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BALD,
+        #acquisition_functions.BALD,
         acquisition_functions.EPIG,
-        acquisition_functions.EvalBALD,
+        #acquisition_functions.EvalBALD,
     ]
-    for acquisition_size in [2000]
-    for num_pool_samples in [64]
-    for ood_exposure in [False, True]
+    for acquisition_size in [1000]
+    for num_pool_samples in [100]
+    for ood_exposure in [True] #[False, True]
     for id_dataset, ood_dataset in [("CIFAR-10", "SVHN"), ("SVHN", "CIFAR-10")]
 ]
 

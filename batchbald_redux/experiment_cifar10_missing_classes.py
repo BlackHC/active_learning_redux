@@ -32,24 +32,24 @@ configs = [
             evaluation_set_size=4000,
             add_dataset_noise=False,
             minority_classes={2, 3, 4, 5, 6, 7},
-            minority_class_percentage=0.0,
+            minority_class_percentage=0.1, #0.0,
         ),
         seed=seed + 4658,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=11000,
+        max_training_set=5000, #11000,
     )
-    for seed in range(3)
+    for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BALD,
+        #acquisition_functions.BALD,
         acquisition_functions.EPIG,
-        acquisition_functions.EvalBALD,
-        baseline_acquisition_functions.BADGE,
-        acquisition_functions.Random,
+        #acquisition_functions.EvalBALD,
+        #baseline_acquisition_functions.BADGE,
+        #acquisition_functions.Random,
     ]
     for acquisition_size in [800]
-    for num_pool_samples in [50]
+    for num_pool_samples in [100]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":

@@ -212,6 +212,7 @@ class UnifiedExperiment:
     temperature: float = 0.0
     epig_bootstrap_type: acquisition_functions.BootstrapType = acquisition_functions.BootstrapType.NO_BOOTSTRAP
     epig_bootstrap_factor: float = 1.
+    epig_dtype: torch.dtype = torch.double
 
     def load_experiment_data(self) -> ExperimentData:
         print(self.experiment_data_config)

@@ -323,6 +323,7 @@ class _EPIG(EvalDatasetBatchComputer):
     num_pool_samples: int
     epig_bootstrap_type: BootstrapType
     epig_bootstrap_factor: float
+    epig_dtype: torch.dtype
 
     def compute_candidate_batch(
         self,
@@ -344,7 +345,7 @@ class _EPIG(EvalDatasetBatchComputer):
             bootstrap_factor=self.epig_bootstrap_factor,
             pool_log_probs_N_K_C=log_probs_N_K_C,
             eval_log_probs_E_K_C=log_eval_probs_N_K_C,
-            dtype=torch.float,
+            dtype=self.epig_dtype,
             device=device,
         )
 
