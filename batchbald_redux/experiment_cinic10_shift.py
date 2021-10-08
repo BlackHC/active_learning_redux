@@ -38,7 +38,7 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BALD,
+        #acquisition_functions.BALD,
         acquisition_functions.EPIG,
     ]
     for acquisition_size in [1000]
