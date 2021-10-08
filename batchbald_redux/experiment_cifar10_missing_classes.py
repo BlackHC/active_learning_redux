@@ -32,7 +32,7 @@ configs = [
             evaluation_set_size=4000,
             add_dataset_noise=False,
             minority_classes={2, 3, 4, 5, 6, 7},
-            minority_class_percentage=0.1, #0.0,
+            minority_class_percentage=0.0,
         ),
         seed=seed + 4658,
         acquisition_function=acquisition_function,

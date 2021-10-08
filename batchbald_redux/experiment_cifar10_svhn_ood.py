@@ -39,7 +39,7 @@ configs = [
         acquisition_functions.EPIG,
         #acquisition_functions.EvalBALD,
     ]
-    for acquisition_size in [1000]
+    for acquisition_size in [2000]
     for num_pool_samples in [100]
     for ood_exposure in [True] #[False, True]
     for id_dataset, ood_dataset in [("CIFAR-10", "SVHN"), ("SVHN", "CIFAR-10")]
