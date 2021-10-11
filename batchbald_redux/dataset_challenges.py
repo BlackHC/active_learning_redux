@@ -306,7 +306,6 @@ def split(dataset: data.Dataset, positive_indices: List[int]):
     negative_subset = SubsetAliasDataset(dataset, negative_indices, alias=f"{dataset}[~{positive_indices}]")
     return positive_subset, negative_subset
 
-
 # Cell
 
 

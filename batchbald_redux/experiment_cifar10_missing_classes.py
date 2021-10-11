@@ -26,7 +26,7 @@ configs = [
         experiment_data_config=ImbalancedTestDistributionExperimentDataConfig(
             dataset_name="CIFAR-10",
             repetitions=1,
-            initial_training_set_size=100,
+            initial_training_set_size=0,
             validation_set_size=4000,
             validation_split_random_state=0,
             evaluation_set_size=4000,
@@ -38,17 +38,17 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=5000, #11000,
+        max_training_set=450, #11000,
     )
     for seed in range(5)
     for acquisition_function in [
-        #acquisition_functions.BALD,
+        acquisition_functions.BALD,
         acquisition_functions.EPIG,
         #acquisition_functions.EvalBALD,
         #baseline_acquisition_functions.BADGE,
         #acquisition_functions.Random,
     ]
-    for acquisition_size in [800]
+    for acquisition_size in [10]
     for num_pool_samples in [100]
 ]
 

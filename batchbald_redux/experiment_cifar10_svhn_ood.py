@@ -20,7 +20,7 @@ from .unified_experiment import UnifiedExperiment
 configs = [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(id_dataset_name=id_dataset, id_repetitions=1,
-                                                                          initial_training_set_size=100,
+                                                                          initial_training_set_size=20,
                                                                           validation_set_size=4000,
                                                                           validation_split_random_state=0,
                                                                           evaluation_set_size=4000,
@@ -31,17 +31,17 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=5000 #15000,
+        max_training_set=450 #15000,
     )
     for seed in range(5)
     for acquisition_function in [
-        #acquisition_functions.BALD,
+        acquisition_functions.BALD,
         acquisition_functions.EPIG,
         #acquisition_functions.EvalBALD,
     ]
-    for acquisition_size in [2000]
+    for acquisition_size in [10]
     for num_pool_samples in [100]
-    for ood_exposure in [True] #[False, True]
+    for ood_exposure in [False, True]
     for id_dataset, ood_dataset in [("CIFAR-10", "SVHN"), ("SVHN", "CIFAR-10")]
 ]
 
