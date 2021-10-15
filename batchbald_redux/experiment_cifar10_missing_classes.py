@@ -21,6 +21,8 @@ from .unified_experiment import UnifiedExperiment
 # (ID: air, automobile, ship and truck, OOD: bird, cat, deer, dog, frog and horse)
 # ood_classes={2, 3, 4, 5, 6, 7}
 
+
+
 configs = [
     UnifiedExperiment(
         experiment_data_config=ImbalancedTestDistributionExperimentDataConfig(
@@ -38,7 +40,9 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=450, #11000,
+        max_training_set=450,
+        ensemble_size=5,
+        disable_training_augmentations=True
     )
     for seed in range(5)
     for acquisition_function in [

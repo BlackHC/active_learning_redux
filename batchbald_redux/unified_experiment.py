@@ -36,7 +36,7 @@ from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
 )
-from .trained_model import ModelTrainer
+from .trained_model import ModelTrainer, BayesianEnsembleModelTrainer
 
 # Cell
 
@@ -53,6 +53,8 @@ class ActiveLearner:
     model_trainer: ModelTrainer
     data: ExperimentData
 
+    disable_training_augmentations: bool
+
     device: Optional
 
     def __call__(self, log):
@@ -60,6 +62,8 @@ class ActiveLearner:
 
         # Active Learning setup
         data = self.data
+
+        train_augmentations = data.train_augmentations if not self.disable_training_augmentations else None
 
         model_trainer = self.model_trainer
         train_eval_model = self.train_eval_model
@@ -101,7 +105,7 @@ class ActiveLearner:
 
             trained_model = model_trainer.get_trained(
                 train_loader=train_loader,
-                train_augmentations=data.train_augmentations,
+                train_augmentations=train_augmentations,
                 validation_loader=validation_loader,
                 log=iteration_log["training"],
                 loss=loss,
@@ -143,7 +147,7 @@ class ActiveLearner:
                 trained_eval_model = train_eval_model(
                     model_trainer=model_trainer,
                     training_dataset=data.active_learning.training_dataset,
-                    train_augmentations=data.train_augmentations,
+                    train_augmentations=train_augmentations,
                     eval_dataset=eval_dataset,
                     validation_loader=validation_loader,
                     trained_model=trained_model,
@@ -208,11 +212,13 @@ class UnifiedExperiment:
     acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = acquisition_functions.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
+    ensemble_size: int = 1
 
     temperature: float = 0.0
     epig_bootstrap_type: acquisition_functions.BootstrapType = acquisition_functions.BootstrapType.NO_BOOTSTRAP
     epig_bootstrap_factor: float = 1.
     epig_dtype: torch.dtype = torch.double
+    disable_training_augmentations: bool = False
 
     def load_experiment_data(self) -> ExperimentData:
         print(self.experiment_data_config)
@@ -242,12 +248,15 @@ class UnifiedExperiment:
 
         acquisition_function = self.create_acquisition_function()
         model_trainer = self.create_model_trainer()
+        if self.ensemble_size > 1:
+            model_trainer = BayesianEnsembleModelTrainer(model_trainer=model_trainer, ensemble_size=self.ensemble_size)
         train_eval_model = self.create_train_eval_model()
 
         active_learner = ActiveLearner(
             acquisition_size=self.acquisition_size,
             max_training_set=self.max_training_set,
             num_validation_samples=self.num_validation_samples,
+            disable_training_augmentations=self.disable_training_augmentations,
             acquisition_function=acquisition_function,
             train_eval_model=train_eval_model,
             model_trainer=model_trainer,

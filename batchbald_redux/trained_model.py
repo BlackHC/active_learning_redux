@@ -229,6 +229,13 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
     model_trainer: ModelTrainer
     ensemble_size: int
 
+    def get_train_dataloader(self, dataset: Dataset):
+        return self.model_trainer.get_train_dataloader(dataset)
+
+    # test|validation|evaluation
+    def get_evaluation_dataloader(self, dataset: Dataset):
+        return self.model_trainer.get_evaluation_dataloader(dataset)
+
     def get_trained(
         self,
         *,
@@ -250,6 +257,29 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
                 log=log[i],
                 loss=loss,
                 validation_loss=validation_loss,
+            )
+            models += [model]
+
+        return TrainedBayesianEnsemble(models)
+
+
+    def get_distilled(
+        self,
+        *,
+        prediction_loader: DataLoader,
+        train_augmentations: Optional[Module],
+        validation_loader: DataLoader,
+        log
+    ) -> TrainedModel:
+        models = []
+
+        for i in range(self.ensemble_size):
+            log[i] = {}
+            model = self.model_trainer.get_distilled(
+                prediction_loader=prediction_loader,
+                train_augmentations=train_augmentations,
+                validation_loader=validation_loader,
+                log=log[i],
             )
             models += [model]
 
