@@ -85,17 +85,26 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
 
 @dataclass
 class TrainExplicitEvalModel(TrainEvalModel):
+    cache_explicit_eval_model: bool = False
+    _fully_trained_model: TrainedModel = None
+
     def __call__(self, *, model_trainer: ModelTrainer, training_dataset: torch.utils.data.Dataset,
                  train_augmentations: nn.Module, eval_dataset: torch.utils.data.Dataset,
                  validation_loader: torch.utils.data.DataLoader, trained_model: TrainedModel, device: Optional,
                  storage_device: Optional, training_log):
         # TODO: support one_hot!? For this we need to change the eval_dataset to also have one_hot applied in
         #  ExperimentData?
-        train_eval_dataset = torch.utils.data.ConcatDataset([training_dataset, eval_dataset])
-        train_eval_loader = model_trainer.get_train_dataloader(train_eval_dataset)
+        if not self._fully_trained_model:
+            train_eval_dataset = torch.utils.data.ConcatDataset([training_dataset, eval_dataset])
+            train_eval_loader = model_trainer.get_train_dataloader(train_eval_dataset)
 
-        trained_model = model_trainer.get_trained(train_loader=train_eval_loader,
-                                                  train_augmentations=train_augmentations,
-                                                  validation_loader=validation_loader, log=training_log)
+            trained_model = model_trainer.get_trained(train_loader=train_eval_loader,
+                                                      train_augmentations=train_augmentations,
+                                                      validation_loader=validation_loader, log=training_log)
+            if self.cache_explicit_eval_model:
+                self._fully_trained_model = trained_model
+        else:
+            print("Using cached fully trained model!")
+            trained_model = self._fully_trained_model
 
         return trained_model

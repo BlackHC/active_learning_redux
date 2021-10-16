@@ -219,6 +219,7 @@ class UnifiedExperiment:
     epig_bootstrap_factor: float = 1.
     epig_dtype: torch.dtype = torch.double
     disable_training_augmentations: bool = False
+    cache_explicit_eval_model: bool = False
 
     def load_experiment_data(self) -> ExperimentData:
         print(self.experiment_data_config)

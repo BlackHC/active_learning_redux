@@ -7,20 +7,23 @@ __all__ = ['train', 'LOG_INTERVAL', 'train_with_schedule', 'train_with_cosine_an
 
 from dataclasses import dataclass
 from typing import Optional
+
 import torch
+import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.utils.ignite_progress_bar import ignite_progress_bar
 from ignite.contrib.engines.common import setup_common_training_handlers
 from ignite.contrib.handlers import ProgressBar
 from ignite.engine import Events, create_supervised_evaluator, create_supervised_trainer
-from ignite.metrics import Accuracy, Loss, RunningAverage
+from ignite.metrics import Accuracy, Loss, RunningAverage, Average
 from torch import nn
 
-
 from .consistent_mc_dropout import (
+    BayesianModule,
     GeometricMeanPrediction,
     SamplerModel,
-    multi_sample_loss, BayesianModule, get_log_mean_probs,
+    get_log_mean_probs,
+    multi_sample_loss,
 )
 from .restoring_early_stopping import (
     PatienceWithSnapshot,
@@ -39,8 +42,8 @@ def train(
     model,
     training_samples,
     validation_samples,
-    train_loader,
-    validation_loader,
+    train_loader:  torch.utils.data.DataLoader,
+    validation_loader: torch.utils.data.DataLoader,
     patience: Optional[int],
     max_epochs: int,
     device: str,
@@ -77,6 +80,7 @@ def train(
 
     validation_evaluator = create_supervised_evaluator(validation_model, metrics=metrics, device=device)
 
+    assert len(validation_loader.dataset) > 0, "Empty validation loader does not work with early stopping!!!"
     @trainer.on(Events.EPOCH_COMPLETED)
     def compute_metrics(engine):
         validation_evaluator.run(validation_loader)
@@ -151,8 +155,8 @@ def train_with_schedule(
     model,
     training_samples,
     validation_samples,
-    train_loader,
-    validation_loader,
+    train_loader: torch.utils.data.DataLoader,
+    validation_loader: torch.utils.data.DataLoader,
     patience_schedule: [int],
     factor_schedule: [int],
     max_epochs: int,
@@ -190,6 +194,7 @@ def train_with_schedule(
 
     validation_evaluator = create_supervised_evaluator(validation_model, metrics=metrics, device=device)
 
+    assert len(validation_loader.dataset) > 0, "Empty validation loader does not work with early stopping!!!"
     @trainer.on(Events.EPOCH_COMPLETED)
     def compute_metrics(engine):
         validation_evaluator.run(validation_loader)
@@ -225,6 +230,7 @@ def train_with_schedule(
             print(f"Epoch metrics: {metrics}")
 
     if prefer_accuracy:
+
         def score_function(metrics):
             return float(metrics["accuracy"])
 
@@ -265,8 +271,8 @@ def train_with_cosine_annealing(
     model,
     training_samples,
     validation_samples,
-    train_loader,
-    validation_loader,
+    train_loader: torch.utils.data.DataLoader,
+    validation_loader: torch.utils.data.DataLoader,
     max_epochs: int,
     device: str,
     training_log: dict,
@@ -301,12 +307,14 @@ def train_with_cosine_annealing(
 
     validation_evaluator = create_supervised_evaluator(validation_model, metrics=metrics, device=device)
 
-    @trainer.on(Events.EPOCH_COMPLETED)
-    def compute_metrics(engine):
-        validation_evaluator.run(validation_loader)
+    if len(validation_loader.dataset) > 0:
+        @trainer.on(Events.EPOCH_COMPLETED)
+        def compute_metrics(engine):
+            validation_evaluator.run(validation_loader)
 
     # Only to look nicer.
-    RunningAverage(output_transform=lambda x: x).attach(trainer, "crossentropy")
+    #RunningAverage(output_transform=lambda x: x).attach(trainer, "crossentropy")
+    Average().attach(trainer, "training_crossentropy")
 
     enable_tqdm_pbars = is_run_from_ipython()
 
@@ -315,11 +323,12 @@ def train_with_cosine_annealing(
     )
 
     if enable_tqdm_pbars:
-        ProgressBar(persist=False).attach(
-            validation_evaluator,
-            metric_names="all",
-            event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
-        )
+        if len(validation_loader.dataset) > 0:
+            ProgressBar(persist=False).attach(
+                validation_evaluator,
+                metric_names="all",
+                event_name=Events.ITERATION_COMPLETED(every=LOG_INTERVAL),
+            )
     else:
         ignite_progress_bar(trainer, desc=lambda engine: "Training", log_interval=LOG_INTERVAL)
 
@@ -327,20 +336,22 @@ def train_with_cosine_annealing(
     epochs_log = training_log["epochs"]
 
     # Logging
+    @trainer.on(Events.EPOCH_COMPLETED)
+    def log_training_metrics(engine):
+        metrics = dict(engine.state.metrics)
+        epochs_log.append(metrics)
+
     @validation_evaluator.on(Events.EPOCH_COMPLETED)
-    def log_training_results(engine):
+    def log_validation_metrics(engine):
         metrics = dict(engine.state.metrics)
         epochs_log.append(metrics)
 
         if is_run_from_ipython():
             print(f"Epoch {trainer.state.epoch} metrics: {metrics}")
 
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer,
-        T_max=max_epochs
-    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epochs)
 
-    @validation_evaluator.on(Events.EPOCH_COMPLETED)
+    @trainer.on(Events.EPOCH_COMPLETED)
     def step_scheduler(engine):
         scheduler.step()
 
@@ -505,8 +516,9 @@ def train_double_snapshots(
 
 
 def evaluate(*, model: TrainedModel, loader, num_samples, device, storage_device, loss=None):
-    log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(loader=loader, num_samples=num_samples, device=device, storage_device=storage_device)
-
+    log_probs_N_K_C, labels_N = model.get_log_probs_N_K_C_labels_N(
+        loader=loader, num_samples=num_samples, device=device, storage_device=storage_device
+    )
 
     if loss is None:
         loss = nn.NLLLoss()
@@ -519,9 +531,9 @@ def evaluate(*, model: TrainedModel, loader, num_samples, device, storage_device
 
 
 def evaluate_old(*, model, num_samples, loader, device, loss=None):
-    # TODO: rewrite this on top of TrainedModel?
-    # Add "get_log_prob_predictions" which returns the mean?
-    # Compute accuracy etc based on that?
+        # TODO: rewrite this on top of TrainedModel?
+        # Add "get_log_prob_predictions" which returns the mean?
+        # Compute accuracy etc based on that?
 
     # Move model to device
     model.to(device)
