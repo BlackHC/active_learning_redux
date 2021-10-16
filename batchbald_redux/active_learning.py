@@ -29,6 +29,7 @@ class ActiveLearningData:
         self.training_mask = np.full((len(dataset),), False)
         self.pool_mask = np.full((len(dataset),), True)
 
+        # TODO: use dataset challenges here?
         self.training_dataset = data.Subset(self.base_dataset, None)
         self.pool_dataset = data.Subset(self.base_dataset, None)
 
@@ -93,6 +94,10 @@ class ActiveLearningData:
         self.remove_base_indices(base_indices)
         return data.Subset(self.base_dataset, base_indices)
 
+
+    def __repr__(self):
+        return f"ActiveLearningData(base_dataset={self.base_dataset}, num_training_samples={len(self.training_dataset)}, num_pool_samples={len(self.pool_dataset)})"
+
 # Cell
 
 
@@ -122,4 +127,4 @@ class RandomFixedLengthSampler(data.Sampler):
         return iter((indices[: self.target_length] % len(self.dataset)).tolist())
 
     def __len__(self):
-        return self.target_length
+        return max(self.target_length, len(self.dataset))
