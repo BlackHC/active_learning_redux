@@ -250,7 +250,7 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
 
         log["ensemble"] = []
         for i in range(self.ensemble_size):
-            log["ensemble"].append([])
+            log["ensemble"].append({})
             model = self.model_trainer.get_trained(
                 train_loader=train_loader,
                 train_augmentations=train_augmentations,
@@ -276,7 +276,7 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
 
         log["ensemble"] = []
         for i in range(self.ensemble_size):
-            log["ensemble"].append([])
+            log["ensemble"].append({})
             model = self.model_trainer.get_distilled(
                 prediction_loader=prediction_loader,
                 train_augmentations=train_augmentations,
