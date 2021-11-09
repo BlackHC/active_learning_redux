@@ -14,6 +14,7 @@ from batchbald_redux import acquisition_functions, baseline_acquisition_function
 from .experiment_data import StandardExperimentDataConfig
 from .unified_experiment import UnifiedExperiment
 from .train_eval_model import TrainExplicitEvalModel
+from .resnet_models import Cifar10ModelWorkshopPaperTrainer
 
 # Cell
 
@@ -23,9 +24,9 @@ configs = [
             id_dataset_name="CIFAR-10",
             id_repetitions=1,
             initial_training_set_size=0,
-            validation_set_size=0,
-            validation_split_random_state=0,
-            evaluation_set_size=0,
+            validation_set_size=5000,
+            validation_split_random_state=seed + 8945,
+            evaluation_set_size=25000,
             add_dataset_noise=False,
             ood_dataset_config=None,
         ),
@@ -35,9 +36,10 @@ configs = [
         num_pool_samples=num_pool_samples,
         max_training_set=200,
         train_eval_model=TrainExplicitEvalModel,
-        ensemble_size=5,
+        ensemble_size=1,
         disable_training_augmentations=True,
-        cache_explicit_eval_model=True
+        cache_explicit_eval_model=True,
+        model_trainer_factory=Cifar10ModelWorkshopPaperTrainer
     )
     for seed in range(5)
     for acquisition_size in [1]
