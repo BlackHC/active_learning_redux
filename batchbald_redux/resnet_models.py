@@ -339,10 +339,10 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
 
     num_training_samples: int = 1
     num_validation_samples: int = 20
-    max_training_epochs: int = 100
-    patience_schedule: [int] = (5,)
+    max_training_epochs: int = 120
+    patience_schedule: [int] = (20,)
 
-    min_samples_per_epoch: int = 5056
+    min_samples_per_epoch: int = 1024
     num_training_batch_size: int = 128
     num_evaluation_batch_size: int = 512
 

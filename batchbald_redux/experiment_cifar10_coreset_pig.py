@@ -26,7 +26,7 @@ configs = [
             initial_training_set_size=0,
             validation_set_size=5000,
             validation_split_random_state=seed + 8945,
-            evaluation_set_size=0,
+            evaluation_set_size=20000,
             add_dataset_noise=False,
             ood_dataset_config=None,
         ),
@@ -36,7 +36,7 @@ configs = [
         num_pool_samples=num_pool_samples,
         max_training_set=200,
         train_eval_model=TrainExplicitEvalModel,
-        ensemble_size=1,
+        ensemble_size=3,
         disable_training_augmentations=True,
         cache_explicit_eval_model=True,
         model_trainer_factory=Cifar10ModelWorkshopPaperTrainer
