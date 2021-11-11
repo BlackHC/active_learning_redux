@@ -26,7 +26,7 @@ configs = [
             initial_training_set_size=0,
             validation_set_size=5000,
             validation_split_random_state=seed + 8945,
-            evaluation_set_size=25000,
+            evaluation_set_size=0,
             add_dataset_noise=False,
             ood_dataset_config=None,
         ),
