@@ -23,7 +23,7 @@ from .consistent_mc_dropout import (
     GeometricMeanPrediction,
     SamplerModel,
     get_log_mean_probs,
-    multi_sample_loss,
+    multi_sample_loss, LogProbMeanPrediction,
 )
 from .restoring_early_stopping import (
     PatienceWithSnapshot,
@@ -66,7 +66,7 @@ def train(
     if train_augmentations is not None:
         train_model = torch.nn.Sequential(train_augmentations, train_model)
 
-    validation_model = GeometricMeanPrediction(SamplerModel(model, validation_samples))
+    validation_model = LogProbMeanPrediction(SamplerModel(model, validation_samples))
 
     # Move model to device before creating the optimizer
     train_model.to(device)
@@ -180,7 +180,7 @@ def train_with_schedule(
     if train_augmentations is not None:
         train_model = torch.nn.Sequential(train_augmentations, train_model)
 
-    validation_model = GeometricMeanPrediction(SamplerModel(model, validation_samples))
+    validation_model = LogProbMeanPrediction(SamplerModel(model, validation_samples))
 
     # Move model to device before creating the optimizer
     train_model.to(device)
@@ -293,7 +293,7 @@ def train_with_cosine_annealing(
     if train_augmentations is not None:
         train_model = torch.nn.Sequential(train_augmentations, train_model)
 
-    validation_model = GeometricMeanPrediction(SamplerModel(model, validation_samples))
+    validation_model = LogProbMeanPrediction(SamplerModel(model, validation_samples))
 
     # Move model to device before creating the optimizer
     train_model.to(device)
@@ -401,7 +401,7 @@ def train_double_snapshots(
     if train_augmentations is not None:
         train_model = torch.nn.Sequential(train_augmentations, train_model)
 
-    validation_model = GeometricMeanPrediction(SamplerModel(model, validation_samples))
+    validation_model = LogProbMeanPrediction(SamplerModel(model, validation_samples))
 
     # Move model to device before creating the optimizer
     train_model.to(device)
@@ -538,7 +538,7 @@ def evaluate_old(*, model, num_samples, loader, device, loss=None):
     # Move model to device
     model.to(device)
 
-    evaluation_model = GeometricMeanPrediction(SamplerModel(model, num_samples))
+    evaluation_model = LogProbMeanPrediction(SamplerModel(model, num_samples))
 
     if loss is None:
         loss = nn.NLLLoss()
