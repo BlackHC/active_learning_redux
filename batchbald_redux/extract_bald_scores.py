@@ -54,7 +54,6 @@ class CustomBALD(acquisition_functions.BALD):
         self.scores_N = scores_N
         return super().extract_candidates(scores_N)
 
-
 # Cell
 
 @dataclass
