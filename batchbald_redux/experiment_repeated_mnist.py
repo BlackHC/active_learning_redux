@@ -46,7 +46,7 @@ configs = [
     for seed in range(5)
     for acquisition_size in [10]
     for num_pool_samples in [100]
-    for id_repetitions in [1,2,4,8]
+    for id_repetitions in [1,2,4]
     for stochastic_mode in [acquisition_functions.StochasticMode.Power]
 ] + [
     UnifiedExperiment(
@@ -75,7 +75,7 @@ configs = [
     for seed in range(5)
     for acquisition_size in [10]
     for num_pool_samples in [100]
-    for id_repetitions in [1,2,4,8]
+    for id_repetitions in [1,2,4]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
