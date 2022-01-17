@@ -215,6 +215,8 @@ class UnifiedExperiment:
     ensemble_size: int = 1
 
     temperature: float = 0.0
+    coldness: float = 0.0
+    stochastic_mode: acquisition_functions.StochasticMode = None
     epig_bootstrap_type: acquisition_functions.BootstrapType = acquisition_functions.BootstrapType.NO_BOOTSTRAP
     epig_bootstrap_factor: float = 1.
     epig_dtype: torch.dtype = torch.double

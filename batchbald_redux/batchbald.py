@@ -4,7 +4,9 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_batch_bald_batch', 'get_bald_scores', 'get_top_k_scorers', 'get_bald_batch',
            'get_batch_eval_bald_batch', 'compute_each_conditional_entropy', 'get_thompson_bald_batch',
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
-           'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_eig_scores', 'get_batch_eig_batch',
+           'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_random_samples',
+           'get_softmax_samples', 'get_power_samples', 'get_softrank_samples', 'StochasticMode',
+           'get_stochastic_samples', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
            'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'BootstrapType',
            'get_joint_probs_N_C_C', 'get_joint_probs_N_C_EC_transposed', 'get_joint_probs_N_C_C_transposed',
@@ -17,6 +19,7 @@ from enum import Enum
 from typing import List
 
 import numpy as np
+import scipy.stats
 import torch
 from blackhc.progress_bar import create_progress_bar, with_progress_bar
 from toma import toma
@@ -374,20 +377,77 @@ def get_top_random_eval_bald_batch(
 # Cell
 
 
-def get_sampled_tempered_scorers(exp_scores_N: torch.Tensor, *, temperature: float, batch_size: int) -> CandidateBatch:
-    N = len(exp_scores_N)
+def get_sampled_tempered_scorers(scores_N: torch.Tensor, *, temperature: float, batch_size: int) -> CandidateBatch:
+    N = len(scores_N)
     batch_size = min(batch_size, N)
 
-    tempered_scores_N = exp_scores_N ** (1 / temperature)
-    tempered_scores_N[exp_scores_N < 0] = 0.0
+    # If we exponentiate scores_N beforehand, we obtain a softmax function here.
+    tempered_scores_N = scores_N ** (1 / temperature)
+    tempered_scores_N[scores_N < 0] = 0.0
     partition_constant = tempered_scores_N.sum()
     p = tempered_scores_N / partition_constant
 
     # TODO: change this to use PyTorch instead of numpy?
     candidate_indices = np.random.choice(N, size=batch_size, replace=False, p=p.cpu().numpy())
-    candidate_scores = exp_scores_N[candidate_indices]
+    candidate_scores = scores_N[candidate_indices]
 
     return CandidateBatch(candidate_scores.tolist(), candidate_indices.tolist())
+
+# Cell
+
+
+def get_random_samples(scores_N: torch.Tensor, *, batch_size: int) -> CandidateBatch:
+    N = len(scores_N)
+    batch_size = min(batch_size, N)
+
+    indices = np.random.choice(N, size=batch_size, replace=False)
+    candidate_batch = CandidateBatch([0.0] * batch_size, indices.tolist())
+    return candidate_batch
+
+
+def get_softmax_samples(scores_N: torch.Tensor, *, coldness: float, batch_size: int) -> CandidateBatch:
+    # As coldness -> 0, we obtain random sampling.
+    if coldness == 0.0:
+        return get_random_samples(scores_N, batch_size=batch_size)
+
+    N = len(scores_N)
+    noised_scores_N = scores_N + scipy.stats.gumbel_r.rvs(loc=0, scale=1 / coldness, size=N, random_state=None)
+
+    return get_top_k_scorers(noised_scores_N, batch_size=batch_size)
+
+
+def get_power_samples(scores_N: torch.Tensor, *, coldness: float, batch_size: int) -> CandidateBatch:
+    return get_softmax_samples(torch.log(scores_N), coldness=coldness, batch_size=batch_size)
+
+
+def get_softrank_samples(scores_N: torch.Tensor, *, coldness: float, batch_size: int) -> CandidateBatch:
+    N = len(scores_N)
+
+    sorted_indices_N = torch.argsort(scores_N, descending=True)
+    ranks_N = torch.argsort(sorted_indices_N) + 1
+
+    return get_power_samples(1 / ranks_N, coldness=coldness, batch_size=batch_size)
+
+# Cell
+
+
+class StochasticMode(Enum):
+    Power = "Power"
+    Softmax = "Softmax"
+    Softrank = "Softrank"
+
+
+def get_stochastic_samples(
+    scores_N: torch.Tensor, *, coldness: float, batch_size: int, mode: StochasticMode
+) -> CandidateBatch:
+    if mode == StochasticMode.Power:
+        return get_power_samples(scores_N, coldness=coldness, batch_size=batch_size)
+    elif mode == StochasticMode.Softmax:
+        return get_softmax_samples(scores_N, coldness=coldness, batch_size=batch_size)
+    elif mode == StochasticMode.Softrank:
+        return get_softrank_samples(scores_N, coldness=coldness, batch_size=batch_size)
+    else:
+        return ValueError(f"Unknown mode")
 
 # Cell
 
@@ -669,6 +729,7 @@ def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtyp
 
 # Cell
 
+
 class BootstrapType(Enum):
     NO_BOOTSTRAP = 0
     SINGLE_BOOTSTRAP = 1
@@ -694,7 +755,7 @@ def get_joint_probs_N_C_EC_transposed(pool_probs_N_C_K: torch.Tensor, eval_probs
     #     joint_probs = pool_probs_C_K @ single_eval_probs_K_C / K
     #     joint_probs_C_C.copy_(joint_probs, non_blocking=True)
     eval_probs_K_EC = eval_probs_E_K_C.transpose(0, 1).reshape(K, E * C)
-    #joint_probs_N_C_EC = pool_probs_N_C_K.contiguous() @ eval_probs_K_EC.contiguous() / K
+    # joint_probs_N_C_EC = pool_probs_N_C_K.contiguous() @ eval_probs_K_EC.contiguous() / K
     joint_probs_N_C_EC = pool_probs_N_C_K @ eval_probs_K_EC / K
     return joint_probs_N_C_EC
 
@@ -703,6 +764,7 @@ def get_joint_probs_N_C_C_transposed(pool_probs_N_C_K: torch.Tensor, single_eval
     K = single_eval_probs_K_C.shape[0]
     joint_probs_N_C_C = pool_probs_N_C_K @ single_eval_probs_K_C / K
     return joint_probs_N_C_C
+
 
 @torch.no_grad()
 def get_real_naive_epig_scores(
@@ -727,8 +789,10 @@ def get_real_naive_epig_scores(
     total_joint_entropies_N = torch.zeros((N,), dtype=dtype, device=device)
 
     if bootstrap_type != BootstrapType.PER_POINT_BOOTSTRAP:
-        pool_probs_N_C_K = pool_log_probs_N_K_C.to(dtype=dtype, device=device, non_blocking=True).exp().transpose(1, 2).contiguous()
-        #eval_probs_E_K_C = eval_log_probs_E_K_C.to(device=device, non_blocking=True).exp()
+        pool_probs_N_C_K = (
+            pool_log_probs_N_K_C.to(dtype=dtype, device=device, non_blocking=True).exp().transpose(1, 2).contiguous()
+        )
+        # eval_probs_E_K_C = eval_log_probs_E_K_C.to(device=device, non_blocking=True).exp()
 
         eval_label_uncertainty = compute_entropy(eval_log_probs_E_K_C).mean(dim=0, keepdim=False)
 
@@ -750,7 +814,9 @@ def get_real_naive_epig_scores(
 
             nonlocal total_joint_entropies_N
             for chunked_eval_log_probs_e_K_C in eval_log_probs_E_K_C[eval_range].split(batchsize):
-                chunked_eval_probs_e_K_C = chunked_eval_log_probs_e_K_C.to(dtype=dtype, device=device, non_blocking=True).exp()
+                chunked_eval_probs_e_K_C = chunked_eval_log_probs_e_K_C.to(
+                    dtype=dtype, device=device, non_blocking=True
+                ).exp()
                 joint_probs_N_E_EC = get_joint_probs_N_C_EC_transposed(pool_probs_N_C_K, chunked_eval_probs_e_K_C)
                 weighted_nats_N_C_EC = joint_probs_N_E_EC * -torch.log(joint_probs_N_E_EC)
                 weighted_nats_N_C_EC[torch.isnan(weighted_nats_N_C_EC)] = 0.0
