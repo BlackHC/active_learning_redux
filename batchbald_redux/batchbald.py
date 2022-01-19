@@ -5,8 +5,8 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'CandidateBatch', '
            'get_batch_eval_bald_batch', 'compute_each_conditional_entropy', 'get_thompson_bald_batch',
            'get_top_random_scorers', 'get_random_bald_batch', 'get_eval_bald_scores', 'get_eval_bald_batch',
            'get_top_random_eval_bald_batch', 'get_sampled_tempered_scorers', 'get_random_samples',
-           'get_softmax_samples', 'get_power_samples', 'get_softrank_samples', 'StochasticMode',
-           'get_stochastic_samples', 'get_eig_scores', 'get_batch_eig_batch',
+           'get_softmax_samples', 'get_power_samples', 'get_softrank_samples', 'get_simulation_samples',
+           'StochasticMode', 'get_stochastic_samples', 'get_eig_scores', 'get_batch_eig_batch',
            'get_coreset_bald_scores_from_predictions', 'get_coreset_bald_scores', 'get_batch_coreset_bald_batch',
            'get_coreset_eig_scores', 'get_coreset_eig_bald_scores', 'get_sieve_bald_batch', 'BootstrapType',
            'get_joint_probs_N_C_C', 'get_joint_probs_N_C_EC_transposed', 'get_joint_probs_N_C_C_transposed',
@@ -428,6 +428,28 @@ def get_softrank_samples(scores_N: torch.Tensor, *, coldness: float, batch_size:
 
     return get_power_samples(1 / ranks_N, coldness=coldness, batch_size=batch_size)
 
+
+def get_simulation_samples(scores_N: torch.Tensor, *, coldness: float, batch_size: int) -> CandidateBatch:
+    # As coldness -> 0, we obtain random sampling.
+    if coldness == 0.0:
+        return get_random_samples(scores_N, batch_size=batch_size)
+
+    N = len(scores_N)
+    batch_size = min(batch_size, N)
+
+    indices = []
+    scores = []
+    current_scores_N = torch.clone(scores_N)
+    for i in range(batch_size):
+        score, index = torch.max(current_scores_N, dim=0)
+        scores += [score.item()]
+        indices += [index.item()]
+        current_scores_N = current_scores_N / (1+ scipy.stats.expon.rvs(loc=0, scale=1 / coldness, size=N, random_state=None))
+        current_scores_N[index] = float("-inf")
+
+    return CandidateBatch(scores=scores, indices=indices)
+
+
 # Cell
 
 
@@ -435,6 +457,7 @@ class StochasticMode(Enum):
     Power = "Power"
     Softmax = "Softmax"
     Softrank = "Softrank"
+    Simulation = "Simulation"
 
 
 def get_stochastic_samples(
@@ -446,6 +469,8 @@ def get_stochastic_samples(
         return get_softmax_samples(scores_N, coldness=coldness, batch_size=batch_size)
     elif mode == StochasticMode.Softrank:
         return get_softrank_samples(scores_N, coldness=coldness, batch_size=batch_size)
+    elif mode == StochasticMode.Simulation:
+        return get_simulation_samples(scores_N, coldness=coldness, batch_size=batch_size)
     else:
         return ValueError(f"Unknown mode")
 
