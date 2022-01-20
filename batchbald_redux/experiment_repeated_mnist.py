@@ -35,6 +35,32 @@ configs = [
         num_pool_samples=num_pool_samples,
         max_training_set=300,
         model_trainer_factory=MnistModelTrainer,
+    )
+    for acquisition_function in [
+        baseline_acquisition_functions.BADGE
+    ]
+    for seed in range(5)
+    for acquisition_size in [80,160]
+    for num_pool_samples in [100]
+    for id_repetitions in [1,2,4]
+] + [
+    UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=True,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 8945,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=300,
+        model_trainer_factory=MnistModelTrainer,
         stochastic_mode=stochastic_mode,
         coldness=coldness,
     )
@@ -45,11 +71,43 @@ configs = [
     for acquisition_size in [10]
     for num_pool_samples in [100]
     for id_repetitions in [1, 2, 4]
-    for coldness in [1., 1/8.]
+    for coldness in [16, 4.]
     # Already ran Power
     for stochastic_mode in [
         acquisition_functions.StochasticMode.Power,
         acquisition_functions.StochasticMode.Softmax,
+    ]
+] + [
+    UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=True,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 8945,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=300,
+        model_trainer_factory=MnistModelTrainer,
+        stochastic_mode=stochastic_mode,
+        coldness=coldness,
+    )
+    for acquisition_function in [
+        acquisition_functions.StochasticBALD,
+    ]
+    for seed in range(5)
+    for acquisition_size in [10]
+    for num_pool_samples in [100]
+    for id_repetitions in [1, 2, 4]
+    for coldness in [4, 1/4.]
+    # Already ran Power
+    for stochastic_mode in [
         acquisition_functions.StochasticMode.Softrank,
     ]
 ]
