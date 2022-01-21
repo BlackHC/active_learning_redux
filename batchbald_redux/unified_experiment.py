@@ -222,6 +222,7 @@ class UnifiedExperiment:
     epig_dtype: torch.dtype = torch.double
     disable_training_augmentations: bool = False
     cache_explicit_eval_model: bool = False
+    resnet18_dropout_head: bool = True
 
     def load_experiment_data(self) -> ExperimentData:
         print(self.experiment_data_config)
