@@ -209,13 +209,13 @@ class UnifiedExperiment:
     num_training_samples: int = 1
 
     device: str = "cuda"
-    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = acquisition_functions.BALD
+    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = None #acquisition_functions.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
-    model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
+    model_trainer_factory: Type[ModelTrainer] = None # Cifar10ModelTrainer
     ensemble_size: int = 1
 
-    temperature: float = 0.0
-    coldness: float = 0.0
+    temperature: float = 1.0
+    coldness: float = 1.0
     stochastic_mode: acquisition_functions.StochasticMode = None
     epig_bootstrap_type: acquisition_functions.BootstrapType = acquisition_functions.BootstrapType.NO_BOOTSTRAP
     epig_bootstrap_factor: float = 1.

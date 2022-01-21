@@ -394,7 +394,7 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
 
     num_training_samples: int = 1
     num_validation_samples: int = 20
-    max_training_epochs: int = 120
+    max_training_epochs: int = 105
     #patience_schedule: [int] = (20,)
     # Added
     patience_schedule: [int] = (20, 10)
@@ -445,7 +445,7 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
             validation_loss = torch.nn.NLLLoss()
 
         print("NeurIPS Workshop Style")
-        train(
+        train_with_schedule(
             model=model_optimizer.model,
             optimizer=model_optimizer.optimizer,
             training_samples=self.num_training_samples,
@@ -454,7 +454,8 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
             train_augmentations=train_augmentations,
             validation_loader=validation_loader,
             max_epochs=self.max_training_epochs,
-            patience=self.patience_schedule[0],
+            patience_schedule=self.patience_schedule,
+            factor_schedule=self.factor_schedule,
             loss=loss,
             validation_loss=validation_loss,
             device=self.device,

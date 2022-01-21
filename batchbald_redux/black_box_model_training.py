@@ -28,7 +28,7 @@ from .consistent_mc_dropout import (
 from .restoring_early_stopping import (
     PatienceWithSnapshot,
     ReduceLROnPlateauWithScheduleWrapper,
-    RestoringEarlyStopping,
+    RestoringEarlyStopping, suggest_limit_schedule,
 )
 
 # Cell
@@ -167,9 +167,13 @@ def train_with_schedule(
     optimizer=None,
     prefer_accuracy=True,
     train_augmentations=None,
+    limit_schedule: [int] = None,
 ):
     if not len(train_loader.dataset):
         return optimizer
+    if not limit_schedule:
+        limit_schedule, max_epochs = suggest_limit_schedule(patience_schedule, max_epochs)
+        print(f"Limit schedule/max epochs updated: {limit_schedule}, {max_epochs}")
 
     if loss is None:
         loss = nn.NLLLoss()
@@ -249,10 +253,12 @@ def train_with_schedule(
         metrics_transform=score_function,
         factor_schedule=factor_schedule,
         patience_schedule=patience_schedule,
+        limit_schedule=limit_schedule,
         end_callback=trainer.terminate,
         next_era_callback=next_era_callback,
         mode="max" if prefer_accuracy else "min",
         verbose=True,
+        module=model
     )
 
     @validation_evaluator.on(Events.EPOCH_COMPLETED)

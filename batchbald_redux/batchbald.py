@@ -449,7 +449,6 @@ def get_simulation_samples(scores_N: torch.Tensor, *, coldness: float, batch_siz
 
     return CandidateBatch(scores=scores, indices=indices)
 
-
 # Cell
 
 
