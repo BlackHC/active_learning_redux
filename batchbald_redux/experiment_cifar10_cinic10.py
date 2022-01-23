@@ -51,7 +51,6 @@ configs = sum(
                 **shared_configs
             )
             for acquisition_function in [
-                baseline_acquisition_functions.BADGE,
                 acquisition_functions.BALD,
             ]
         ]
@@ -79,47 +78,48 @@ configs = sum(
                 acquisition_functions.StochasticMode.Softmax,
                 acquisition_functions.StochasticMode.Softrank,
             ]
-            for coldness in ([1, 8] if stochastic_mode != acquisition_functions.StochasticMode.Softrank else [1])
+            for coldness in ([1/8, 1] if stochastic_mode != acquisition_functions.StochasticMode.Softrank else [1])
             for acquisition_function in [
                 acquisition_functions.StochasticBALD,
             ]
         ]
         for seed in range(3)
-        for id_dataset_name in ["CIFAR-10", "CINIC-10"]
-        for acquisition_size in [300, 900]
+        for id_dataset_name in ["CINIC-10"]
+        for acquisition_size in [300]
     ],
     [],
-) + [
-    UnifiedExperiment(
-        experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name=id_dataset_name,
-            id_repetitions=1,
-            initial_training_set_size=1000,
-            validation_set_size=1024,
-            validation_split_random_state=0,
-            evaluation_set_size=0,
-            add_dataset_noise=False,
-            ood_dataset_config=None,
-        ),
-        seed=seed + 1456,
-        acquisition_function=acquisition_function,
-        acquisition_size=acquisition_size,
-        num_validation_samples=1,
-        num_pool_samples=1,
-        num_training_samples=1,
-        resnet18_dropout_head=False,
-        ensemble_size=1,
-        max_training_epochs=105,
-        model_trainer_factory=Cifar10ModelWorkshopPaperTrainer,
-        max_training_set=16000,
-    )
-    for acquisition_function in [
-        baseline_acquisition_functions.BADGE,
-    ]
-    for seed in range(3)
-    for id_dataset_name in ["CIFAR-10", "CINIC-10"]
-    for acquisition_size in [300, 900]
-]
+)
+# + [
+#     UnifiedExperiment(
+#         experiment_data_config=StandardExperimentDataConfig(
+#             id_dataset_name=id_dataset_name,
+#             id_repetitions=1,
+#             initial_training_set_size=1000,
+#             validation_set_size=1024,
+#             validation_split_random_state=0,
+#             evaluation_set_size=0,
+#             add_dataset_noise=False,
+#             ood_dataset_config=None,
+#         ),
+#         seed=seed + 1456,
+#         acquisition_function=acquisition_function,
+#         acquisition_size=acquisition_size,
+#         num_validation_samples=1,
+#         num_pool_samples=1,
+#         num_training_samples=1,
+#         resnet18_dropout_head=False,
+#         ensemble_size=1,
+#         max_training_epochs=105,
+#         model_trainer_factory=Cifar10ModelWorkshopPaperTrainer,
+#         max_training_set=16000,
+#     )
+#     for acquisition_function in [
+#         baseline_acquisition_functions.BADGE,
+#     ]
+#     for seed in range(3)
+#     for id_dataset_name in ["CIFAR-10", "CINIC-10"]
+#     for acquisition_size in [300, 900]
+# ]
 #     UnifiedExperiment(
 #         seed=seed + 8945,
 #         acquisition_function=acquisition_function,
