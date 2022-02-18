@@ -403,7 +403,6 @@ def get_EMNIST(*, root, validation_set_size, validation_split_random_state, norm
         device_hint,
     )
 
-
 # Cell
 
 dataset_factories = {

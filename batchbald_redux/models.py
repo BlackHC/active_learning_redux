@@ -46,9 +46,9 @@ class BayesianMNISTCNN(BayesianModule):
             input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
             input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
             input = input.view(-1, 1024)
+            input = F.relu(self.fc1_drop(self.fc1(input)))
 
         embedding = input
-        input = F.relu(self.fc1_drop(self.fc1(input)))
         input = self.fc2(input)
         input = F.log_softmax(input, dim=1)
 
@@ -76,9 +76,9 @@ class BayesianMNISTCNN_EBM(BayesianModule):
             input = F.relu(F.max_pool2d(self.conv1_drop(self.conv1(input)), 2))
             input = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(input)), 2))
             input = input.view(-1, 1024)
+            input = F.relu(self.fc1_drop(self.fc1(input)))
 
         embedding = input
-        input = F.relu(self.fc1_drop(self.fc1(input)))
         input = self.fc2(input)
 
         return input, embedding

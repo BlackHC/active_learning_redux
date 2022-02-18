@@ -49,9 +49,9 @@ class BayesianEMNISTCNN(BayesianModule):
             input = F.relu(self.conv2_drop(self.conv2(input)))
             input = F.relu(F.max_pool2d(self.conv3_drop(self.conv3(input)), 2))
             input = input.view(-1, 128 * 4 * 4)
+            input = F.relu(self.fc1_drop(self.fc1(input)))
 
         embedding = input
-        input = F.relu(self.fc1_drop(self.fc1(input)))
         input = self.fc2(input)
         input = F.log_softmax(input, dim=1)
         return input, embedding
