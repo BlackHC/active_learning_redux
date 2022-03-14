@@ -156,7 +156,7 @@ configs = [
     ]
     for seed in range(5)
     for acquisition_size in [5]
-    for num_pool_samples in [10]
+    for num_pool_samples in [20]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
