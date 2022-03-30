@@ -4,7 +4,7 @@ __all__ = ['TrainEvalModel', 'TrainSelfDistillationEvalModel', 'TrainRandomLabel
 
 # Cell
 from dataclasses import dataclass
-from typing import Type, Optional
+from typing import Optional, Type
 
 import torch
 import torch.nn
@@ -17,16 +17,26 @@ from .dataset_challenges import (
     RandomLabelsDataset,
     ReplaceTargetsDataset,
 )
-from .trained_model import TrainedModel, ModelTrainer
+from .trained_model import ModelTrainer, TrainedModel
 
 # Cell
 
 
 class TrainEvalModel:
-    def __call__(self, *, model_trainer: ModelTrainer, training_dataset: torch.utils.data.Dataset,
-                 train_augmentations: nn.Module, eval_dataset: torch.utils.data.Dataset,
-                 validation_loader: torch.utils.data.DataLoader, trained_model: TrainedModel, device: Optional,
-                 storage_device: Optional, training_log) -> TrainedModel:
+    def __call__(
+        self,
+        *,
+        model_trainer: ModelTrainer,
+        training_dataset: torch.utils.data.Dataset,
+        train_augmentations: nn.Module,
+        eval_dataset: torch.utils.data.Dataset,
+        validation_loader: torch.utils.data.DataLoader,
+        trained_model: TrainedModel,
+        device: Optional,
+        storage_device: Optional,
+        training_log,
+        wandb_key_path: str
+    ) -> TrainedModel:
         raise NotImplementedError()
 
 
@@ -34,16 +44,27 @@ class TrainEvalModel:
 class TrainSelfDistillationEvalModel(TrainEvalModel):
     num_pool_samples: int
 
-    def __call__(self, *, model_trainer: ModelTrainer, training_dataset: torch.utils.data.Dataset,
-                 train_augmentations: nn.Module, eval_dataset: torch.utils.data.Dataset,
-                 validation_loader: torch.utils.data.DataLoader, trained_model: TrainedModel, device: Optional,
-                 storage_device: Optional, training_log):
+    def __call__(
+        self,
+        *,
+        model_trainer: ModelTrainer,
+        training_dataset: torch.utils.data.Dataset,
+        train_augmentations: nn.Module,
+        eval_dataset: torch.utils.data.Dataset,
+        validation_loader: torch.utils.data.DataLoader,
+        trained_model: TrainedModel,
+        device: Optional,
+        storage_device: Optional,
+        training_log,
+        wandb_key_path: str
+    ):
         train_eval_dataset = torch.utils.data.ConcatDataset([training_dataset, eval_dataset])
         train_eval_loader = model_trainer.get_evaluation_dataloader(train_eval_dataset)
 
         eval_log_probs_N_C = get_log_mean_probs(
-            trained_model.get_log_probs_N_K_C(train_eval_loader, num_samples=self.num_pool_samples, device=device,
-                                              storage_device=storage_device)
+            trained_model.get_log_probs_N_K_C(
+                train_eval_loader, num_samples=self.num_pool_samples, device=device, storage_device=storage_device
+            )
         )
 
         eval_self_distillation_dataset = ReplaceTargetsDataset(dataset=train_eval_dataset, targets=eval_log_probs_N_C)
@@ -54,7 +75,8 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
             prediction_loader=train_eval_self_distillation_loader,
             train_augmentations=train_augmentations,
             validation_loader=validation_loader,
-            log=training_log
+            log=training_log,
+            wandb_key_path=wandb_key_path,
         )
 
         return trained_model
@@ -62,10 +84,20 @@ class TrainSelfDistillationEvalModel(TrainEvalModel):
 
 @dataclass
 class TrainRandomLabelEvalModel(TrainEvalModel):
-    def __call__(self, *, model_trainer: ModelTrainer, training_dataset: torch.utils.data.Dataset,
-                 train_augmentations: nn.Module, eval_dataset: torch.utils.data.Dataset,
-                 validation_loader: torch.utils.data.DataLoader, trained_model: TrainedModel, device: Optional,
-                 storage_device: Optional, training_log):
+    def __call__(
+        self,
+        *,
+        model_trainer: ModelTrainer,
+        training_dataset: torch.utils.data.Dataset,
+        train_augmentations: nn.Module,
+        eval_dataset: torch.utils.data.Dataset,
+        validation_loader: torch.utils.data.DataLoader,
+        trained_model: TrainedModel,
+        device: Optional,
+        storage_device: Optional,
+        training_log,
+        wandb_key_path: str
+    ):
         # TODO: support one_hot!
         # TODO: different seed needed!
         train_eval_dataset = torch.utils.data.ConcatDataset(
@@ -77,7 +109,8 @@ class TrainRandomLabelEvalModel(TrainEvalModel):
             train_loader=train_eval_loader,
             train_augmentations=train_augmentations,
             validation_loader=validation_loader,
-            log=training_log
+            log=training_log,
+            wandb_key_path=wandb_key_path,
         )
 
         return trained_model
@@ -88,19 +121,33 @@ class TrainExplicitEvalModel(TrainEvalModel):
     cache_explicit_eval_model: bool = False
     _fully_trained_model: TrainedModel = None
 
-    def __call__(self, *, model_trainer: ModelTrainer, training_dataset: torch.utils.data.Dataset,
-                 train_augmentations: nn.Module, eval_dataset: torch.utils.data.Dataset,
-                 validation_loader: torch.utils.data.DataLoader, trained_model: TrainedModel, device: Optional,
-                 storage_device: Optional, training_log):
-        # TODO: support one_hot!? For this we need to change the eval_dataset to also have one_hot applied in
-        #  ExperimentData?
+    def __call__(
+        self,
+        *,
+        model_trainer: ModelTrainer,
+        training_dataset: torch.utils.data.Dataset,
+        train_augmentations: nn.Module,
+        eval_dataset: torch.utils.data.Dataset,
+        validation_loader: torch.utils.data.DataLoader,
+        trained_model: TrainedModel,
+        device: Optional,
+        storage_device: Optional,
+        training_log,
+        wandb_key_path: str
+    ):
+                        # TODO: support one_hot!? For this we need to change the eval_dataset to also have one_hot applied in
+                        #  ExperimentData?
         if not self._fully_trained_model:
             train_eval_dataset = torch.utils.data.ConcatDataset([training_dataset, eval_dataset])
             train_eval_loader = model_trainer.get_train_dataloader(train_eval_dataset)
 
-            trained_model = model_trainer.get_trained(train_loader=train_eval_loader,
-                                                      train_augmentations=train_augmentations,
-                                                      validation_loader=validation_loader, log=training_log)
+            trained_model = model_trainer.get_trained(
+                train_loader=train_eval_loader,
+                train_augmentations=train_augmentations,
+                validation_loader=validation_loader,
+                log=training_log,
+                wandb_key_path=wandb_key_path,
+            )
             if self.cache_explicit_eval_model:
                 self._fully_trained_model = trained_model
         else:

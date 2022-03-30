@@ -199,6 +199,7 @@ class ModelTrainer:
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
         log,
+        wandb_key_path: str,
         loss=None,
         validation_loss=None
     ) -> TrainedModel:
@@ -210,7 +211,8 @@ class ModelTrainer:
         prediction_loader: DataLoader,
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
-        log
+        log,
+        wandb_key_path:str
     ) -> TrainedModel:
         loss = torch.nn.KLDivLoss(log_target=True, reduction="batchmean")
         validation_loss = torch.nn.NLLLoss()
@@ -221,6 +223,7 @@ class ModelTrainer:
             loss=loss,
             validation_loss=validation_loss,
             log=log,
+            wandb_key_path=wandb_key_path,
         )
 
 
@@ -243,6 +246,7 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
         log,
+        wandb_key_path: str,
         loss=None,
         validation_loss=None
     ) -> TrainedBayesianEnsemble:
@@ -256,6 +260,7 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
                 train_augmentations=train_augmentations,
                 validation_loader=validation_loader,
                 log=log["ensemble"][-1],
+                wandb_key_path=wandb_key_path + f"/{i}/",
                 loss=loss,
                 validation_loss=validation_loss,
             )
@@ -270,7 +275,8 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
         prediction_loader: DataLoader,
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
-        log
+        log,
+        wandb_key_path:str,
     ) -> TrainedModel:
         models = []
 
@@ -282,6 +288,7 @@ class BayesianEnsembleModelTrainer(ModelTrainer):
                 train_augmentations=train_augmentations,
                 validation_loader=validation_loader,
                 log=log["ensemble"][-1],
+                wandb_key_path=wandb_key_path + f"/{i}/",
             )
             models += [model]
 

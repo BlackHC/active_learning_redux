@@ -128,7 +128,7 @@ class MnistModelTrainer(ModelTrainer):
         return evaluation_loader
 
     def get_trained(self, *, train_loader: DataLoader, train_augmentations: Optional[Module],
-                    validation_loader: DataLoader, log, loss=None, validation_loss=None) -> TrainedModel:
+                    validation_loader: DataLoader, log, wandb_key_path:str, loss=None, validation_loss=None) -> TrainedModel:
         model_optimizer = self.create_model_optimizer()
 
         if loss is None:
@@ -150,6 +150,7 @@ class MnistModelTrainer(ModelTrainer):
             validation_loss=validation_loss,
             device=self.device,
             training_log=log,
+            wandb_key_path=wandb_key_path,
         )
 
         return TrainedBayesianModel(model_optimizer.model)

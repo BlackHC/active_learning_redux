@@ -434,6 +434,7 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
         log,
+        wandb_key_path:str,
         loss=None,
         validation_loss=None
     ) -> TrainedModel:
@@ -460,6 +461,7 @@ class Cifar10ModelWorkshopPaperTrainer(ModelTrainer):
             validation_loss=validation_loss,
             device=self.device,
             training_log=log,
+            wandb_key_path=wandb_key_path,
         )
 
         return TrainedBayesianModel(model_optimizer.model)
@@ -510,6 +512,7 @@ class Cifar10ModelTrainer(ModelTrainer):
         train_augmentations: Optional[Module],
         validation_loader: DataLoader,
         log,
+        wandb_key_path:str,
         loss=None,
         validation_loss=None
     ) -> TrainedModel:
@@ -537,6 +540,7 @@ class Cifar10ModelTrainer(ModelTrainer):
                 validation_loss=validation_loss,
                 device=self.device,
                 training_log=log,
+                wandb_key_path=wandb_key_path,
             )
         else:
             print("Cosine Annealing")
@@ -553,6 +557,7 @@ class Cifar10ModelTrainer(ModelTrainer):
                 validation_loss=validation_loss,
                 device=self.device,
                 training_log=log,
+                wandb_key_path=wandb_key_path,
             )
 
         return TrainedBayesianModel(model_optimizer.model)
