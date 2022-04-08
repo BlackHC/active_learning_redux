@@ -78,12 +78,15 @@ def _asclassdict_inner(obj, dict_factory):
         return copy.deepcopy(obj)
 
 
-def init_wandb(config, notes=None, project="balds", entity="oatml-andreas-kirsch"):
+def init_wandb(config, notes=None, project=None, entity=None):
+    project = project or "balds"
+    entity = entity or "oatml-andreas-kirsch"
+
     global __logging_initialized__
 
     wandb.init(
-        project="balds",
-        entity="oatml-andreas-kirsch",
+        project=project,
+        entity=entity,
         config=asclassdict(config),
         save_code=True,
         job_type="experiment",
