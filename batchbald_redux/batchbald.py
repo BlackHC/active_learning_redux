@@ -457,6 +457,7 @@ class StochasticMode(Enum):
     Softmax = "Softmax"
     Softrank = "Softrank"
     Simulation = "Simulation"
+    TopK = "TopK"
 
 
 def get_stochastic_samples(
@@ -470,8 +471,10 @@ def get_stochastic_samples(
         return get_softrank_samples(scores_N, coldness=coldness, batch_size=batch_size)
     elif mode == StochasticMode.Simulation:
         return get_simulation_samples(scores_N, coldness=coldness, batch_size=batch_size)
+    elif mode == StochasticMode.TopK:
+        return get_top_k_scorers(scores_N, batch_size=batch_size)
     else:
-        return ValueError(f"Unknown mode")
+        raise ValueError(f"Unknown mode")
 
 # Cell
 
