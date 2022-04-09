@@ -262,8 +262,8 @@ class UnifiedExperiment:
         di = DependencyInjection(vars(self))
         return di.create_dataclass_type(self.model_trainer_factory)
 
-    def run(self, store):
-        init_wandb(self)
+    def run(self, store, project=None, entity=None):
+        init_wandb(self, project=project, entity=entity)
 
         torch.manual_seed(self.seed)
 

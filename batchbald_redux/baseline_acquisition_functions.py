@@ -1,5 +1,3 @@
-__all__ = ['init_centers', 'BADGE']
-
 import math
 from dataclasses import dataclass
 
@@ -68,7 +66,8 @@ class StochasticScoringFunction(PoolScorerCandidateBatchComputer):
     stochastic_mode: StochasticMode
 
     def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
-        scores_N = self.compute_scores(log_probs_N_K_C, device=device)
+        # Ignore the device (because get_stochastic_samples needs a cpu device!)
+        scores_N = self.compute_scores(log_probs_N_K_C, device="cpu")
 
         candidate_batch = self.extract_candidates(scores_N)
 
@@ -83,9 +82,8 @@ class StochasticScoringFunction(PoolScorerCandidateBatchComputer):
 
 
 def get_variation_ratios(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-    N, K, C = log_probs_N_K_C.shape
-    mean_log_probs_N_C = torch.logsumexp(log_probs_N_K_C.to(device), dim=1) - math.log(K)
-    return -torch.argmax(mean_log_probs_N_C, dim=1)
+    mean_probs_N_C = torch.mean(log_probs_N_K_C.to(device).exp(), dim=1)
+    return 1. - torch.max(mean_probs_N_C, dim=1)[0]
 
 
 @dataclass
@@ -95,11 +93,10 @@ class VariationRatios(StochasticScoringFunction):
 
 
 def get_margin_scores(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-    N, K, C = log_probs_N_K_C.shape
-    mean_log_probs_N_C = torch.logsumexp(log_probs_N_K_C.to(device), dim=1) - math.log(K)
-    top_2_probs_N = torch.topk(mean_log_probs_N_C, k=2, dim=1, sorted=True)[0]
-    margin_scores_N = top_2_probs_N[0] - top_2_probs_N[1]
-    return margin_scores_N
+    mean_probs_N_C = torch.mean(log_probs_N_K_C.to(device).exp(), dim=1)
+    top_2_probs_N_2 = torch.topk(mean_probs_N_C, k=2, dim=1, sorted=True)[0]
+    margin_scores_N = top_2_probs_N_2[:, 0] - top_2_probs_N_2[:, 1]
+    return 1. - margin_scores_N
 
 
 @dataclass
@@ -108,15 +105,15 @@ class Margin(StochasticScoringFunction):
         return get_margin_scores(log_probs_N_K_C=log_probs_N_K_C, device=device)
 
 
-def get_mean_stddev_scores(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-    stddev_B_C = torch.std(torch.exp(log_probs_N_K_C).to(device).double(), dim=1)
-    return torch.mean(stddev_B_C, dim=1).float()
+def get_stddev_scores(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
+    stddev_B_C = torch.std(log_probs_N_K_C.to(device).double().exp(), dim=1)
+    return torch.sum(stddev_B_C, dim=1)
 
 
 @dataclass
-class MeanStdDev(StochasticScoringFunction):
+class StdDev(StochasticScoringFunction):
     def compute_scores(self, log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-        return get_mean_stddev_scores(log_probs_N_K_C=log_probs_N_K_C, device=device)
+        return get_stddev_scores(log_probs_N_K_C=log_probs_N_K_C, device=device)
 
 
 # class DistilBayesianModelAdapter(torch.nn.Module):

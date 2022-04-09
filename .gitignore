@@ -142,3 +142,4 @@ checklink/cookies.txt
 /.virtual_documents/
 /.lsp_symlink/
 /data/
+/wandb/
