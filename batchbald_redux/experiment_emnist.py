@@ -20,7 +20,7 @@ from .unified_experiment import UnifiedExperiment
 configs = [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="EMNIST",
+            id_dataset_name="BalancedEMNIST",
             id_repetitions=1,
             initial_training_set_size=0,
             validation_set_size=4096,
@@ -53,7 +53,7 @@ configs = [
 ] + [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="EMNIST",
+            id_dataset_name="BalancedEMNIST",
             id_repetitions=1,
             initial_training_set_size=0,
             validation_set_size=4096,
@@ -85,7 +85,7 @@ configs = [
 ] + [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="EMNIST",
+            id_dataset_name="BalancedEMNIST",
             id_repetitions=1,
             initial_training_set_size=0,
             validation_set_size=4096,
@@ -106,11 +106,11 @@ configs = [
     ]
     for seed in range(5)
     for acquisition_size in [10, 20, 40]
-    for num_pool_samples in [10]
+    for num_pool_samples in [100]
 ] + [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="EMNIST",
+            id_dataset_name="BalancedEMNIST",
             id_repetitions=1,
             initial_training_set_size=0,
             validation_set_size=4096, # Increase the validation set to reduce memory pressure
@@ -135,7 +135,7 @@ configs = [
 ] + [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="EMNIST",
+            id_dataset_name="BalancedEMNIST",
             id_repetitions=1,
             initial_training_set_size=0,
             validation_set_size=4096,
