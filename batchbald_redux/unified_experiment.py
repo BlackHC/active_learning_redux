@@ -273,6 +273,8 @@ class UnifiedExperiment:
         store["initial_training_set_indices"] = data.initial_training_set_indices
         store["evaluation_set_indices"] = data.evaluation_set_indices
 
+        print(wandb.config)
+
         wandb.config.initial_training_set_indices = data.initial_training_set_indices
         wandb.config.evaluation_set_indices = data.evaluation_set_indices
         wandb.config["dataset_info"] = store["dataset_info"]
