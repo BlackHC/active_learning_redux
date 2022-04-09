@@ -403,6 +403,57 @@ def get_EMNIST(*, root, validation_set_size, validation_split_random_state, norm
         device_hint,
     )
 
+def get_balanced_EMNIST(*, root, validation_set_size, validation_split_random_state, normalize_like_cifar10, device_hint):
+    input_size = 28
+    num_classes = 47
+
+    """
+    EMNIST ByClass: 814,255 characters. 62 unbalanced classes.
+
+    EMNIST ByMerge: 814,255 characters. 47 unbalanced classes.
+
+    EMNIST Balanced: 131,600 characters. 47 balanced classes.
+
+    EMNIST Letters: 145,600 characters. 26 balanced classes.
+
+    EMNIST Digits: 280,000 characters. 10 balanced classes.
+
+    EMNIST MNIST: 70,000 characters. 10 balanced classes.
+    """
+
+    split = "balanced"
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+    full_train_dataset = datasets.EMNIST("data", split=split, train=True, download=True,
+                                    transform=transform)
+
+    test_dataset = datasets.EMNIST("data", split=split, train=False, transform=transform)
+
+    train_dataset, validation_dataset = train_validation_split(
+        full_train_dataset=full_train_dataset,
+        train_labels=full_train_dataset.targets,
+        validation_set_size=validation_set_size,
+        validation_split_random_state=validation_split_random_state,
+    )
+
+    return SplitDataset(
+        input_size,
+        num_classes,
+        dict(
+            validation_split_random_state=validation_split_random_state,
+            normalize_like_cifar10=normalize_like_cifar10,
+        ),
+        NamedDataset(
+            train_dataset, f"EMNIST (Train, seed={validation_split_random_state}, {len(train_dataset)} samples)"
+        ),
+        NamedDataset(
+            validation_dataset,
+            f"EMNIST (Validation, seed={validation_split_random_state}, {len(validation_dataset)} samples)",
+        ),
+        NamedDataset(test_dataset, "EMNIST (Test)"),
+        nn.Sequential(),
+        device_hint,
+    )
+
 # Cell
 
 dataset_factories = {
@@ -413,6 +464,7 @@ dataset_factories = {
     "IMAGENET-CINIC-10": functools.partial(get_CINIC10, imagenet_only=True),
     "MNIST": get_MNIST,
     "EMNIST": get_EMNIST,
+    "BalancedEMNIST": get_balanced_EMNIST,
     "FashionMNIST": get_FashionMNIST,
 }
 
