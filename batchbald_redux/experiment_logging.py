@@ -91,7 +91,8 @@ def init_wandb(config, notes=None, project=None, entity=None):
         save_code=True,
         job_type="experiment",
         notes=notes,
-        magic=True,
+        # This codepath is currently broken.
+        magic=False,
         mode="online",
     )
 
