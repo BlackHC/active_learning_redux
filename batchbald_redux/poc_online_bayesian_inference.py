@@ -181,6 +181,27 @@ training_set_90 = [
     43095,
 ]
 
+training_set_90[:20] = [51348,
+ 49110,
+ 8222,
+ 28130,
+ 13484,
+ 47685,
+ 3938,
+ 59930,
+ 49196,
+ 19427,
+ 4601,
+ 49922,
+ 45635,
+ 35684,
+ 3579,
+ 7621,
+ 8465,
+ 33959,
+ 27521,
+ 27015]
+
 
 @dataclass
 class Experiment:
@@ -205,23 +226,13 @@ class Experiment:
         train_dataset = NamedDataset(
             FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
         )
-        train_predictions = torch.load("./data/mnist_train_predictions.pt", map_location=self.device)
-        # train_dataset = train_dataset.override_targets(targets=train_predictions.argmax(dim=1))
-
-        train_entropies = compute_entropy_from_probs(train_predictions[:, None, :])
-
-        allowed_indices = torch.nonzero(train_entropies < 0.01, as_tuple=True)[0].numpy()
-        allowed_train_dataset = train_dataset.subset(allowed_indices)
-        fixed_initial_set_indices = [
-            allowed_train_dataset.get_base_dataset_index(i).index for i in training_set_90[:20]
-        ]
 
         active_learning_data = ActiveLearningData(train_dataset)
 
-        active_learning_data.acquire_base_indices(fixed_initial_set_indices)
+        active_learning_data.acquire_base_indices(training_set_90[:20])
 
         active_learning_data_validation_set = ActiveLearningData(train_dataset)
-        active_learning_data_validation_set.acquire_base_indices(fixed_initial_set_indices + training_set_90[20:])
+        active_learning_data_validation_set.acquire_base_indices(training_set_90)
 
         validation_dataset = active_learning_data_validation_set.extract_dataset_from_pool(self.validation_set_size)
         validation_dataset = NamedDataset(
@@ -231,7 +242,7 @@ class Experiment:
         test_dataset = FastMNIST("data", train=False, device=self.device)
         test_dataset = NamedDataset(test_dataset, f"FastMNIST (test, {len(test_dataset)} samples)")
 
-        return active_learning_data, validation_dataset, test_dataset, fixed_initial_set_indices
+        return active_learning_data, validation_dataset, test_dataset, training_set_90[:20]
 
     # Simple Dependency Injection
     def create_train_eval_model(self, runtime_config) -> TrainEvalModel:
@@ -341,7 +352,7 @@ class Experiment:
             next_indices = training_set_90[training_set_size : training_set_size + self.acquisition_size]
             iteration_log["acquisition"] = dict(indices=next_indices)
 
-            active_learning_data.acquire(next_indices)
+            active_learning_data.acquire_base_indices(next_indices)
             log2wandb({}, commit=True)
 
 # Cell
