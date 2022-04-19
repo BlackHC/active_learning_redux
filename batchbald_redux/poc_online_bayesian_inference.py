@@ -331,9 +331,8 @@ class Experiment:
                     real_training_set_size=training_set_size,
                     train_dataset=active_learning_data.base_dataset,
                     test_dataset=test_dataset,
-                    additional_training_indices=training_set_90[
-                        training_set_size : training_set_size + self.max_obi_steps
-                    ],
+                    training_indices=training_set_90[: training_set_size + self.max_obi_steps],
+                    start_index=training_set_size,
                     num_samples_list=self.num_samples_list,
                     num_trials=self.num_trials,
                     up_factor=self.up_factor,
