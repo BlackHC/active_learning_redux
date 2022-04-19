@@ -181,26 +181,28 @@ training_set_90 = [
     43095,
 ]
 
-training_set_90[:20] = [51348,
- 49110,
- 8222,
- 28130,
- 13484,
- 47685,
- 3938,
- 59930,
- 49196,
- 19427,
- 4601,
- 49922,
- 45635,
- 35684,
- 3579,
- 7621,
- 8465,
- 33959,
- 27521,
- 27015]
+training_set_90[:20] = [
+    51348,
+    49110,
+    8222,
+    28130,
+    13484,
+    47685,
+    3938,
+    59930,
+    49196,
+    19427,
+    4601,
+    49922,
+    45635,
+    35684,
+    3579,
+    7621,
+    8465,
+    33959,
+    27521,
+    27015,
+]
 
 
 @dataclass
@@ -283,6 +285,9 @@ class Experiment:
         store["obi_performances"] = []
         obi_performances = store["obi_performances"]
 
+        store["upperbound_performances"] = []
+        upperbound_performances = store["upperbound_performances"]
+
         store["active_learning_steps"] = []
         active_learning_steps = store["active_learning_steps"]
 
@@ -324,24 +329,29 @@ class Experiment:
             log2wandb(evaluation_metrics, commit=False)
             print(f"Perf after training {evaluation_metrics}")
 
-            results = []
-            if training_set_size % 5 == 0:
-                results = evaluate_online_bayesian_inference(
-                    model=model_optimizer.model,
-                    real_training_set_size=training_set_size,
-                    train_dataset=active_learning_data.base_dataset,
-                    test_dataset=test_dataset,
-                    training_indices=training_set_90[: training_set_size + self.max_obi_steps],
-                    start_index=training_set_size,
-                    num_samples_list=self.num_samples_list,
-                    num_trials=self.num_trials,
-                    up_factor=self.up_factor,
-                    eval_batchsize=512,
-                    device=self.device,
-                )
+            obi_results, upperbound_result = evaluate_online_bayesian_inference(
+                model=model_optimizer.model,
+                real_training_set_size=training_set_size,
+                train_dataset=active_learning_data.base_dataset,
+                test_dataset=test_dataset,
+                training_indices=training_set_90[: training_set_size + self.max_obi_steps],
+                start_index=training_set_size,
+                num_samples_list=self.num_samples_list,
+                num_trials=self.num_trials,
+                up_factor=self.up_factor,
+                eval_batchsize=512,
+                device=self.device,
+            )
 
-            obi_performances.append(results)
-            log2wandb(dict(obi_performances=[asclassdict(result) for result in results]), commit=False)
+            obi_performances.append(obi_results)
+            upperbound_performances.append(upperbound_result)
+            log2wandb(
+                dict(
+                    obi_performances=[asclassdict(result) for result in obi_results],
+                    upperbound_performance=asclassdict(upperbound_result),
+                ),
+                commit=False,
+            )
 
             if training_set_size >= len(training_set_90):
                 log2wandb({}, commit=True)
