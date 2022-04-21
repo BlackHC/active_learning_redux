@@ -99,8 +99,13 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
 
                 validation_log_probs_n_m_C = trial_log_probs_N_m_C[start_index:end_index]
 
+                # validation_log_likelihood_m = get_log_likelihoods(log_probs_N_M_C=trial_log_probs_N_m_C,
+                #                                                   labels_N=labels_N,
+                #                                                   start=start_index, end=end_index)
+
                 weights_m = torch.nn.Parameter(data=torch.ones(num_samples))
-                #optimizer = torch.optim.LBFGS([weights_m], lr=0.05)
+                #weights_m = torch.nn.Parameter(data=validation_log_likelihood_m / (end_index - start_index))
+                # optimizer = torch.optim.LBFGS([weights_m], lr=0.05)
                 optimizer = torch.optim.AdamW([weights_m], lr=1)
                 pbar = tqdm(range(200))
                 patience = 15
@@ -134,6 +139,27 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                 if verbose:
                     print("Restored best weights with objective", best_objective)
                 weights_m = best_weights
+
+                if verbose:
+                    accuracy_m, test_crossentropy_m = get_accuracy_crossentropy(log_probs_N_M_C=trial_log_probs_N_m_C,
+                                                                                labels_N=labels_N,
+                                                                                training_set_size=training_set_size)
+                    validation_log_likelihood_m = get_log_likelihoods(log_probs_N_M_C=trial_log_probs_N_m_C,
+                                                                       labels_N=labels_N,
+                                                                       start=start_index, end=end_index)
+
+                    print(validation_log_likelihood_m)
+                    smw_values, smw_indices = weights_m.sort()
+                    plt.plot(list(range(num_samples)), torch.softmax(weights_m, dim=0)[smw_indices].cpu().numpy(), label="Weights")
+                    plt.plot(list(range(num_samples)), -validation_log_likelihood_m[smw_indices].cpu().numpy() / (end_index_end - start_index),
+                             label="Validation Cross-Entropy")
+                    plt.plot(list(range(num_samples)), test_crossentropy_m[smw_indices].cpu().numpy(),
+                             label="Test Cross-Entropy")
+                    plt.plot(list(range(num_samples)), torch.softmax(validation_log_likelihood_m, dim=0)[smw_indices].cpu().numpy(),
+                             label="OBI Likelihood")
+                    plt.yscale("log")
+                    plt.legend()
+                    plt.show()
 
                 joint_log_probs_n_m_C = weights_m[None, :, None] + trial_log_probs_N_m_C[training_set_size:]
                 marginal_predictive_n_C = torch.log_softmax(torch.logsumexp(joint_log_probs_n_m_C, dim=1), dim=1)
