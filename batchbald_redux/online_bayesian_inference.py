@@ -5,6 +5,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from tqdm.auto import tqdm
 
 from batchbald_redux.dataset_challenges import AliasDataset
 from batchbald_redux.consistent_mc_dropout import BayesianModule
@@ -75,8 +76,10 @@ def sum_log_probs(log_probs, dim: int):
     return summed_log_probs
 
 
-def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
-                    real_training_set_size, start_index=None, end_index_start=None, end_index_end=None):
+def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
+                                        real_training_set_size, start_index=None, end_index_start=None,
+                                        end_index_end=None,
+                                        verbose=True):
     start_index = start_index if start_index is not None else 0
     end_index_start = end_index_start if end_index_start is not None else start_index
     end_index_end = end_index_end if end_index_end is not None else training_set_size
@@ -85,11 +88,103 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
 
     results = []
     # Compute the weights incl the initial training set.
-    for end_index in range(end_index_start, end_index_end + 1):
-        online_training_set_size = end_index - start_index
-        for num_samples in num_samples_list:
-            for trial in range(num_trials):
-                print(f"Online Training Size/Num Samples/Trial: {online_training_set_size}/{num_samples}/{trial}")
+    for trial in tqdm(range(num_trials)):
+        for end_index in range(end_index_start, end_index_end + 1):
+            online_training_set_size = end_index - start_index
+            for num_samples in num_samples_list:
+                if verbose:
+                    print(f"Online Training Size/Num Samples/Trial: {online_training_set_size}/{num_samples}/{trial}")
+                sample_subset = np.random.choice(M, num_samples, replace=False)
+                trial_log_probs_N_m_C = log_probs_N_M_C[:, sample_subset, :]
+
+                validation_log_probs_n_m_C = trial_log_probs_N_m_C[start_index:end_index]
+
+                weights_m = torch.nn.Parameter(data=torch.ones(num_samples))
+                #optimizer = torch.optim.LBFGS([weights_m], lr=0.05)
+                optimizer = torch.optim.AdamW([weights_m], lr=1)
+                pbar = tqdm(range(200))
+                patience = 15
+                best_i = 0
+                best_weights = None
+                best_objective = float("inf")
+                for i in pbar:
+                    optimizer.zero_grad()
+
+                    def objective_f(weights_m, validation_log_probs_n_m_C):
+                        joint_log_probs_n_m_C = (
+                            weights_m[None, :, None] + validation_log_probs_n_m_C)
+                        marginal_logits_n_C = torch.logsumexp(joint_log_probs_n_m_C, dim=1)
+                        objective = torch.nn.functional.cross_entropy(input=marginal_logits_n_C,
+                                                                      target=labels_N[start_index:end_index],
+                                                                      reduction="mean")
+                        return objective
+
+                    objective = objective_f(weights_m, validation_log_probs_n_m_C)
+                    objective.backward()
+                    optimizer.step(lambda: objective_f(weights_m, validation_log_probs_n_m_C))
+                    pbar.set_description_str(desc=str(objective.item()))
+
+                    if objective.item() <= best_objective:
+                        best_objective = objective.item()
+                        best_weights = weights_m.detach().clone()
+                        best_i = i
+                    elif i - best_i > patience:
+                        break
+
+                if verbose:
+                    print("Restored best weights with objective", best_objective)
+                weights_m = best_weights
+
+                joint_log_probs_n_m_C = weights_m[None, :, None] + trial_log_probs_N_m_C[training_set_size:]
+                marginal_predictive_n_C = torch.log_softmax(torch.logsumexp(joint_log_probs_n_m_C, dim=1), dim=1)
+                del joint_log_probs_n_m_C
+
+                best_predictive_n_C = trial_log_probs_N_m_C[training_set_size:, torch.argmax(weights_m)]
+
+                kl_best_marginal = torch.nn.functional.kl_div(input=marginal_predictive_n_C, target=best_predictive_n_C,
+                                                              reduction="batchmean",
+                                                              log_target=True).cpu().item()
+                if verbose:
+                    print("KL(best || ensemble) =", kl_best_marginal)
+
+                predictions_n = torch.argmax(marginal_predictive_n_C, dim=1)
+                accuracy = torch.mean(
+                    (predictions_n == labels_N[training_set_size:]).type(torch.float)).cpu().item()
+                crossentropy = -torch.mean(marginal_predictive_n_C[list(range(len(marginal_predictive_n_C))),
+                                                                   labels_N[
+                                                                   training_set_size:]]).cpu().item()
+
+                result = OBIPerformance(total_training_set_size=online_training_set_size + real_training_set_size,
+                                        real_training_set_size=real_training_set_size,
+                                        online_training_set_size=online_training_set_size,
+                                        trial_index=trial,
+                                        num_samples=num_samples,
+                                        accuracy=accuracy,
+                                        crossentropy=crossentropy,
+                                        kl_best_marginal=kl_best_marginal)
+                if verbose:
+                    print(result)
+                results.append(result)
+
+    return results
+
+
+def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
+                    real_training_set_size, start_index=None, end_index_start=None, end_index_end=None, verbose=True):
+    start_index = start_index if start_index is not None else 0
+    end_index_start = end_index_start if end_index_start is not None else start_index
+    end_index_end = end_index_end if end_index_end is not None else training_set_size
+
+    N, M, C = log_probs_N_M_C.shape
+
+    results = []
+    # Compute the weights incl the initial training set.
+    for trial in tqdm(range(num_trials)):
+        for end_index in range(end_index_start, end_index_end + 1):
+            online_training_set_size = end_index - start_index
+            for num_samples in num_samples_list:
+                if verbose:
+                    print(f"Online Training Size/Num Samples/Trial: {online_training_set_size}/{num_samples}/{trial}")
                 sample_subset = np.random.choice(M, num_samples, replace=False)
                 trial_log_probs_N_m_C = log_probs_N_M_C[:, sample_subset, :]
 
@@ -109,7 +204,8 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
                 kl_best_marginal = torch.nn.functional.kl_div(input=marginal_predictive_n_C, target=best_predictive_n_C,
                                                               reduction="batchmean",
                                                               log_target=True).cpu().item()
-                print("KL(best || ensemble) =", kl_best_marginal)
+                if verbose:
+                    print("KL(best || ensemble) =", kl_best_marginal)
 
                 predictions_n = torch.argmax(marginal_predictive_n_C, dim=1)
                 accuracy = torch.mean(
@@ -126,7 +222,8 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
                                         accuracy=accuracy,
                                         crossentropy=crossentropy,
                                         kl_best_marginal=kl_best_marginal)
-                print(result)
+                if verbose:
+                    print(result)
                 results.append(result)
 
     return results
@@ -134,7 +231,7 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
 
 def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
                                   real_training_set_size, k: int, start_index=None, end_index_start=None,
-                                  end_index_end=None):
+                                  end_index_end=None, verbose=True):
     start_index = start_index if start_index is not None else 0
     end_index_start = end_index_start if end_index_start is not None else start_index
     end_index_end = end_index_end if end_index_end is not None else training_set_size
@@ -143,11 +240,12 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
 
     results = []
     # Compute the weights incl the initial training set.
-    for end_index in range(end_index_start, end_index_end + 1):
-        online_training_set_size = end_index - start_index
-        for num_samples in num_samples_list:
-            for trial in range(num_trials):
-                print(f"Online Training Size/Num Samples/Trial: {online_training_set_size}/{num_samples}/{trial}")
+    for trial in tqdm(range(num_trials)):
+        for end_index in range(end_index_start, end_index_end + 1):
+            online_training_set_size = end_index - start_index
+            for num_samples in num_samples_list:
+                if verbose:
+                    print(f"Online Training Size/Num Samples/Trial: {online_training_set_size}/{num_samples}/{trial}")
                 sample_subset = np.random.choice(M, num_samples, replace=False)
                 trial_log_probs_N_m_C = log_probs_N_M_C[:, sample_subset, :]
 
@@ -168,7 +266,8 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
                 kl_best_marginal = torch.nn.functional.kl_div(input=marginal_predictive_n_C, target=best_predictive_n_C,
                                                               reduction="batchmean",
                                                               log_target=True).cpu().item()
-                print("KL(best || ensemble) =", kl_best_marginal)
+                if verbose:
+                    print("KL(best || ensemble) =", kl_best_marginal)
 
                 predictions_n = torch.argmax(marginal_predictive_n_C, dim=1)
                 accuracy = torch.mean(
@@ -186,7 +285,8 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
                                         accuracy=accuracy,
                                         crossentropy=crossentropy,
                                         kl_best_marginal=kl_best_marginal)
-                print(result)
+                if verbose:
+                    print(result)
                 results.append(result)
 
     return results
