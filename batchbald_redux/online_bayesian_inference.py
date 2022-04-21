@@ -69,6 +69,16 @@ def get_obi_predictions_labels(model, *, test_dataset, train_dataset, training_i
 # import numpy as np
 
 
+import gc
+
+def gc_cuda():
+    """Gargage collect Torch (CUDA) memory."""
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
+
 def sum_log_probs(log_probs, dim: int):
     # NOTE: assumes that the probs \in (0,1], ie. log_probs \in (-infty, 0]
     sorted_log_probs = torch.sort(log_probs, dim=dim, descending=False).values
@@ -79,7 +89,9 @@ def sum_log_probs(log_probs, dim: int):
 def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
                                         real_training_set_size, start_index=None, end_index_start=None,
                                         end_index_end=None,
-                                        verbose=True):
+                                        verbose=True, device="cuda"):
+    gc_cuda()
+
     start_index = start_index if start_index is not None else 0
     end_index_start = end_index_start if end_index_start is not None else start_index
     end_index_end = end_index_end if end_index_end is not None else training_set_size
@@ -97,30 +109,31 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                 sample_subset = np.random.choice(M, num_samples, replace=False)
                 trial_log_probs_N_m_C = log_probs_N_M_C[:, sample_subset, :]
 
-                validation_log_probs_n_m_C = trial_log_probs_N_m_C[start_index:end_index]
+                validation_log_probs_n_m_C = trial_log_probs_N_m_C[start_index:end_index].to(device=device)
 
                 # validation_log_likelihood_m = get_log_likelihoods(log_probs_N_M_C=trial_log_probs_N_m_C,
                 #                                                   labels_N=labels_N,
                 #                                                   start=start_index, end=end_index)
 
-                weights_m = torch.nn.Parameter(data=torch.ones(num_samples))
-                #weights_m = torch.nn.Parameter(data=validation_log_likelihood_m / (end_index - start_index))
+                weights_m = torch.nn.Parameter(data=torch.ones(num_samples, device=device))
+                # weights_m = torch.nn.Parameter(data=validation_log_likelihood_m / (end_index - start_index))
                 # optimizer = torch.optim.LBFGS([weights_m], lr=0.05)
+                labels_n = labels_N[start_index:end_index].to(device=device)
                 optimizer = torch.optim.AdamW([weights_m], lr=1)
                 pbar = tqdm(range(200))
                 patience = 15
                 best_i = 0
                 best_weights = None
-                best_objective = float("inf")
+                best_objective = None
                 for i in pbar:
                     optimizer.zero_grad()
 
                     def objective_f(weights_m, validation_log_probs_n_m_C):
-                        joint_log_probs_n_m_C = (
-                            weights_m[None, :, None] + validation_log_probs_n_m_C)
+                        joint_log_probs_n_m_C = weights_m[None, :, None] + validation_log_probs_n_m_C
                         marginal_logits_n_C = torch.logsumexp(joint_log_probs_n_m_C, dim=1)
+                        del joint_log_probs_n_m_C
                         objective = torch.nn.functional.cross_entropy(input=marginal_logits_n_C,
-                                                                      target=labels_N[start_index:end_index],
+                                                                      target=labels_n,
                                                                       reduction="mean")
                         return objective
 
@@ -129,9 +142,9 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                     optimizer.step(lambda: objective_f(weights_m, validation_log_probs_n_m_C))
                     pbar.set_description_str(desc=str(objective.item()))
 
-                    if objective.item() <= best_objective:
-                        best_objective = objective.item()
-                        best_weights = weights_m.detach().clone()
+                    if best_objective is None or objective <= best_objective:
+                        best_objective = objective.detach().clone()
+                        best_weights = weights_m.detach().cpu().clone()
                         best_i = i
                     elif i - best_i > patience:
                         break
@@ -145,17 +158,18 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                                                                                 labels_N=labels_N,
                                                                                 training_set_size=training_set_size)
                     validation_log_likelihood_m = get_log_likelihoods(log_probs_N_M_C=trial_log_probs_N_m_C,
-                                                                       labels_N=labels_N,
-                                                                       start=start_index, end=end_index)
-
-                    print(validation_log_likelihood_m)
+                                                                      labels_N=labels_N,
+                                                                      start=start_index, end=end_index)
                     smw_values, smw_indices = weights_m.sort()
-                    plt.plot(list(range(num_samples)), torch.softmax(weights_m, dim=0)[smw_indices].cpu().numpy(), label="Weights")
-                    plt.plot(list(range(num_samples)), -validation_log_likelihood_m[smw_indices].cpu().numpy() / (end_index_end - start_index),
+                    plt.plot(list(range(num_samples)), torch.softmax(weights_m, dim=0)[smw_indices].cpu().numpy(),
+                             label="Weights")
+                    plt.plot(list(range(num_samples)),
+                             -validation_log_likelihood_m[smw_indices].cpu().numpy() / (end_index_end - start_index),
                              label="Validation Cross-Entropy")
                     plt.plot(list(range(num_samples)), test_crossentropy_m[smw_indices].cpu().numpy(),
                              label="Test Cross-Entropy")
-                    plt.plot(list(range(num_samples)), torch.softmax(validation_log_likelihood_m, dim=0)[smw_indices].cpu().numpy(),
+                    plt.plot(list(range(num_samples)),
+                             torch.softmax(validation_log_likelihood_m, dim=0)[smw_indices].cpu().numpy(),
                              label="OBI Likelihood")
                     plt.yscale("log")
                     plt.legend()
