@@ -564,16 +564,28 @@ class OneHotDataset(ReplaceTargetsDataset):
 
 
 class RepeatedDataset(AliasDataset):
-    def __init__(self, dataset: data.Dataset, *, num_repeats: int):
+    def __init__(self, dataset: data.Dataset, *, num_repeats: int, interleaved:bool=None):
         self.num_repeats = num_repeats
+        self.interleaved = interleaved if interleaved is not None else True
 
-        super().__init__(dataset, f"{_wrap_alias(dataset)}x{num_repeats}")
+        alias = f"{_wrap_alias(dataset)}x{num_repeats}"
+        if not self.interleaved:
+            alias += " (non-interleaved)"
+
+        super().__init__(dataset, alias)
 
     def __getitem__(self, idx):
-        if idx > len(self):
+        if idx > len(self) or idx < -len(self):
+            # Fail out using the standard error message if we are out-of-bounds.
             return self.dataset[idx]
 
-        return self.dataset[idx % len(self.dataset)]
+        if idx < 0:
+            idx = len(self) + idx
+
+        if self.interleaved:
+            return self.dataset[idx // self.num_repeats]
+        else:
+            return self.dataset[idx % len(self.dataset)]
 
     def __len__(self):
         return len(self.dataset) * self.num_repeats

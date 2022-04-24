@@ -144,7 +144,8 @@ def load_standard_experiment_data(
         idx for by_class in balanced_samples_indices.values() for idx in by_class[initial_samples_per_class:]
     ]
 
-    # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates.
+    # If we over-sample the train set, we do so after picking the initial train set to avoid duplicates
+    # (duplicates within the initial train set).
     if id_repetitions > 1:
         train_dataset = train_dataset * id_repetitions
 
