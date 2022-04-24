@@ -93,7 +93,7 @@ class VariationRatios(StochasticScoringFunction):
 
 
 def get_margin_scores(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-    mean_probs_N_C = torch.mean(log_probs_N_K_C.to(device).exp(), dim=1)
+    mean_probs_N_C = torch.mean(log_probs_N_K_C.to(device).double().exp(), dim=1)
     top_2_probs_N_2 = torch.topk(mean_probs_N_C, k=2, dim=1, sorted=True)[0]
     margin_scores_N = top_2_probs_N_2[:, 0] - top_2_probs_N_2[:, 1]
     return 1. - margin_scores_N
