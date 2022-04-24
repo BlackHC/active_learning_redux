@@ -41,9 +41,9 @@ configs = [
         coldness=coldness,
     )
     for seed in range(5)
-    for acquisition_size in [10, 20, 40]
+    for acquisition_size in [10]
     for num_pool_samples in [100]
-    for id_repetitions in [1, 2, 4]
+    for id_repetitions in [4]
     for coldness in coldness_range
     # Already ran Power
     for stochastic_mode in [
@@ -78,9 +78,9 @@ configs = [
         coldness=coldness,
     )
     for seed in range(5)
-    for acquisition_size in [10, 20, 40]
+    for acquisition_size in [10]
     for num_pool_samples in [100]
-    for id_repetitions in [1, 2, 4]
+    for id_repetitions in [4]
     for coldness in [1.]
     # Already ran Power
     for stochastic_mode in [
