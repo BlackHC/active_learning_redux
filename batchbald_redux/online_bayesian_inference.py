@@ -22,6 +22,9 @@ class OBIPerformance:
     accuracy: float
     crossentropy: float
     kl_best_marginal: float
+    k: int = None
+    weight_threshold: float = None
+    type: str = None
 
 
 def evaluate_online_bayesian_inference(model: BayesianModule, *, real_training_set_size: int,
@@ -89,7 +92,7 @@ def sum_log_probs(log_probs, dim: int):
 
 def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
                                         real_training_set_size, start_index=None, end_index_start=None,
-                                        end_index_end=None,
+                                        end_index_end=None, weight_threshold=float("-inf"), k=None,
                                         verbose=True, device="cuda"):
     start_index = start_index if start_index is not None else 0
     end_index_start = end_index_start if end_index_start is not None else start_index
@@ -194,6 +197,16 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                     plt.show()
 
                 joint_log_probs_n_m_C = weights_m[None, :, None] + trial_log_probs_N_m_C[training_set_size:]
+                if k is None:
+                    joint_log_probs_n_m_C = joint_log_probs_n_m_C[:,
+                                            torch.softmax(weights_m, dim=0) >= weight_threshold]
+                else:
+                    joint_log_probs_n_m_C = joint_log_probs_n_m_C[:, torch.topk(weights_m, k=k).indices]
+
+                k = joint_log_probs_n_m_C.shape[1]
+                if verbose:
+                    print("Ensemble of size:", k)
+
                 marginal_predictive_n_C = torch.log_softmax(torch.logsumexp(joint_log_probs_n_m_C, dim=1), dim=1)
                 del joint_log_probs_n_m_C
 
@@ -219,7 +232,10 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                                         num_samples=num_samples,
                                         accuracy=accuracy,
                                         crossentropy=crossentropy,
-                                        kl_best_marginal=kl_best_marginal)
+                                        kl_best_marginal=kl_best_marginal,
+                                        k=k,
+                                        weight_threshold=weight_threshold,
+                                        type="optimized_BMA")
                 if verbose:
                     print(result)
                 results.append(result)
@@ -279,7 +295,8 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
                                         num_samples=num_samples,
                                         accuracy=accuracy,
                                         crossentropy=crossentropy,
-                                        kl_best_marginal=kl_best_marginal)
+                                        kl_best_marginal=kl_best_marginal,
+                                        type="Bayesian")
                 if verbose:
                     print(result)
                 results.append(result)
@@ -289,7 +306,7 @@ def eval_obi_simple(*, log_probs_N_M_C, labels_N, training_set_size, num_samples
 
 def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_size, num_samples_list, num_trials,
                                   real_training_set_size, k: int, start_index=None, end_index_start=None,
-                                  end_index_end=None, verbose=True):
+                                  end_index_end=None, verbose=True, by_accuracy: bool = False):
     start_index = start_index if start_index is not None else 0
     end_index_start = end_index_start if end_index_start is not None else start_index
     end_index_end = end_index_end if end_index_end is not None else training_set_size
@@ -307,10 +324,14 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
                 sample_subset = np.random.choice(M, num_samples, replace=False)
                 trial_log_probs_N_m_C = log_probs_N_M_C[:, sample_subset, :]
 
-                true_train_log_probs_n_m = trial_log_probs_N_m_C[list(range(start_index, end_index)), :,
-                                           labels_N[start_index:end_index]]
+                if by_accuracy:
+                    weights_m = torch.mean((trial_log_probs_N_m_C[list(range(start_index, end_index))].argmax(
+                        dim=-1) == labels_N[start_index:end_index, None]).float(), dim=0)
+                else:
+                    true_train_log_probs_n_m = trial_log_probs_N_m_C[list(range(start_index, end_index)), :,
+                                               labels_N[start_index:end_index]]
 
-                weights_m = sum_log_probs(true_train_log_probs_n_m, dim=0)
+                    weights_m = sum_log_probs(true_train_log_probs_n_m, dim=0)
 
                 # simply take the top 10.
                 topk_samples = torch.topk(weights_m, k=k).indices
@@ -342,7 +363,9 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
                                         num_samples=num_samples,
                                         accuracy=accuracy,
                                         crossentropy=crossentropy,
-                                        kl_best_marginal=kl_best_marginal)
+                                        kl_best_marginal=kl_best_marginal,
+                                        k=k,
+                                        type="simple_topk_ensemble_by_accuracy" if by_accuracy else "simple_topk_ensemble_by_crossentropy")
                 if verbose:
                     print(result)
                 results.append(result)
