@@ -42,16 +42,26 @@ def evaluate_online_bayesian_inference(model: BayesianModule, *, real_training_s
     num_training_indices = len(training_indices)
     obi_simple_results = eval_obi_simple(log_probs_N_M_C=log_probs_N_M_C, labels_N=labels_N,
                                          training_set_size=num_training_indices,
-                                         start_index=start_index, end_index=num_training_indices,
+                                         start_index=start_index,
+                                         end_index_start=start_index,
+                                         end_index_end=num_training_indices,
                                          num_samples_list=num_samples_list,
                                          num_trials=num_trials,
-                                         real_training_set_size=real_training_set_size)
-    obi_upperbound_result = eval_best_topk_liklihood_ensemble(log_probs_N_M_C=log_probs_N_M_C,
+                                         real_training_set_size=real_training_set_size,
+                                         verbose=False)
+    obi_topk_ensemble_results = eval_obi_simple_topk_ensemble(log_probs_N_M_C=log_probs_N_M_C,
                                                               labels_N=labels_N,
                                                               training_set_size=num_training_indices,
                                                               real_training_set_size=real_training_set_size,
-                                                              k=10)
-    return obi_simple_results, obi_upperbound_result
+                                                              start_index=0,
+                                                              end_index_start=start_index,
+                                                              end_index_end=num_training_indices,
+                                                              num_samples_list=num_samples_list,
+                                                              num_trials=num_trials,
+                                                              verbose=False,
+                                                              k=10,
+                                                              by_accuracy=True)
+    return obi_simple_results, obi_topk_ensemble_results
 
 
 def get_obi_predictions_labels(model, *, test_dataset, train_dataset, training_indices, num_samples,
@@ -365,7 +375,8 @@ def eval_obi_simple_topk_ensemble(*, log_probs_N_M_C, labels_N, training_set_siz
                                         crossentropy=crossentropy,
                                         kl_best_marginal=kl_best_marginal,
                                         k=k,
-                                        type="simple_topk_ensemble_by_accuracy" if by_accuracy else "simple_topk_ensemble_by_crossentropy")
+                                        type="simple_topk_ensemble_by_accuracy" if by_accuracy else
+                                        "simple_topk_ensemble_by_crossentropy")
                 if verbose:
                     print(result)
                 results.append(result)
