@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.batchbald
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import StandardExperimentDataConfig
 from .models import MnistModelTrainer
@@ -113,7 +115,7 @@ configs = [
         coldness=coldness,
     )
     for acquisition_function in [
-        acquisition_functions.StochasticBALD,
+        batchbald_redux.acquisition_functions.bald.StochasticBALD,
     ]
     for seed in range(5)
     for acquisition_size in [20, 40]
@@ -146,7 +148,7 @@ configs = [
         model_trainer_factory=MnistModelTrainer,
     )
     for acquisition_function in [
-        acquisition_functions.BALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
         acquisition_functions.Random,
         baseline_acquisition_functions.BADGE
     ]
@@ -174,7 +176,7 @@ configs = [
         model_trainer_factory=MnistModelTrainer,
     )
     for acquisition_function in [
-        acquisition_functions.BatchBALD,
+        batchbald_redux.acquisition_functions.batchbald.BatchBALD,
     ]
     for seed in range(5)
     for acquisition_size in [5]

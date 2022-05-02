@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 import torch.utils.data
 
-from .batchbald import CandidateBatch, StochasticMode, get_stochastic_samples
+from .acquisition_functions.stochastic_acquisition import get_stochastic_samples, StochasticMode
 from .trained_model import TrainedModel
-from .acquisition_functions import CandidateBatchComputer, PoolScorerCandidateBatchComputer
+from .acquisition_functions import CandidateBatchComputer, PoolScorerCandidateBatchComputer, CandidateBatch
 from .consistent_mc_dropout import GradEmbeddingType
 
 # copied from https://github.com/JordanAsh/badge/blob/master/query_strategies/badge_sampling.py

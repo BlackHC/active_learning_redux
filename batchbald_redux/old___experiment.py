@@ -17,6 +17,7 @@ from torch import nn
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
+import batchbald_redux.acquisition_functions.bald
 from .acquisition_functions import (
     CandidateBatchComputer,
     EvalModelBatchComputer,
@@ -62,7 +63,7 @@ class Experiment:
     add_dataset_noise: bool = False
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
-    ] = acquisition_functions.BALD
+    ] = batchbald_redux.acquisition_functions.bald.BALD
     train_eval_model_factory: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = MnistModelTrainer
     acquisition_function_args: dict = None
@@ -192,7 +193,7 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.SoftmaxBALD,
+        batchbald_redux.acquisition_functions.bald.SoftmaxBALD,
     ]
     for temperature in [1 / 32, 1 / 64, 1 / 128, 1 / 256]
     for acquisition_size in [5]

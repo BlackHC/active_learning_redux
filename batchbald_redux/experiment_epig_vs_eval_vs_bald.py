@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.epig
 from batchbald_redux import acquisition_functions
 from batchbald_redux import baseline_acquisition_functions
 from .unified_experiment import UnifiedExperiment
@@ -66,9 +68,9 @@ configs = [
     )
     for acquisition_function in [
         baseline_acquisition_functions.BADGE,
-        acquisition_functions.EPIG,
-        acquisition_functions.EvalBALD,
-        acquisition_functions.BALD,
+        batchbald_redux.acquisition_functions.epig.EPIG,
+        batchbald_redux.acquisition_functions.epig.EvalBALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
     ]
     for seed in range(5)
     for acquisition_size in [1]

@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.batchbald
+import batchbald_redux.acquisition_functions.sievebald
 from batchbald_redux import acquisition_functions
 from .unified_experiment import UnifiedExperiment
 
@@ -35,8 +37,8 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.SieveBALD,
-        acquisition_functions.BatchBALD,
+        batchbald_redux.acquisition_functions.sievebald.SieveBALD,
+        batchbald_redux.acquisition_functions.batchbald.BatchBALD,
     ]
     for acquisition_size in [10]
     for num_pool_samples in [100]

@@ -14,6 +14,8 @@ import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiment
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.candidate_batch_computers
 from batchbald_redux import acquisition_functions
 from batchbald_redux import baseline_acquisition_functions
 from .acquisition_functions import (
@@ -38,19 +40,21 @@ from .train_eval_model import (
 )
 from .trained_model import ModelTrainer, BayesianEnsembleModelTrainer
 
-from .batchbald import get_bald_scores, compute_entropy
+from .batchbald import compute_entropy
+from .acquisition_functions.bald import get_bald_scores
 
 from .dataset_challenges import get_base_dataset_index
 
 # Cell
 
 @dataclass
-class CustomBALD(acquisition_functions.BALD):
-    def get_candidate_batch(self, log_probs_N_K_C, device) -> acquisition_functions.CandidateBatch:
+class CustomBALD(batchbald_redux.acquisition_functions.bald.BALD):
+    def get_candidate_batch(self, log_probs_N_K_C, device) -> batchbald_redux.acquisition_functions\
+        .candidate_batch_computers.CandidateBatch:
         self.log_probs_N_K_C = log_probs_N_K_C
         return super().get_candidate_batch(log_probs_N_K_C, device)
 
-    def extract_candidates(self, scores_N) -> acquisition_functions.CandidateBatch:
+    def extract_candidates(self, scores_N) -> batchbald_redux.acquisition_functions.candidate_batch_computers.CandidateBatch:
         self.scores_N = scores_N
         return super().extract_candidates(scores_N)
 
@@ -210,7 +214,8 @@ class UnifiedExperiment:
     num_training_samples: int = 1
 
     device: str = "cuda"
-    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = acquisition_functions.BALD
+    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = batchbald_redux\
+        .acquisition_functions.bald.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
     ensemble_size: int = 1

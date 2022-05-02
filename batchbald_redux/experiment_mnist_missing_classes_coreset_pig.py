@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.coreset
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import ImbalancedTestDistributionExperimentDataConfig
 from .models import MnistModelTrainer
@@ -44,9 +46,9 @@ configs = [
     for num_pool_samples in [100]
     for id_repetitions in [1]
     for acquisition_function in [
-        acquisition_functions.BALD,
-        acquisition_functions.CoreSetPIG,
-        acquisition_functions.CoreSetPIGBALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
+        batchbald_redux.acquisition_functions.coreset.CoreSetPIG,
+        batchbald_redux.acquisition_functions.coreset.CoreSetPIGBALD,
     ]
  ]
 #    + [

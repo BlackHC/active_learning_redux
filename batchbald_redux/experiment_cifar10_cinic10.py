@@ -10,6 +10,7 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import (
     OoDDatasetConfig,
@@ -51,7 +52,7 @@ configs = sum(
                 **shared_configs
             )
             for acquisition_function in [
-                acquisition_functions.BALD,
+            batchbald_redux.acquisition_functions.bald.BALD,
             ]
         ]
         + [
@@ -80,7 +81,7 @@ configs = sum(
             ]
             for coldness in ([1/8, 1] if stochastic_mode != acquisition_functions.StochasticMode.Softrank else [1])
             for acquisition_function in [
-                acquisition_functions.StochasticBALD,
+                batchbald_redux.acquisition_functions.bald.StochasticBALD,
             ]
         ]
         for seed in range(3)

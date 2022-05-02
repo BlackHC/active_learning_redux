@@ -16,6 +16,8 @@ from blackhc.project.experiment import embedded_experiments
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.coreset
 from .acquisition_functions import (
     CandidateBatchComputer,
     EvalModelBatchComputer,
@@ -87,7 +89,7 @@ class Experiment:
     add_dataset_noise: bool = False
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
-    ] = acquisition_functions.BALD
+    ] = batchbald_redux.acquisition_functions.bald.BALD
     train_eval_model: TrainEvalModel = TrainSelfDistillationEvalModel
     model_optimizer_factory: Type[ModelOptimizerFactory] = MnistOptimizerFactory
     acquisition_function_args: dict = None
@@ -267,8 +269,8 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.BALD,
-        acquisition_functions.CoreSetBALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
+        batchbald_redux.acquisition_functions.coreset.CoreSetBALD,
     ]
     for acquisition_size in [1]
     for num_pool_samples in [100]
