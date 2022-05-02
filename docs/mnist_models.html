@@ -37,17 +37,23 @@ nb_path: "06b_mnist_models.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span><span class="p">,</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
 
+<span class="kn">from</span> <span class="nn">batchbald_redux.active_learning</span> <span class="kn">import</span> <span class="n">RandomFixedLengthSampler</span>
+<span class="kn">from</span> <span class="nn">batchbald_redux.black_box_model_training</span> <span class="kn">import</span> <span class="n">train</span>
 <span class="kn">from</span> <span class="nn">batchbald_redux.consistent_mc_dropout</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GradEmbeddingType</span><span class="p">,</span>
     <span class="n">BayesianModule</span><span class="p">,</span>
     <span class="n">ConsistentMCDropout</span><span class="p">,</span>
     <span class="n">ConsistentMCDropout2d</span><span class="p">,</span>
+    <span class="n">freeze_encoder_context</span>
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">batchbald_redux.model_optimizer_factory</span> <span class="kn">import</span> <span class="n">ModelOptimizer</span><span class="p">,</span> <span class="n">ModelOptimizerFactory</span>
@@ -71,10 +77,11 @@ nb_path: "06b_mnist_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BayesianMNISTCNN" class="doc_header"><code>class</code> <code>BayesianMNISTCNN</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L25" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
+<h2 id="BayesianMNISTCNN" class="doc_header"><code>class</code> <code>BayesianMNISTCNN</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L32" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
 </blockquote>
 <p>A module that we can sample multiple times from given a single input batch.</p>
 <p>To be efficient, the module allows for a part of the forward pass to be deterministic.</p>
+<p>If we sample with "0" samples, we do a single deterministic forward pass with disabled dropout during evaluation.</p>
 
 </div>
 
@@ -93,7 +100,10 @@ nb_path: "06b_mnist_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">BayesianMNISTCNN</span><span class="p">(</span><span class="n">BayesianModule</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">batchbald_redux.trained_model</span> <span class="kn">import</span> <span class="n">ModelTrainer</span><span class="p">,</span> <span class="n">TrainedModel</span><span class="p">,</span> <span class="n">TrainedBayesianModel</span>
+
+
+<span class="k">class</span> <span class="nc">BayesianMNISTCNN</span><span class="p">(</span><span class="n">BayesianModule</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -105,15 +115,18 @@ nb_path: "06b_mnist_models.ipynb"
         <span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span> <span class="o">=</span> <span class="n">ConsistentMCDropout</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
+    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">freeze_encoder</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">freeze_encoder_context</span><span class="p">(</span><span class="n">freeze_encoder</span><span class="p">):</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
+
+        <span class="n">embedding</span> <span class="o">=</span> <span class="nb">input</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">input</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="p">,</span> <span class="n">embedding</span>
 </pre></div>
 
     </div>
@@ -175,7 +188,7 @@ nb_path: "06b_mnist_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BayesianMNISTCNN_EBM" class="doc_header"><code>class</code> <code>BayesianMNISTCNN_EBM</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN_EBM</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
+<h2 id="BayesianMNISTCNN_EBM" class="doc_header"><code>class</code> <code>BayesianMNISTCNN_EBM</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L60" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BayesianMNISTCNN_EBM</code>(<strong><code>num_classes</code></strong>=<em><code>10</code></em>) :: <a href="/batchbald_redux/consistent_mc_dropout.html#BayesianModule"><code>BayesianModule</code></a></p>
 </blockquote>
 <p>Without Softmax.</p>
 
@@ -210,14 +223,17 @@ nb_path: "06b_mnist_models.ipynb"
         <span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span> <span class="o">=</span> <span class="n">ConsistentMCDropout</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
+    <span class="k">def</span> <span class="nf">mc_forward_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">freeze_encoder</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">freeze_encoder_context</span><span class="p">(</span><span class="n">freeze_encoder</span><span class="p">):</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="nb">input</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
+
+        <span class="n">embedding</span> <span class="o">=</span> <span class="nb">input</span>
         <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">input</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="p">,</span> <span class="n">embedding</span>
 </pre></div>
 
     </div>
@@ -279,9 +295,33 @@ nb_path: "06b_mnist_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MnistOptimizerFactory" class="doc_header"><code>class</code> <code>MnistOptimizerFactory</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L77" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MnistOptimizerFactory</code>() :: <a href="/batchbald_redux/model_optimizer_factory.html#ModelOptimizerFactory"><code>ModelOptimizerFactory</code></a></p>
+<h2 id="MnistOptimizerFactory" class="doc_header"><code>class</code> <code>MnistOptimizerFactory</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L89" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MnistOptimizerFactory</code>() :: <code>ModelOptimizerFactory</code></p>
 </blockquote>
-<p>MnistOptimizerFactory()</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="MnistModelTrainer" class="doc_header"><code>class</code> <code>MnistModelTrainer</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/models.py#L97" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MnistModelTrainer</code>(<strong><code>device</code></strong>:<code>str</code>, <strong><code>num_training_samples</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>num_validation_samples</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>num_patience_epochs</code></strong>:<code>int</code>=<em><code>20</code></em>, <strong><code>max_training_epochs</code></strong>:<code>int</code>=<em><code>120</code></em>, <strong><code>min_samples_per_epoch</code></strong>:<code>int</code>=<em><code>1024</code></em>, <strong><code>num_training_batch_size</code></strong>:<code>int</code>=<em><code>64</code></em>, <strong><code>num_evaluation_batch_size</code></strong>:<code>int</code>=<em><code>128</code></em>) :: <code>ModelTrainer</code></p>
+</blockquote>
+<p>MnistModelTrainer(device: str, num_training_samples: int = 1, num_validation_samples: int = 20, num_patience_epochs: int = 20, max_training_epochs: int = 120, min_samples_per_epoch: int = 1024, num_training_batch_size: int = 64, num_evaluation_batch_size: int = 128)</p>
 
 </div>
 
@@ -300,15 +340,380 @@ nb_path: "06b_mnist_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MnistOptimizerFactory</span><span class="p">(</span><span class="n">ModelOptimizerFactory</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MnistOptimizerFactory</span><span class="p">(</span><span class="n">ModelOptimizerFactory</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">create_model_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelOptimizer</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">BayesianMNISTCNN</span><span class="p">()</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ModelOptimizer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MnistModelTrainer</span><span class="p">(</span><span class="n">ModelTrainer</span><span class="p">):</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="n">num_training_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">num_validation_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">num_patience_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">max_training_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">120</span>
+
+    <span class="n">min_samples_per_epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">num_training_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">num_evaluation_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_model_optimizer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ModelOptimizer</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">BayesianMNISTCNN</span><span class="p">()</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ModelOptimizer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_batch_size</span><span class="p">,</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">RandomFixedLengthSampler</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples_per_epoch</span><span class="p">),</span>
+            <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">train_loader</span>
+
+    <span class="k">def</span> <span class="nf">get_evaluation_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">evaluation_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_evaluation_batch_size</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">evaluation_loader</span>
+
+    <span class="k">def</span> <span class="nf">get_trained</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">train_augmentations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Module</span><span class="p">],</span>
+                    <span class="n">validation_loader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">wandb_key_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainedModel</span><span class="p">:</span>
+        <span class="n">model_optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_model_optimizer</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">validation_loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">validation_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+
+        <span class="n">train</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">training_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_training_samples</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_validation_samples</span><span class="p">,</span>
+            <span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span>
+            <span class="n">train_augmentations</span><span class="o">=</span><span class="n">train_augmentations</span><span class="p">,</span>
+            <span class="n">validation_loader</span><span class="o">=</span><span class="n">validation_loader</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_patience_epochs</span><span class="p">,</span>
+            <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_training_epochs</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">validation_loss</span><span class="o">=</span><span class="n">validation_loss</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">training_log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span>
+            <span class="n">wandb_key_path</span><span class="o">=</span><span class="n">wandb_key_path</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TrainedBayesianModel</span><span class="p">(</span><span class="n">model_optimizer</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">batchbald_redux</span> <span class="kn">import</span> <span class="n">dataset_challenges</span>
+
+<span class="n">fast_mnist_train</span><span class="p">,</span> <span class="n">fast_mnist_test</span> <span class="o">=</span> <span class="n">dataset_challenges</span><span class="o">.</span><span class="n">create_MNIST_dataset</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+
+<span class="n">model_trainer</span> <span class="o">=</span> <span class="n">MnistModelTrainer</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">max_training_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_train_dataloader</span><span class="p">(</span><span class="n">fast_mnist_train</span><span class="p">)</span>
+
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_evaluation_dataloader</span><span class="p">(</span><span class="n">fast_mnist_test</span><span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">trained_model</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_trained</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">train_augmentations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Engine run is terminating due to exception: .
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyboardInterrupt</span>                         Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-24-14bf0f616c9e&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">     12</span> 
+<span class="ansi-green-intense-fg ansi-bold">     13</span> log <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">{</span><span class="ansi-blue-fg">}</span>
+<span class="ansi-green-fg">---&gt; 14</span><span class="ansi-red-fg"> </span>trained_model <span class="ansi-blue-fg">=</span> model_trainer<span class="ansi-blue-fg">.</span>get_trained<span class="ansi-blue-fg">(</span>train_loader<span class="ansi-blue-fg">=</span>train_loader<span class="ansi-blue-fg">,</span> train_augmentations<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">None</span><span class="ansi-blue-fg">,</span> validation_loader<span class="ansi-blue-fg">=</span>test_loader<span class="ansi-blue-fg">,</span> log<span class="ansi-blue-fg">=</span>log<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-23-898eaf54ef4c&gt;</span> in <span class="ansi-cyan-fg">get_trained</span><span class="ansi-blue-fg">(self, train_loader, train_augmentations, validation_loader, log, loss, validation_loss)</span>
+<span class="ansi-green-intense-fg ansi-bold">     52</span>             validation_loss <span class="ansi-blue-fg">=</span> torch<span class="ansi-blue-fg">.</span>nn<span class="ansi-blue-fg">.</span>NLLLoss<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     53</span> 
+<span class="ansi-green-fg">---&gt; 54</span><span class="ansi-red-fg">         train(
+</span><span class="ansi-green-intense-fg ansi-bold">     55</span>             model<span class="ansi-blue-fg">=</span>model_optimizer<span class="ansi-blue-fg">.</span>model<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">     56</span>             optimizer<span class="ansi-blue-fg">=</span>model_optimizer<span class="ansi-blue-fg">.</span>optimizer<span class="ansi-blue-fg">,</span>
+
+<span class="ansi-green-fg">~/PycharmProjects/bald-ical/batchbald_redux/black_box_model_training.py</span> in <span class="ansi-cyan-fg">train</span><span class="ansi-blue-fg">(model, training_samples, validation_samples, train_loader, validation_loader, patience, max_epochs, device, training_log, loss, validation_loss, optimizer, prefer_accuracy, train_augmentations)</span>
+<span class="ansi-green-intense-fg ansi-bold">    136</span> 
+<span class="ansi-green-intense-fg ansi-bold">    137</span>     <span class="ansi-red-fg"># Kick everything off</span>
+<span class="ansi-green-fg">--&gt; 138</span><span class="ansi-red-fg">     </span>trainer<span class="ansi-blue-fg">.</span>run<span class="ansi-blue-fg">(</span>train_loader<span class="ansi-blue-fg">,</span> max_epochs<span class="ansi-blue-fg">=</span>max_epochs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    139</span> 
+<span class="ansi-green-intense-fg ansi-bold">    140</span>     <span class="ansi-green-fg">if</span> early_stopping<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">run</span><span class="ansi-blue-fg">(self, data, max_epochs, epoch_length, seed)</span>
+<span class="ansi-green-intense-fg ansi-bold">    689</span> 
+<span class="ansi-green-intense-fg ansi-bold">    690</span>         self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>dataloader <span class="ansi-blue-fg">=</span> data
+<span class="ansi-green-fg">--&gt; 691</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_internal_run<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    692</span> 
+<span class="ansi-green-intense-fg ansi-bold">    693</span>     <span class="ansi-blue-fg">@</span>staticmethod
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    760</span>             self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+<span class="ansi-green-intense-fg ansi-bold">    761</span>             self<span class="ansi-blue-fg">.</span>logger<span class="ansi-blue-fg">.</span>error<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Engine run is terminating due to exception: %s.&#34;</span><span class="ansi-blue-fg">,</span> str<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 762</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_handle_exception<span class="ansi-blue-fg">(</span>e<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    763</span> 
+<span class="ansi-green-intense-fg ansi-bold">    764</span>         self<span class="ansi-blue-fg">.</span>_dataloader_iter <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_handle_exception</span><span class="ansi-blue-fg">(self, e)</span>
+<span class="ansi-green-intense-fg ansi-bold">    465</span>             self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>EXCEPTION_RAISED<span class="ansi-blue-fg">,</span> e<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    466</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 467</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> e
+<span class="ansi-green-intense-fg ansi-bold">    468</span> 
+<span class="ansi-green-intense-fg ansi-bold">    469</span>     <span class="ansi-blue-fg">@</span>property
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_internal_run</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    728</span>                     self<span class="ansi-blue-fg">.</span>_setup_engine<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    729</span> 
+<span class="ansi-green-fg">--&gt; 730</span><span class="ansi-red-fg">                 </span>time_taken <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_run_once_on_dataset<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    731</span>                 <span class="ansi-red-fg"># time is available for handlers but must be update after fire</span>
+<span class="ansi-green-intense-fg ansi-bold">    732</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>times<span class="ansi-blue-fg">[</span>Events<span class="ansi-blue-fg">.</span>EPOCH_COMPLETED<span class="ansi-blue-fg">.</span>name<span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">=</span> time_taken
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_run_once_on_dataset</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    810</span>                 self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_STARTED<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    811</span>                 self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>output <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_process_function<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>state<span class="ansi-blue-fg">.</span>batch<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 812</span><span class="ansi-red-fg">                 </span>self<span class="ansi-blue-fg">.</span>_fire_event<span class="ansi-blue-fg">(</span>Events<span class="ansi-blue-fg">.</span>ITERATION_COMPLETED<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    813</span> 
+<span class="ansi-green-intense-fg ansi-bold">    814</span>                 <span class="ansi-red-fg"># TODO: remove refs on batch to avoid high mem consumption ? -&gt; need verification</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/engine/engine.py</span> in <span class="ansi-cyan-fg">_fire_event</span><span class="ansi-blue-fg">(self, event_name, *event_args, **event_kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    421</span>                 kwargs<span class="ansi-blue-fg">.</span>update<span class="ansi-blue-fg">(</span>event_kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    422</span>                 first<span class="ansi-blue-fg">,</span> others <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">(</span>args<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">:</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">if</span> <span class="ansi-blue-fg">(</span>args <span class="ansi-green-fg">and</span> args<span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">==</span> self<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">else</span> <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> args<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 423</span><span class="ansi-red-fg">                 </span>func<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>first<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span><span class="ansi-blue-fg">(</span>event_args <span class="ansi-blue-fg">+</span> others<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    424</span> 
+<span class="ansi-green-intense-fg ansi-bold">    425</span>     <span class="ansi-green-fg">def</span> fire_event<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> event_name<span class="ansi-blue-fg">:</span> Any<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/metrics/metric.py</span> in <span class="ansi-cyan-fg">completed</span><span class="ansi-blue-fg">(self, engine, name)</span>
+<span class="ansi-green-intense-fg ansi-bold">    290</span>             engine <span class="ansi-blue-fg">(</span>Engine<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span> the engine to which the metric must be attached
+<span class="ansi-green-intense-fg ansi-bold">    291</span>         &#34;&#34;&#34;
+<span class="ansi-green-fg">--&gt; 292</span><span class="ansi-red-fg">         </span>result <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>compute<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    293</span>         <span class="ansi-green-fg">if</span> isinstance<span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">,</span> Mapping<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    294</span>             <span class="ansi-green-fg">for</span> key<span class="ansi-blue-fg">,</span> value <span class="ansi-green-fg">in</span> result<span class="ansi-blue-fg">.</span>items<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/metrics/running_average.py</span> in <span class="ansi-cyan-fg">compute</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">     90</span>             self<span class="ansi-blue-fg">.</span>_value <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_get_src_value<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     91</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 92</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_value <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_value <span class="ansi-blue-fg">*</span> self<span class="ansi-blue-fg">.</span>alpha <span class="ansi-blue-fg">+</span> <span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">1.0</span> <span class="ansi-blue-fg">-</span> self<span class="ansi-blue-fg">.</span>alpha<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">*</span> self<span class="ansi-blue-fg">.</span>_get_src_value<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     93</span> 
+<span class="ansi-green-intense-fg ansi-bold">     94</span>         <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_value
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/metrics/metric.py</span> in <span class="ansi-cyan-fg">another_wrapper</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    535</span>                     self<span class="ansi-blue-fg">.</span>_is_reduced <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">True</span>
+<span class="ansi-green-intense-fg ansi-bold">    536</span> 
+<span class="ansi-green-fg">--&gt; 537</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> func<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    538</span> 
+<span class="ansi-green-intense-fg ansi-bold">    539</span>         <span class="ansi-green-fg">return</span> another_wrapper
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/metrics/running_average.py</span> in <span class="ansi-cyan-fg">_get_output_value</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    109</span>     <span class="ansi-green-fg">def</span> _get_output_value<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> Union<span class="ansi-blue-fg">[</span>torch<span class="ansi-blue-fg">.</span>Tensor<span class="ansi-blue-fg">,</span> float<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    110</span>         <span class="ansi-red-fg"># we need to compute average instead of sum produced by @sync_all_reduce(&#34;src&#34;)</span>
+<span class="ansi-green-fg">--&gt; 111</span><span class="ansi-red-fg">         </span>output <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>src <span class="ansi-blue-fg">/</span> idist<span class="ansi-blue-fg">.</span>get_world_size<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    112</span>         <span class="ansi-green-fg">return</span> output
+<span class="ansi-green-intense-fg ansi-bold">    113</span> 
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/distributed/utils.py</span> in <span class="ansi-cyan-fg">get_world_size</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">    131</span>     &#34;&#34;&#34;
+<span class="ansi-green-intense-fg ansi-bold">    132</span>     <span class="ansi-green-fg">if</span> _need_to_sync <span class="ansi-green-fg">and</span> isinstance<span class="ansi-blue-fg">(</span>_model<span class="ansi-blue-fg">,</span> _SerialModel<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 133</span><span class="ansi-red-fg">         </span>sync<span class="ansi-blue-fg">(</span>temporary<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">True</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    134</span> 
+<span class="ansi-green-intense-fg ansi-bold">    135</span>     <span class="ansi-green-fg">return</span> _model<span class="ansi-blue-fg">.</span>get_world_size<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/distributed/utils.py</span> in <span class="ansi-cyan-fg">sync</span><span class="ansi-blue-fg">(temporary)</span>
+<span class="ansi-green-intense-fg ansi-bold">     62</span>         <span class="ansi-green-fg">if</span> comp_model_cls <span class="ansi-blue-fg">==</span> _SerialModel<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     63</span>             <span class="ansi-green-fg">continue</span>
+<span class="ansi-green-fg">---&gt; 64</span><span class="ansi-red-fg">         </span>model <span class="ansi-blue-fg">=</span> comp_model_cls<span class="ansi-blue-fg">.</span>create_from_context<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     65</span>         <span class="ansi-green-fg">if</span> model <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     66</span>             _set_model<span class="ansi-blue-fg">(</span>model<span class="ansi-blue-fg">,</span> temporary<span class="ansi-blue-fg">=</span>temporary<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/active_learning/lib/python3.8/site-packages/ignite/distributed/comp_models/native.py</span> in <span class="ansi-cyan-fg">create_from_context</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">     44</span>         <span class="ansi-blue-fg">@</span>staticmethod
+<span class="ansi-green-intense-fg ansi-bold">     45</span>         <span class="ansi-green-fg">def</span> create_from_context<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">-&gt;</span> Optional<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#34;_NativeDistModel&#34;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 46</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> <span class="ansi-blue-fg">(</span>dist<span class="ansi-blue-fg">.</span>is_available<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">and</span> dist<span class="ansi-blue-fg">.</span>is_initialized<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">     47</span>                 <span class="ansi-green-fg">return</span> <span class="ansi-green-fg">None</span>
+<span class="ansi-green-intense-fg ansi-bold">     48</span>             <span class="ansi-green-fg">return</span> _NativeDistModel<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">KeyboardInterrupt</span>: </pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">subset_mnist</span> <span class="o">=</span> <span class="n">fast_mnist_train</span> <span class="o">*</span> <span class="mf">0.2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">subset_mnist</span><span class="p">)</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_train_dataloader</span><span class="p">(</span><span class="n">subset_mnist</span><span class="p">)</span>
+
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_evaluation_dataloader</span><span class="p">(</span><span class="n">fast_mnist_test</span><span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">trained_model</span> <span class="o">=</span> <span class="n">model_trainer</span><span class="o">.</span><span class="n">get_trained</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">train_augmentations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation_loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;FastMNIST (Train)&#39;)~x0.2
+Epoch metrics: {&#39;accuracy&#39;: 0.9388, &#39;crossentropy&#39;: 0.36818689460754395}
+RestoringEarlyStopping: Restoring best parameters. (Score: 0.9388)
+RestoringEarlyStopping: Restoring optimizer.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">trained_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_embeddings</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">storage_device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([10000, 1, 1024])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">trained_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_grad_embeddings</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">,</span> <span class="n">grad_embedding_type</span><span class="o">=</span><span class="n">GradEmbeddingType</span><span class="o">.</span><span class="n">BIAS_LINEAR</span><span class="p">,</span> <span class="n">model_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">storage_device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([10000, 1, 10250])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">trained_model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_grad_embeddings</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">loader</span><span class="o">=</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">,</span> <span class="n">grad_embedding_type</span><span class="o">=</span><span class="n">GradEmbeddingType</span><span class="o">.</span><span class="n">BIAS_LINEAR</span><span class="p">,</span> <span class="n">model_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">storage_device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([10000, 1, 10250])</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 

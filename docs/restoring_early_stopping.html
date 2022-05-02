@@ -85,7 +85,7 @@ evaluator.add_event_handler(Events.COMPLETED, handler)</code></pre>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">ignite.engine</span> <span class="kn">import</span> <span class="n">Engine</span><span class="p">,</span> <span class="n">Events</span>
@@ -262,168 +262,6 @@ evaluator.add_event_handler(Events.COMPLETED, handler)</code></pre>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="ReduceLROnPlateauWithSchedule" class="doc_header"><code>class</code> <code>ReduceLROnPlateauWithSchedule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L251" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ReduceLROnPlateauWithSchedule</code>(<strong><code>optimizer</code></strong>, <strong><code>factor_schedule</code></strong>:<code>[&lt;class 'float'&gt;]</code>, <strong><code>patience_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>end_callback</code></strong>:<code>Callable</code>, <strong><code>next_era_callback</code></strong>:<code>Callable</code>, <strong><code>mode</code></strong>=<em><code>'min'</code></em>, <strong><code>threshold</code></strong>=<em><code>0.0001</code></em>, <strong><code>threshold_mode</code></strong>=<em><code>'rel'</code></em>, <strong><code>cooldown</code></strong>=<em><code>0</code></em>, <strong><code>min_lr</code></strong>=<em><code>0</code></em>, <strong><code>eps</code></strong>=<em><code>1e-08</code></em>, <strong><code>verbose</code></strong>=<em><code>False</code></em>)</p>
-</blockquote>
-<p>Reduce learning rate when a metric has stopped improving.
-Models often benefit from reducing the learning rate by a factor
-of 2-10 once learning stagnates. This scheduler reads a metrics
-quantity and if no improvement is seen for a 'patience' number
-of epochs, the learning rate is reduced.</p>
-<p>Args:
-    optimizer (Optimizer): Wrapped optimizer.
-    mode (str): One of <code>min</code>, <code>max</code>. In <code>min</code> mode, lr will
-        be reduced when the quantity monitored has stopped
-        decreasing; in <code>max</code> mode it will be reduced when the
-        quantity monitored has stopped increasing. Default: 'min'.
-    factor (float): Factor by which the learning rate will be
-        reduced. new_lr = lr <em> factor. Default: 0.1.
-    patience (int): Number of epochs with no improvement after
-        which learning rate will be reduced. For example, if
-        <code>patience = 2</code>, then we will ignore the first 2 epochs
-        with no improvement, and will only decrease the LR after the
-        3rd epoch if the loss still hasn't improved then.
-        Default: 10.
-    threshold (float): Threshold for measuring the new optimum,
-        to only focus on significant changes. Default: 1e-4.
-    threshold_mode (str): One of <code>rel</code>, <code>abs</code>. In <code>rel</code> mode,
-        dynamic_threshold = best </em> ( 1 + threshold ) in 'max'
-        mode or best * ( 1 - threshold ) in <code>min</code> mode.
-        In <code>abs</code> mode, dynamic_threshold = best + threshold in
-        <code>max</code> mode or best - threshold in <code>min</code> mode. Default: 'rel'.
-    cooldown (int): Number of epochs to wait before resuming
-        normal operation after lr has been reduced. Default: 0.
-    min_lr (float or list): A scalar or a list of scalars. A
-        lower bound on the learning rate of all param groups
-        or each group respectively. Default: 0.
-    eps (float): Minimal decay applied to lr. If the difference
-        between new and old lr is smaller than eps, the update is
-        ignored. Default: 1e-8.
-    verbose (bool): If <code>True</code>, prints a message to stdout for
-        each update. Default: <code>False</code>.</p>
-<p>Example:</p>
-
-<pre><code>&gt;&gt;&gt; optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
-&gt;&gt;&gt; scheduler = ReduceLROnPlateau(optimizer, 'min')
-&gt;&gt;&gt; for epoch in range(10):
-&gt;&gt;&gt;     train(...)
-&gt;&gt;&gt;     val_loss = validate(...)
-&gt;&gt;&gt;     # Note that step should be called after validate()
-&gt;&gt;&gt;     scheduler.step(val_loss)</code></pre>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="lr_step_after_epoch" class="doc_header"><code>lr_step_after_epoch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L451" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>lr_step_after_epoch</code>(<strong><code>trainer</code></strong>, <strong><code>scheduler</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="ReduceLROnPlateauWithScheduleWrapper" class="doc_header"><code>class</code> <code>ReduceLROnPlateauWithScheduleWrapper</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L480" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ReduceLROnPlateauWithScheduleWrapper</code>(<strong><code>optimizer</code></strong>, <strong><code>output_transform</code></strong>:<code>Optional</code>[<code>Callable</code>]=<em><code>None</code></em>, <strong><code>metrics_transform</code></strong>:<code>Optional</code>[<code>Callable</code>]=<em><code>None</code></em>, <strong><code>factor_schedule</code></strong>:<code>[&lt;class 'float'&gt;]</code>, <strong><code>patience_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>next_era_callback</code></strong>:<code>Callable</code>, <strong><code>end_callback</code></strong>:<code>Callable</code>, <strong><code>mode</code></strong>=<em><code>'min'</code></em>, <strong><code>threshold</code></strong>=<em><code>0.0001</code></em>, <strong><code>threshold_mode</code></strong>=<em><code>'rel'</code></em>, <strong><code>cooldown</code></strong>=<em><code>0</code></em>, <strong><code>min_lr</code></strong>=<em><code>0</code></em>, <strong><code>eps</code></strong>=<em><code>1e-08</code></em>, <strong><code>verbose</code></strong>=<em><code>False</code></em>) :: <a href="/batchbald_redux/restoring_early_stopping.html#ReduceLROnPlateauWithSchedule"><code>ReduceLROnPlateauWithSchedule</code></a></p>
-</blockquote>
-<p>Reduce learning rate when a metric has stopped improving.
-Models often benefit from reducing the learning rate by a factor
-of 2-10 once learning stagnates. This scheduler reads a metrics
-quantity and if no improvement is seen for a 'patience' number
-of epochs, the learning rate is reduced.</p>
-<p>Args:
-    optimizer (Optimizer): Wrapped optimizer.
-    mode (str): One of <code>min</code>, <code>max</code>. In <code>min</code> mode, lr will
-        be reduced when the quantity monitored has stopped
-        decreasing; in <code>max</code> mode it will be reduced when the
-        quantity monitored has stopped increasing. Default: 'min'.
-    factor (float): Factor by which the learning rate will be
-        reduced. new_lr = lr <em> factor. Default: 0.1.
-    patience (int): Number of epochs with no improvement after
-        which learning rate will be reduced. For example, if
-        <code>patience = 2</code>, then we will ignore the first 2 epochs
-        with no improvement, and will only decrease the LR after the
-        3rd epoch if the loss still hasn't improved then.
-        Default: 10.
-    threshold (float): Threshold for measuring the new optimum,
-        to only focus on significant changes. Default: 1e-4.
-    threshold_mode (str): One of <code>rel</code>, <code>abs</code>. In <code>rel</code> mode,
-        dynamic_threshold = best </em> ( 1 + threshold ) in 'max'
-        mode or best * ( 1 - threshold ) in <code>min</code> mode.
-        In <code>abs</code> mode, dynamic_threshold = best + threshold in
-        <code>max</code> mode or best - threshold in <code>min</code> mode. Default: 'rel'.
-    cooldown (int): Number of epochs to wait before resuming
-        normal operation after lr has been reduced. Default: 0.
-    min_lr (float or list): A scalar or a list of scalars. A
-        lower bound on the learning rate of all param groups
-        or each group respectively. Default: 0.
-    eps (float): Minimal decay applied to lr. If the difference
-        between new and old lr is smaller than eps, the update is
-        ignored. Default: 1e-8.
-    verbose (bool): If <code>True</code>, prints a message to stdout for
-        each update. Default: <code>False</code>.</p>
-<p>Example:</p>
-
-<pre><code>&gt;&gt;&gt; optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
-&gt;&gt;&gt; scheduler = ReduceLROnPlateau(optimizer, 'min')
-&gt;&gt;&gt; for epoch in range(10):
-&gt;&gt;&gt;     train(...)
-&gt;&gt;&gt;     val_loss = validate(...)
-&gt;&gt;&gt;     # Note that step should be called after validate()
-&gt;&gt;&gt;     scheduler.step(val_loss)</code></pre>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
@@ -543,6 +381,358 @@ of epochs, the learning rate is reduced.</p>
     <span class="k">def</span> <span class="nf">on_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_epoch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_epoch</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_engine</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">callback_epoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_engine</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="suggest_limit_schedule" class="doc_header"><code>suggest_limit_schedule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L253" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>suggest_limit_schedule</code>(<strong><code>patience_schedule</code></strong>, <strong><code>max_epochs</code></strong>, <strong><code>factor</code></strong>=<em><code>2</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">suggest_limit_schedule</span><span class="p">(</span><span class="n">patience_schedule</span><span class="p">,</span> <span class="n">max_epochs</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">backward_limit_schedule</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_epoch</span> <span class="o">=</span> <span class="n">max_epochs</span>
+    <span class="k">for</span> <span class="n">patience</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">patience_schedule</span><span class="p">):</span>
+        <span class="n">current_epoch</span> <span class="o">-=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">patience</span>
+        <span class="n">backward_limit_schedule</span> <span class="o">+=</span> <span class="p">[</span><span class="n">current_epoch</span><span class="p">]</span>
+
+    <span class="n">limit_schedule</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">backward_limit_schedule</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">limit_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">limit_schedule</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">patience</span> <span class="ow">in</span> <span class="n">patience_schedule</span><span class="p">:</span>
+            <span class="n">current_epoch</span> <span class="o">+=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">patience</span>
+            <span class="n">limit_schedule</span> <span class="o">+=</span> <span class="p">[</span><span class="n">current_epoch</span><span class="p">]</span>
+        <span class="n">max_epochs</span> <span class="o">=</span> <span class="n">current_epoch</span>
+
+    <span class="k">return</span> <span class="n">limit_schedule</span><span class="p">,</span> <span class="n">max_epochs</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">suggest_limit_schedule</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="mi">120</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>([60, 100], 120)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">suggest_limit_schedule</span><span class="p">([</span><span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="mi">120</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>([60, 100, 140], 140)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ModuleOptimizerSnapshotter" class="doc_header"><code>class</code> <code>ModuleOptimizerSnapshotter</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L273" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ModuleOptimizerSnapshotter</code>(<strong><code>module</code></strong>:<code>Module</code>, <strong><code>optimizer</code></strong>:<code>Optimizer</code>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ReduceLROnPlateauWithSchedule" class="doc_header"><code>class</code> <code>ReduceLROnPlateauWithSchedule</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L302" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ReduceLROnPlateauWithSchedule</code>(<strong><code>optimizer</code></strong>:<code>Optimizer</code>, <strong><code>factor_schedule</code></strong>:<code>[&lt;class 'float'&gt;]</code>, <strong><code>patience_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>limit_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>end_callback</code></strong>:<code>Callable</code>, <strong><code>next_era_callback</code></strong>:<code>Callable</code>, <strong><code>mode</code></strong>=<em><code>'min'</code></em>, <strong><code>threshold</code></strong>=<em><code>0.0001</code></em>, <strong><code>threshold_mode</code></strong>=<em><code>'rel'</code></em>, <strong><code>cooldown</code></strong>=<em><code>0</code></em>, <strong><code>min_lr</code></strong>=<em><code>0</code></em>, <strong><code>eps</code></strong>=<em><code>1e-08</code></em>, <strong><code>verbose</code></strong>=<em><code>False</code></em>, <strong><code>module</code></strong>:<code>Module</code>=<em><code>None</code></em>)</p>
+</blockquote>
+<p>Reduce learning rate when a metric has stopped improving.
+Models often benefit from reducing the learning rate by a factor
+of 2-10 once learning stagnates. This scheduler reads a metrics
+quantity and if no improvement is seen for a 'patience' number
+of epochs, the learning rate is reduced.</p>
+<p>Args:
+    optimizer (Optimizer): Wrapped optimizer.
+    mode (str): One of <code>min</code>, <code>max</code>. In <code>min</code> mode, lr will
+        be reduced when the quantity monitored has stopped
+        decreasing; in <code>max</code> mode it will be reduced when the
+        quantity monitored has stopped increasing. Default: 'min'.
+    factor (float): Factor by which the learning rate will be
+        reduced. new_lr = lr <em> factor. Default: 0.1.
+    patience (int): Number of epochs with no improvement after
+        which learning rate will be reduced. For example, if
+        <code>patience = 2</code>, then we will ignore the first 2 epochs
+        with no improvement, and will only decrease the LR after the
+        3rd epoch if the loss still hasn't improved then.
+        Default: 10.
+    threshold (float): Threshold for measuring the new optimum,
+        to only focus on significant changes. Default: 1e-4.
+    threshold_mode (str): One of <code>rel</code>, <code>abs</code>. In <code>rel</code> mode,
+        dynamic_threshold = best </em> ( 1 + threshold ) in 'max'
+        mode or best * ( 1 - threshold ) in <code>min</code> mode.
+        In <code>abs</code> mode, dynamic_threshold = best + threshold in
+        <code>max</code> mode or best - threshold in <code>min</code> mode. Default: 'rel'.
+    cooldown (int): Number of epochs to wait before resuming
+        normal operation after lr has been reduced. Default: 0.
+    min_lr (float or list): A scalar or a list of scalars. A
+        lower bound on the learning rate of all param groups
+        or each group respectively. Default: 0.
+    eps (float): Minimal decay applied to lr. If the difference
+        between new and old lr is smaller than eps, the update is
+        ignored. Default: 1e-8.
+    verbose (bool): If <code>True</code>, prints a message to stdout for
+        each update. Default: <code>False</code>.</p>
+<p>Example:</p>
+
+<pre><code>&gt;&gt;&gt; optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+&gt;&gt;&gt; scheduler = ReduceLROnPlateau(optimizer, 'min')
+&gt;&gt;&gt; for epoch in range(10):
+&gt;&gt;&gt;     train(...)
+&gt;&gt;&gt;     val_loss = validate(...)
+&gt;&gt;&gt;     # Note that step should be called after validate()
+&gt;&gt;&gt;     scheduler.step(val_loss)</code></pre>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="lr_step_after_epoch" class="doc_header"><code>lr_step_after_epoch</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L519" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>lr_step_after_epoch</code>(<strong><code>trainer</code></strong>, <strong><code>scheduler</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="ReduceLROnPlateauWithScheduleWrapper" class="doc_header"><code>class</code> <code>ReduceLROnPlateauWithScheduleWrapper</code><a href="https://github.com/blackhc/batchbald_redux/tree/master/batchbald_redux/restoring_early_stopping.py#L548" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ReduceLROnPlateauWithScheduleWrapper</code>(<strong><code>optimizer</code></strong>, <strong><code>output_transform</code></strong>:<code>Optional</code>[<code>Callable</code>]=<em><code>None</code></em>, <strong><code>metrics_transform</code></strong>:<code>Optional</code>[<code>Callable</code>]=<em><code>None</code></em>, <strong><code>factor_schedule</code></strong>:<code>[&lt;class 'float'&gt;]</code>, <strong><code>patience_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>limit_schedule</code></strong>:<code>[&lt;class 'int'&gt;]</code>, <strong><code>next_era_callback</code></strong>:<code>Callable</code>, <strong><code>end_callback</code></strong>:<code>Callable</code>, <strong><code>mode</code></strong>=<em><code>'min'</code></em>, <strong><code>threshold</code></strong>=<em><code>0.0001</code></em>, <strong><code>threshold_mode</code></strong>=<em><code>'rel'</code></em>, <strong><code>cooldown</code></strong>=<em><code>0</code></em>, <strong><code>min_lr</code></strong>=<em><code>0</code></em>, <strong><code>eps</code></strong>=<em><code>1e-08</code></em>, <strong><code>verbose</code></strong>=<em><code>False</code></em>, <strong><code>module</code></strong>:<code>Module</code>=<em><code>None</code></em>) :: <a href="/batchbald_redux/restoring_early_stopping.html#ReduceLROnPlateauWithSchedule"><code>ReduceLROnPlateauWithSchedule</code></a></p>
+</blockquote>
+<p>Reduce learning rate when a metric has stopped improving.
+Models often benefit from reducing the learning rate by a factor
+of 2-10 once learning stagnates. This scheduler reads a metrics
+quantity and if no improvement is seen for a 'patience' number
+of epochs, the learning rate is reduced.</p>
+<p>Args:
+    optimizer (Optimizer): Wrapped optimizer.
+    mode (str): One of <code>min</code>, <code>max</code>. In <code>min</code> mode, lr will
+        be reduced when the quantity monitored has stopped
+        decreasing; in <code>max</code> mode it will be reduced when the
+        quantity monitored has stopped increasing. Default: 'min'.
+    factor (float): Factor by which the learning rate will be
+        reduced. new_lr = lr <em> factor. Default: 0.1.
+    patience (int): Number of epochs with no improvement after
+        which learning rate will be reduced. For example, if
+        <code>patience = 2</code>, then we will ignore the first 2 epochs
+        with no improvement, and will only decrease the LR after the
+        3rd epoch if the loss still hasn't improved then.
+        Default: 10.
+    threshold (float): Threshold for measuring the new optimum,
+        to only focus on significant changes. Default: 1e-4.
+    threshold_mode (str): One of <code>rel</code>, <code>abs</code>. In <code>rel</code> mode,
+        dynamic_threshold = best </em> ( 1 + threshold ) in 'max'
+        mode or best * ( 1 - threshold ) in <code>min</code> mode.
+        In <code>abs</code> mode, dynamic_threshold = best + threshold in
+        <code>max</code> mode or best - threshold in <code>min</code> mode. Default: 'rel'.
+    cooldown (int): Number of epochs to wait before resuming
+        normal operation after lr has been reduced. Default: 0.
+    min_lr (float or list): A scalar or a list of scalars. A
+        lower bound on the learning rate of all param groups
+        or each group respectively. Default: 0.
+    eps (float): Minimal decay applied to lr. If the difference
+        between new and old lr is smaller than eps, the update is
+        ignored. Default: 1e-8.
+    verbose (bool): If <code>True</code>, prints a message to stdout for
+        each update. Default: <code>False</code>.</p>
+<p>Example:</p>
+
+<pre><code>&gt;&gt;&gt; optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+&gt;&gt;&gt; scheduler = ReduceLROnPlateau(optimizer, 'min')
+&gt;&gt;&gt; for epoch in range(10):
+&gt;&gt;&gt;     train(...)
+&gt;&gt;&gt;     val_loss = validate(...)
+&gt;&gt;&gt;     # Note that step should be called after validate()
+&gt;&gt;&gt;     scheduler.step(val_loss)</code></pre>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ModuleOptimizerSnapshotter</span><span class="p">:</span>
+    <span class="n">module</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span>
+    <span class="n">module_state_dict</span><span class="p">:</span> <span class="n">Optional</span>
+    <span class="n">optimizer_state_dict</span><span class="p">:</span> <span class="n">Optional</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">module_state_dict</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_state_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">module_state_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span><span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+            <span class="c1"># Only take a snapshot of the optimizer if we also have a module.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_state_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_state_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module_state_dict</span><span class="p">))</span>
+
+            <span class="c1"># Only restore if we also restore a module (otherwise... messy?)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_state_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_state_dict</span><span class="p">))</span>
 
 
 <span class="k">class</span> <span class="nc">ReduceLROnPlateauWithSchedule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -596,9 +786,10 @@ of epochs, the learning rate is reduced.</p>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">optimizer</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">,</span>
         <span class="n">factor_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">patience_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">limit_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">end_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">next_era_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
@@ -608,6 +799,7 @@ of epochs, the learning rate is reduced.</p>
         <span class="n">min_lr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">module</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">factor</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factor_schedule</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Factor should be &lt; 1.0.&quot;</span><span class="p">)</span>
@@ -617,6 +809,8 @@ of epochs, the learning rate is reduced.</p>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">Optimizer</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not an Optimizer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshotter</span> <span class="o">=</span> <span class="n">ModuleOptimizerSnapshotter</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_lr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_lr</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">min_lr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">):</span>
@@ -628,10 +822,13 @@ of epochs, the learning rate is reduced.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">era</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit_schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">end_callback</span> <span class="o">=</span> <span class="n">end_callback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">next_era_callback</span> <span class="o">=</span> <span class="n">next_era_callback</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">patience_schedule</span> <span class="o">=</span> <span class="n">patience_schedule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit_schedule</span> <span class="o">=</span> <span class="n">limit_schedule</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cooldown</span> <span class="o">=</span> <span class="n">cooldown</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cooldown_counter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -639,6 +836,7 @@ of epochs, the learning rate is reduced.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold_mode</span> <span class="o">=</span> <span class="n">threshold_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_epoch</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode_worse</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># the worse value for the chosen mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
@@ -649,6 +847,7 @@ of epochs, the learning rate is reduced.</p>
     <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Resets num_bad_epochs counter and cooldown counter.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode_worse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_epoch</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cooldown_counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -663,18 +862,25 @@ of epochs, the learning rate is reduced.</p>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="n">current</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_epoch</span> <span class="o">=</span> <span class="n">epoch</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">snapshotter</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2"> worse than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="si">}</span><span class="s2">, patience: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
-
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2"> worse than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="si">}</span><span class="s2">, patience: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="si">}</span><span class="s2">!&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_cooldown</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cooldown_counter</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># ignore any bad epochs in cooldown</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_epoch</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshotter</span><span class="o">.</span><span class="n">module</span><span class="p">:</span>
+              <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Restoring best snapshot: best_score: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="si">}</span><span class="s2"> @ epoch </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">best_epoch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">snapshotter</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_lr</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cooldown_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cooldown</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_bad_epochs</span> <span class="o">=</span> <span class="mi">0</span>
@@ -689,6 +895,7 @@ of epochs, the learning rate is reduced.</p>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience_schedule</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">era</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit_schedule</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">era</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_era_callback</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">next_era_callback</span><span class="p">()</span>
 
@@ -786,6 +993,7 @@ of epochs, the learning rate is reduced.</p>
         <span class="n">metrics_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">factor_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">patience_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">limit_schedule</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">next_era_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">end_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
@@ -795,11 +1003,13 @@ of epochs, the learning rate is reduced.</p>
         <span class="n">min_lr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">module</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">optimizer</span><span class="p">,</span>
             <span class="n">factor_schedule</span><span class="o">=</span><span class="n">factor_schedule</span><span class="p">,</span>
             <span class="n">patience_schedule</span><span class="o">=</span><span class="n">patience_schedule</span><span class="p">,</span>
+            <span class="n">limit_schedule</span><span class="o">=</span><span class="n">limit_schedule</span><span class="p">,</span>
             <span class="n">end_callback</span><span class="o">=</span><span class="n">end_callback</span><span class="p">,</span>
             <span class="n">next_era_callback</span><span class="o">=</span><span class="n">next_era_callback</span><span class="p">,</span>
             <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
@@ -809,6 +1019,7 @@ of epochs, the learning rate is reduced.</p>
             <span class="n">min_lr</span><span class="o">=</span><span class="n">min_lr</span><span class="p">,</span>
             <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">module</span><span class="o">=</span><span class="n">module</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics_transform</span> <span class="o">=</span> <span class="n">metrics_transform</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_transform</span> <span class="o">=</span> <span class="n">output_transform</span>
