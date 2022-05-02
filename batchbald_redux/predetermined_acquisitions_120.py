@@ -22,7 +22,7 @@ from .acquisition_functions import (
     EvalDatasetBatchComputer,
     EvalModelBatchComputer,
 )
-from .batchbald import compute_entropy
+from .joint_entropy import compute_entropy
 from .acquisition_functions.bald import get_bald_scores
 from .black_box_model_training import evaluate
 from .dataset_challenges import get_base_dataset_index, get_target

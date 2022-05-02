@@ -2,9 +2,8 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"compute_conditional_entropy": "01_batchbald.ipynb",
-         "compute_entropy": "01_batchbald.ipynb",
-         "get_top_random_eval_bald_batch": "01_batchbald.ipynb",
+index = {"compute_conditional_entropy": "02_joint_entropy_computation.ipynb",
+         "compute_entropy": "02_joint_entropy_computation.ipynb",
          "JointEntropy": "02_joint_entropy_computation.ipynb",
          "ExactJointEntropy": "02_joint_entropy_computation.ipynb",
          "batch_multi_choices": "02_joint_entropy_computation.ipynb",
@@ -153,8 +152,7 @@ index = {"compute_conditional_entropy": "01_batchbald.ipynb",
          "T": "Z_dependency_injection.ipynb",
          "logmatmulexp": "Z_logmatmulexp.ipynb"}
 
-modules = ["batchbald.py",
-           "joint_entropy.py",
+modules = ["joint_entropy.py",
            "consistent_mc_dropout.py",
            "cinic10.py",
            "dataset_challenges.py",

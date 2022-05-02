@@ -5,7 +5,7 @@ from blackhc.progress_bar import create_progress_bar
 from toma import toma
 
 from batchbald_redux.acquisition_functions import PoolScorerCandidateBatchComputer, CandidateBatch
-from batchbald_redux.batchbald import compute_conditional_entropy, compute_entropy
+from batchbald_redux.joint_entropy import compute_conditional_entropy, compute_entropy
 from batchbald_redux.acquisition_functions.stochastic_acquisition import get_top_k_scorers, \
     get_sampled_tempered_scorers, get_stochastic_samples, StochasticMode
 

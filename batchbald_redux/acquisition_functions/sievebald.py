@@ -4,7 +4,7 @@ import torch
 
 from batchbald_redux import joint_entropy
 from batchbald_redux.acquisition_functions import PoolScorerCandidateBatchComputer, CandidateBatch
-from batchbald_redux.batchbald import compute_entropy, compute_conditional_entropy
+from batchbald_redux.joint_entropy import compute_conditional_entropy, compute_entropy
 
 
 def get_sieve_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:

@@ -5,7 +5,7 @@ from blackhc.progress_bar import with_progress_bar
 
 from batchbald_redux import joint_entropy
 from batchbald_redux.acquisition_functions import PoolScorerCandidateBatchComputer, CandidateBatch
-from batchbald_redux.batchbald import compute_conditional_entropy
+from batchbald_redux.joint_entropy import compute_conditional_entropy
 
 
 class BatchBALDScorer:

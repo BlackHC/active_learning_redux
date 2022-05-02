@@ -11,7 +11,7 @@ from batchbald_redux.acquisition_functions import EvaluationPoolScorerCandidateB
     CandidateBatch, get_top_random_scorers
 from batchbald_redux.acquisition_functions.bald import get_bald_scores
 from batchbald_redux.acquisition_functions.batchbald import BatchBALDScorer
-from batchbald_redux.batchbald import compute_entropy
+from batchbald_redux.joint_entropy import compute_entropy
 from batchbald_redux.acquisition_functions.stochastic_acquisition import get_top_k_scorers, get_sampled_tempered_scorers
 from batchbald_redux.trained_model import TrainedModel
 

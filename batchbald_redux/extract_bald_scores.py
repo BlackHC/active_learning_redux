@@ -40,7 +40,7 @@ from .train_eval_model import (
 )
 from .trained_model import ModelTrainer, BayesianEnsembleModelTrainer
 
-from .batchbald import compute_entropy
+from .joint_entropy import compute_entropy
 from .acquisition_functions.bald import get_bald_scores
 
 from .dataset_challenges import get_base_dataset_index
