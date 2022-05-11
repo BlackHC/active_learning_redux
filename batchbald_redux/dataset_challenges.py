@@ -19,6 +19,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 import torchvision.datasets
+from ddu_dirty_mnist import DistributionalAmbiguousMNIST, AmbiguousMNIST
 
 from .fast_mnist import FastFashionMNIST, FastMNIST
 
@@ -159,6 +160,7 @@ def get_base_dataset_index(dataset: data.Dataset, index: int) -> DatasetIndex:
             torchvision.datasets.CIFAR10,
             torchvision.datasets.SVHN,
             torchvision.datasets.ImageFolder,
+            DistributionalAmbiguousMNIST, AmbiguousMNIST
         ),
     ):
         return DatasetIndex(dataset, int(index))
@@ -199,7 +201,7 @@ def get_num_classes(dataset: data.Dataset) -> int:
         dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)
     ):
         return len(dataset.classes)
-    elif isinstance(dataset, torchvision.datasets.SVHN):
+    elif isinstance(dataset, (torchvision.datasets.SVHN, DistributionalAmbiguousMNIST, AmbiguousMNIST)):
         return 10
     elif isinstance(dataset, AliasDataset):
         return dataset.get_num_classes()
@@ -225,7 +227,9 @@ def get_target(dataset, index: int, *, device=None):
         target = get_target(dataset.dataset, dataset.indices[index], device=device)
     elif isinstance(dataset, data.TensorDataset):
         target = dataset.tensors[1][index]
-    elif isinstance(dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)):
+    elif isinstance(dataset, (
+    torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder,
+    DistributionalAmbiguousMNIST, AmbiguousMNIST)):
         target = dataset.targets[index]
     elif isinstance(dataset, torchvision.datasets.SVHN):
         target = dataset.labels[index]
@@ -244,7 +248,9 @@ def get_targets(dataset, *, device=None) -> torch.Tensor:
         return get_targets(dataset.dataset, device=device)[torch.as_tensor(dataset.indices)]
     elif isinstance(dataset, data.TensorDataset):
         return torch.as_tensor(dataset.tensors[1], device=device)
-    elif isinstance(dataset, (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder)):
+    elif isinstance(dataset,
+                    (torchvision.datasets.MNIST, torchvision.datasets.CIFAR10, torchvision.datasets.ImageFolder,
+                     DistributionalAmbiguousMNIST, AmbiguousMNIST)):
         return torch.as_tensor(dataset.targets, device=device)
     elif isinstance(dataset, torchvision.datasets.SVHN):
         return torch.as_tensor(dataset.labels, device=device)
@@ -326,7 +332,7 @@ def split(dataset: data.Dataset, positive_indices: List[int]):
     positive_subset = SubsetAliasDataset(dataset, positive_indices)
 
     mask = np.full((len(dataset),), True)
-    mask[positive_indices]=False
+    mask[positive_indices] = False
     negative_indices = np.nonzero(mask)[0]
     negative_subset = SubsetAliasDataset(dataset, negative_indices, alias=f"{dataset}[~{positive_indices}]")
     return positive_subset, negative_subset
@@ -528,7 +534,8 @@ class ImbalancedClassSplitDataset(SubsetAliasDataset):
         #
         generator = np.random.default_rng(seed)
 
-        # class_counts = [num_samples_majority] * num_majority_classes + [num_samples_minority] * (num_classes - num_majority_classes)
+        # class_counts = [num_samples_majority] * num_majority_classes + [num_samples_minority] * (num_classes -
+        # num_majority_classes)
         # class_counts = list(generator.permuted(class_counts))
 
         indices = get_class_indices(dataset, class_counts=class_counts, generator=generator)
@@ -564,7 +571,7 @@ class OneHotDataset(ReplaceTargetsDataset):
 
 
 class RepeatedDataset(AliasDataset):
-    def __init__(self, dataset: data.Dataset, *, num_repeats: int, interleaved:bool=None):
+    def __init__(self, dataset: data.Dataset, *, num_repeats: int, interleaved: bool = None):
         self.num_repeats = num_repeats
         self.interleaved = interleaved if interleaved is not None else True
 
