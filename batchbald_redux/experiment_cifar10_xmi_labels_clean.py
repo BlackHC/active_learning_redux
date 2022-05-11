@@ -18,6 +18,8 @@ from torch import nn
 from torch.utils.data import Dataset
 
 import batchbald_redux.acquisition_functions as acquisition_functions
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.coreset
 from .acquisition_functions import (
     CandidateBatchComputer,
     EvalModelBatchComputer,
@@ -210,7 +212,7 @@ class Experiment:
     factor_schedule: [int] = (0.1,)
     acquisition_function: Union[
         Type[CandidateBatchComputer], Type[EvalModelBatchComputer]
-    ] = acquisition_functions.BALD
+    ] = batchbald_redux.acquisition_functions.bald.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
     acquisition_function_args: dict = None
@@ -329,8 +331,8 @@ configs = [
     )
     for seed in range(5)
     for acquisition_function in [
-        acquisition_functions.CoreSetBALD,
-        acquisition_functions.BALD,
+        batchbald_redux.acquisition_functions.coreset.CoreSetBALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
         #acquisition_functions.Random,
     ]
     for acquisition_size in [1]

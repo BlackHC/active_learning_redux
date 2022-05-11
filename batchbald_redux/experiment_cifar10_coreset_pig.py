@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.coreset
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import StandardExperimentDataConfig
 from .unified_experiment import UnifiedExperiment
@@ -45,9 +47,9 @@ configs = [
     for acquisition_size in [1]
     for num_pool_samples in [100]
     for acquisition_function in [
-        acquisition_functions.CoreSetPIGBALD,
-        acquisition_functions.BALD,
-        acquisition_functions.CoreSetPIG,
+        batchbald_redux.acquisition_functions.coreset.CoreSetPIGBALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
+        batchbald_redux.acquisition_functions.coreset.CoreSetPIG,
     ]
 ]
 

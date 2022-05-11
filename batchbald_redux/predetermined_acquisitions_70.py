@@ -15,13 +15,15 @@ import torch.utils.data
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
     EvalDatasetBatchComputer,
     EvalModelBatchComputer,
 )
-from .batchbald import compute_entropy, get_bald_scores
+from .joint_entropy import compute_entropy
+from .acquisition_functions.bald import get_bald_scores
 from .black_box_model_training import evaluate
 from .dataset_challenges import get_base_dataset_index, get_target
 from .di import DependencyInjection
@@ -500,7 +502,8 @@ class UnifiedExperiment:
     num_training_samples: int = 1
 
     device: str = "cuda"
-    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = acquisition_functions.BALD
+    acquisition_function: Union[Type[CandidateBatchComputer], Type[EvalModelBatchComputer]] = batchbald_redux\
+        .acquisition_functions.bald.BALD
     train_eval_model: Type[TrainEvalModel] = TrainSelfDistillationEvalModel
     model_trainer_factory: Type[ModelTrainer] = Cifar10ModelTrainer
     ensemble_size: int = 1

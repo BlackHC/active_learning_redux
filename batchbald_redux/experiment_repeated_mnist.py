@@ -10,6 +10,8 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.bald
+import batchbald_redux.acquisition_functions.batchbald
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import StandardExperimentDataConfig
 from .models import MnistModelTrainer
@@ -20,6 +22,74 @@ from .unified_experiment import UnifiedExperiment
 coldness_range = [1/4, 1., 4., 8., 16.]
 
 configs = [
+    UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=True,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 45682,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=300,
+        model_trainer_factory=MnistModelTrainer,
+        stochastic_mode=stochastic_mode,
+        coldness=coldness,
+    )
+    for seed in range(5)
+    for acquisition_size in [10]
+    for num_pool_samples in [100]
+    for id_repetitions in [4]
+    for coldness in coldness_range
+    # Already ran Power
+    for stochastic_mode in [
+        acquisition_functions.StochasticMode.Softrank,
+        acquisition_functions.StochasticMode.Power,
+        acquisition_functions.StochasticMode.Softmax,
+    ]
+    for acquisition_function in [
+        baseline_acquisition_functions.Entropy,
+    ]
+] + [
+    UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=True,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 45682,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=300,
+        model_trainer_factory=MnistModelTrainer,
+        stochastic_mode=stochastic_mode,
+        coldness=coldness,
+    )
+    for seed in range(5)
+    for acquisition_size in [10]
+    for num_pool_samples in [100]
+    for id_repetitions in [4]
+    for coldness in [1.]
+    # Already ran Power
+    for stochastic_mode in [
+        acquisition_functions.StochasticMode.TopK,
+    ]
+    for acquisition_function in [
+        baseline_acquisition_functions.Entropy
+    ]
+] + [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
             id_dataset_name="MNIST",
@@ -113,7 +183,7 @@ configs = [
         coldness=coldness,
     )
     for acquisition_function in [
-        acquisition_functions.StochasticBALD,
+        batchbald_redux.acquisition_functions.bald.StochasticBALD,
     ]
     for seed in range(5)
     for acquisition_size in [20, 40]
@@ -146,7 +216,7 @@ configs = [
         model_trainer_factory=MnistModelTrainer,
     )
     for acquisition_function in [
-        acquisition_functions.BALD,
+        batchbald_redux.acquisition_functions.bald.BALD,
         acquisition_functions.Random,
         baseline_acquisition_functions.BADGE
     ]
@@ -174,7 +244,7 @@ configs = [
         model_trainer_factory=MnistModelTrainer,
     )
     for acquisition_function in [
-        acquisition_functions.BatchBALD,
+        batchbald_redux.acquisition_functions.batchbald.BatchBALD,
     ]
     for seed in range(5)
     for acquisition_size in [5]

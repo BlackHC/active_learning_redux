@@ -1,11 +1,11 @@
-import math
 from dataclasses import dataclass
 
 import torch.utils.data
 
-from .batchbald import CandidateBatch, StochasticMode, get_stochastic_samples
+from .joint_entropy import compute_entropy
 from .trained_model import TrainedModel
-from .acquisition_functions import CandidateBatchComputer, PoolScorerCandidateBatchComputer
+from .acquisition_functions import CandidateBatchComputer, CandidateBatch, \
+    StochasticScoringFunction
 from .consistent_mc_dropout import GradEmbeddingType
 
 # copied from https://github.com/JordanAsh/badge/blob/master/query_strategies/badge_sampling.py
@@ -60,27 +60,6 @@ class BADGE(CandidateBatchComputer):
         return CandidateBatch(indices=chosen_indices, scores=[0.0] * len(chosen_indices))
 
 
-@dataclass
-class StochasticScoringFunction(PoolScorerCandidateBatchComputer):
-    coldness: float
-    stochastic_mode: StochasticMode
-
-    def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
-        # Ignore the device (because get_stochastic_samples needs a cpu device!)
-        scores_N = self.compute_scores(log_probs_N_K_C, device="cpu")
-
-        candidate_batch = self.extract_candidates(scores_N)
-
-        return candidate_batch
-
-    def extract_candidates(self, scores_N) -> CandidateBatch:
-        return get_stochastic_samples(scores_N, batch_size=self.acquisition_size, coldness=self.coldness,
-                                      mode=self.stochastic_mode)
-
-    def compute_scores(self, log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
-        raise NotImplementedError()
-
-
 def get_variation_ratios(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
     mean_probs_N_C = torch.mean(log_probs_N_K_C.to(device).exp(), dim=1)
     return 1. - torch.max(mean_probs_N_C, dim=1)[0]
@@ -114,6 +93,12 @@ def get_stddev_scores(log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
 class StdDev(StochasticScoringFunction):
     def compute_scores(self, log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
         return get_stddev_scores(log_probs_N_K_C=log_probs_N_K_C, device=device)
+
+
+@dataclass
+class Entropy(StochasticScoringFunction):
+    def compute_scores(self, log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
+        return compute_entropy(log_probs_N_K_C=log_probs_N_K_C)
 
 
 # class DistilBayesianModelAdapter(torch.nn.Module):

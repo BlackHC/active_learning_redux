@@ -10,6 +10,7 @@ import traceback
 from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
+import batchbald_redux.acquisition_functions.epig
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import (
     CinicCifarShiftExperimentDataConfig,
@@ -39,7 +40,7 @@ configs = [
     for seed in range(5)
     for acquisition_function in [
         #acquisition_functions.BALD,
-        acquisition_functions.EPIG,
+        batchbald_redux.acquisition_functions.epig.EPIG,
     ]
     for acquisition_size in [1000]
     for num_pool_samples in [100]

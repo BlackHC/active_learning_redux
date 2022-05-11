@@ -15,6 +15,9 @@ from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 
 import wandb
+
+import batchbald_redux.acquisition_functions.batchbald
+import batchbald_redux.acquisition_functions.epig
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .acquisition_functions import (
     CandidateBatchComputer,
@@ -323,7 +326,8 @@ configs = [
         num_pool_samples=num_pool_samples,
     )
     for seed in range(3)
-    for acquisition_function in [acquisition_functions.BatchEvalBALD, acquisition_functions.BatchBALD]
+    for acquisition_function in [batchbald_redux.acquisition_functions.epig.BatchEvalBALD,
+                                 batchbald_redux.acquisition_functions.batchbald.BatchBALD]
     for evaluation_set_size in [1024]
     for num_pool_samples in [100]
     for ood_exposure in [True, False]
