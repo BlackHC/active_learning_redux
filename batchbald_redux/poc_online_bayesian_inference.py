@@ -333,6 +333,10 @@ class Experiment:
             FastMNIST("data", train=True, download=True, device=self.device), "FastMNIST (train)"
         )
 
+        train_predictions = torch.load("./data/mnist_train_predictions.pt", map_location=self.device)
+
+        train_dataset = train_dataset.override_targets(targets=train_predictions.argmax(dim=1))
+
         active_learning_data = ActiveLearningData(train_dataset)
 
         active_learning_data.acquire_base_indices(training_set_indices[:20])
@@ -474,14 +478,16 @@ class Experiment:
 
 configs = [
     Experiment(
-        seed=seed,
+        seed=seed+1337,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        random_acquisition=True
+        random_acquisition=random_acquisition,
+        num_samples_list= (10000,)
     )
-    for seed in range(1)
-    for acquisition_size in [5]
+    for seed in range(4)
+    for acquisition_size in [1]
     for num_pool_samples in [100]
+    for random_acquisition in [True, False]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":

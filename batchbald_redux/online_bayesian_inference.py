@@ -3,8 +3,6 @@ from typing import List
 
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from tqdm.auto import tqdm
 from toma import toma
 
@@ -76,11 +74,6 @@ def get_obi_predictions_labels(model, *, test_dataset, train_dataset, training_i
                                                              device=device,
                                                              storage_device="cpu")
     return log_probs_N_M_C, labels_N
-
-
-# import seaborn as sns
-# import matplotlib.pyplot as plt
-# import numpy as np
 
 
 import gc
@@ -184,6 +177,8 @@ def eval_validation_convex_optimization(*, log_probs_N_M_C, labels_N, training_s
                 weights_m = get_optimized_weights()
 
                 if verbose:
+                    import matplotlib.pyplot as plt
+
                     accuracy_m, test_crossentropy_m = get_accuracy_crossentropy(log_probs_N_M_C=trial_log_probs_N_m_C,
                                                                                 labels_N=labels_N,
                                                                                 training_set_size=training_set_size)
