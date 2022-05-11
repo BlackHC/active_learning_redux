@@ -128,3 +128,5 @@ class CoreSetEvaluationPoolScorerCandidateBatchComputer(EvalModelBatchComputer):
 
     def get_candidate_batch(self, training_log_probs_N_K_C, eval_log_probs_N_K_C, labels_N, device) -> CandidateBatch:
         raise NotImplementedError()
+
+

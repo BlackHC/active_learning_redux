@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from enum import Enum
 
 import numpy as np
 import scipy.stats
 import torch
 
-from batchbald_redux.acquisition_functions import CandidateBatch
+from batchbald_redux.acquisition_functions import CandidateBatch, PoolScorerCandidateBatchComputer
 
 
 def get_top_k_scorers(scores_N: torch.Tensor, *, batch_size: int) -> CandidateBatch:
@@ -110,3 +111,24 @@ def get_stochastic_samples(
         return get_top_k_scorers(scores_N, batch_size=batch_size)
     else:
         raise ValueError(f"Unknown mode")
+
+
+@dataclass
+class StochasticScoringFunction(PoolScorerCandidateBatchComputer):
+    coldness: float
+    stochastic_mode: StochasticMode
+
+    def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
+        # Ignore the device (because get_stochastic_samples needs a cpu device!)
+        scores_N = self.compute_scores(log_probs_N_K_C, device="cpu")
+
+        candidate_batch = self.extract_candidates(scores_N)
+
+        return candidate_batch
+
+    def extract_candidates(self, scores_N) -> CandidateBatch:
+        return get_stochastic_samples(scores_N, batch_size=self.acquisition_size, coldness=self.coldness,
+                                      mode=self.stochastic_mode)
+
+    def compute_scores(self, log_probs_N_K_C: torch.Tensor, *, device) -> torch.Tensor:
+        raise NotImplementedError()

@@ -7,7 +7,7 @@ from toma import toma
 from batchbald_redux.acquisition_functions import PoolScorerCandidateBatchComputer, CandidateBatch
 from batchbald_redux.joint_entropy import compute_conditional_entropy, compute_entropy
 from batchbald_redux.acquisition_functions.stochastic_acquisition import get_top_k_scorers, \
-    get_sampled_tempered_scorers, get_stochastic_samples, StochasticMode
+    get_sampled_tempered_scorers, get_stochastic_samples, StochasticMode, StochasticScoringFunction
 
 
 def get_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dtype=None, device=None) -> CandidateBatch:
@@ -94,6 +94,7 @@ def get_random_bald_batch(log_probs_N_K_C: torch.Tensor, *, batch_size: int, dty
     return get_top_random_scorers(scores_N, num_classes=C, batch_size=batch_size)
 
 
+# TODO(blackhc): remove this! it's deprecated
 @dataclass
 class _BALD(PoolScorerCandidateBatchComputer):
     def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
@@ -109,9 +110,14 @@ class _BALD(PoolScorerCandidateBatchComputer):
 
 
 @dataclass
-class BALD(_BALD):
-    def extract_candidates(self, scores_N) -> CandidateBatch:
-        return get_top_k_scorers(scores_N, batch_size=self.acquisition_size)
+class BALD(StochasticScoringFunction):
+    def get_candidate_batch(self, log_probs_N_K_C, device) -> CandidateBatch:
+        # Evaluate BALD scores
+        scores_N = get_bald_scores(log_probs_N_K_C, dtype=torch.double, device=device)
+
+        candidate_batch = self.extract_candidates(scores_N)
+
+        return candidate_batch
 
 
 @dataclass
