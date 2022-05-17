@@ -332,7 +332,7 @@ def get_DirtyMNIST(*, root, validation_set_size, validation_split_random_state, 
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = DirtyMNIST("data", train=False, device=device_hint)
+    test_dataset = DirtyMNIST("data", train=False, download=True, device=device_hint)
 
     train_dataset = torch.utils.data.ConcatDataset([train_dataset, full_train_dataset.datasets[1]])
 
@@ -370,7 +370,7 @@ def get_DistributionalAmbiguousMNIST(*, root, validation_set_size, validation_sp
         validation_split_random_state=validation_split_random_state,
     )
 
-    test_dataset = DirtyMNIST("data", train=False, device=device_hint)
+    test_dataset = DirtyMNIST("data", train=False, download=True, device=device_hint)
 
     return SplitDataset(
         input_size,

@@ -18,8 +18,6 @@ from .sampling_unified_experiment import SampledUnifiedExperiment, SampledExperi
 
 # Cell
 
-coldness_range = [1/4, 1., 4., 8., 16.]
-
 configs = [
     SampledUnifiedExperiment(
         experiment_data_config=SampledExperimentDataConfig(
@@ -32,13 +30,13 @@ configs = [
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        max_training_set=300,
+        max_training_set=500,
         model_trainer_factory=MnistModelTrainer,
         stochastic_mode=acquisition_functions.StochasticMode.TopK,
         allow_repeated_acquisition=allow_repeated_acquisition,
     )
     for seed in range(5)
-    for acquisition_size in [10]
+    for acquisition_size in [1]
     for num_pool_samples in [100]
     for acquisition_function in [
         acquisition_functions.BALD,
