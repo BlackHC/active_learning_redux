@@ -110,7 +110,7 @@ def get_stochastic_samples(
     elif mode == StochasticMode.TopK:
         return get_top_k_scorers(scores_N, batch_size=batch_size)
     else:
-        raise ValueError(f"Unknown mode")
+        raise ValueError(f"Unknown mode {mode}")
 
 
 @dataclass
