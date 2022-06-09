@@ -77,9 +77,9 @@ class ActiveLearningData:
 
         Useful for extracting a validation set.
         """
-        return self.extract_dataset_from_pool_from_indices(self.get_random_pool_indices(size))
+        return self.extract_dataset_from_pool_indices(self.get_random_pool_indices(size))
 
-    def extract_dataset_from_pool_from_indices(self, pool_indices) -> data.Dataset:
+    def extract_dataset_from_pool_indices(self, pool_indices) -> data.Dataset:
         """
         Extract a dataset from the pool dataset and make those indices unavailable.
 
