@@ -15,22 +15,11 @@ from blackhc.project import is_run_from_ipython
 from blackhc.project.experiment import embedded_experiments
 from torch.utils.data import Dataset
 
-import batchbald_redux.acquisition_functions as acquisition_functions
 import wandb
-from .acquisition_functions import (
-    CandidateBatchComputer,
-    EvalModelBatchComputer,
-)
+
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate_old, train
-from .dataset_challenges import (
-    AdditiveGaussianNoise,
-    NamedDataset,
-    create_repeated_MNIST_dataset,
-    get_balanced_sample_indices,
-    get_base_dataset_index,
-    get_target,
-)
+from .dataset_challenges import NamedDataset
 from .di import DependencyInjection
 from .experiment_logging import asclassdict, init_wandb, log2wandb
 from .fast_mnist import FastMNIST
@@ -41,11 +30,7 @@ from .online_bayesian_inference import evaluate_online_bayesian_inference
 # Cell
 
 # From the BatchBALD Repo
-from .train_eval_model import (
-    TrainEvalModel,
-    TrainSelfDistillationEvalModel,
-)
-from .trained_model import TrainedBayesianModel
+from .train_eval_model import TrainEvalModel
 
 # Cell
 

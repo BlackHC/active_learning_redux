@@ -26,7 +26,6 @@ from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate_old, train
 from .dataset_challenges import (
     NamedDataset,
-    create_repeated_MNIST_dataset,
     get_balanced_sample_indices,
     get_base_dataset_index,
     get_target, AdditiveGaussianNoise,
@@ -122,7 +121,7 @@ class Experiment:
         num_classes = train_dataset.get_num_classes()
         initial_samples_per_class = self.initial_training_set_size // num_classes
         initial_training_set_indices = get_balanced_sample_indices(
-            train_dataset,
+            targets=train_dataset.get_targets(),
             num_classes=num_classes,
             samples_per_class=initial_samples_per_class,
             seed=0,

@@ -139,12 +139,13 @@ def load_experiment_data(
     if id_repetitions < 1:
         train_dataset = train_dataset * id_repetitions
 
+    targets = train_dataset.get_targets()
     num_classes = train_dataset.get_num_classes()
     initial_samples_per_class = initial_training_set_size // num_classes
     evaluation_set_samples_per_class = evaluation_set_size // num_classes
     samples_per_class = initial_samples_per_class + evaluation_set_samples_per_class
     balanced_samples_indices = get_balanced_sample_indices_by_class(
-        train_dataset,
+        targets=targets,
         num_classes=num_classes,
         samples_per_class=samples_per_class,
         seed=validation_split_random_state,

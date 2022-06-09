@@ -454,17 +454,14 @@ class RandomLabelsDataset(ReplaceTargetsDataset):
 # Cell
 
 
-def get_class_indices_by_class(
-    dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator
-) -> Dict[int, List[int]]:
+def get_class_indices_by_class(targets: torch.Tensor, *, class_counts: list, generator: np.random.Generator) -> Dict[int, List[int]]:
     class_counts = list(class_counts)
 
     subset_indices = {label: [] for label in range(len(class_counts))}
 
     remaining_samples = sum(class_counts)
 
-    indices = generator.permutation(len(dataset))
-    targets = get_targets(dataset)
+    indices = generator.permutation(len(targets))
     for index in indices:
         target = targets[index].item()
 
@@ -479,25 +476,25 @@ def get_class_indices_by_class(
     return subset_indices
 
 
-def get_class_indices(dataset: data.Dataset, *, class_counts: list, generator: np.random.Generator) -> List[int]:
-    indices_by_class = get_class_indices_by_class(dataset=dataset, class_counts=class_counts, generator=generator)
+def get_class_indices(targets: torch.Tensor, *, class_counts: list, generator: np.random.Generator) -> List[int]:
+    indices_by_class = get_class_indices_by_class(targets=targets, class_counts=class_counts, generator=generator)
     return [index for by_class in indices_by_class.values() for index in by_class]
 
 
-def get_balanced_sample_indices(dataset: data.Dataset, *, num_classes, samples_per_class, seed: int) -> List[int]:
+def get_balanced_sample_indices(targets: torch.Tensor, *, num_classes, samples_per_class, seed: int) -> List[int]:
     class_counts = [samples_per_class] * num_classes
     generator = np.random.default_rng(seed)
 
-    return get_class_indices(dataset, class_counts=class_counts, generator=generator)
+    return get_class_indices(targets=targets, class_counts=class_counts, generator=generator)
 
 
 def get_balanced_sample_indices_by_class(
-    dataset: data.Dataset, *, num_classes, samples_per_class, seed: int
-) -> Dict[int, int]:
+    targets: torch.Tensor, *, num_classes, samples_per_class, seed: int
+) -> Dict[int, List[int]]:
     class_counts = [samples_per_class] * num_classes
     generator = np.random.default_rng(seed)
 
-    return get_class_indices_by_class(dataset, class_counts=class_counts, generator=generator)
+    return get_class_indices_by_class(targets=targets, class_counts=class_counts, generator=generator)
 
 # Cell
 
@@ -508,7 +505,7 @@ class ImbalancedDataset(SubsetAliasDataset):
     def __init__(self, dataset: data.Dataset, *, class_counts: list, seed: int):
         options = dict(class_counts=class_counts, seed=seed)
         generator = np.random.default_rng(seed)
-        indices = get_class_indices(dataset, class_counts=class_counts, generator=generator)
+        indices = get_class_indices(get_targets(dataset), class_counts=class_counts, generator=generator)
 
         super().__init__(dataset, indices, f"ImbalancedDataset(dataset={dataset}, {options})")
         self.options = options
@@ -538,7 +535,7 @@ class ImbalancedClassSplitDataset(SubsetAliasDataset):
         # num_majority_classes)
         # class_counts = list(generator.permuted(class_counts))
 
-        indices = get_class_indices(dataset, class_counts=class_counts, generator=generator)
+        indices = get_class_indices(get_targets(dataset), class_counts=class_counts, generator=generator)
 
         options = dict(
             # num_majority_classes=num_majority_classes,

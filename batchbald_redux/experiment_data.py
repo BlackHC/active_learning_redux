@@ -126,12 +126,14 @@ def load_standard_experiment_data(
     if id_repetitions < 1:
         train_dataset = train_dataset * id_repetitions
 
+    targets = train_dataset.get_targets()
     num_classes = train_dataset.get_num_classes()
     initial_samples_per_class = initial_training_set_size // num_classes
     evaluation_set_samples_per_class = evaluation_set_size // num_classes
     samples_per_class = initial_samples_per_class + evaluation_set_samples_per_class
+
     balanced_samples_indices = get_balanced_sample_indices_by_class(
-        train_dataset,
+        targets=targets,
         num_classes=num_classes,
         samples_per_class=samples_per_class,
         seed=validation_split_random_state,
@@ -287,7 +289,7 @@ def load_imbalanced_experiment_data(
 
     generator = np.random.default_rng(validation_split_random_state)
     class_indices_by_class = get_class_indices_by_class(
-        train_dataset,
+        train_dataset.get_targets(),
         class_counts=[
             initial_samples_per_class + evaluation_set_class_count
             for evaluation_set_class_count in evaluation_set_class_counts
@@ -439,7 +441,7 @@ def load_ood_classes_experiment_data(
     print("Initial Samples + Evaluation Set Class Counts:", class_counts)
 
     generator = np.random.default_rng(validation_split_random_state)
-    class_indices_by_class = get_class_indices_by_class(id_dataset, class_counts=class_counts, generator=generator)
+    class_indices_by_class = get_class_indices_by_class(get_targets(id_dataset), class_counts=class_counts, generator=generator)
 
     initial_training_set_indices = [
         idx for by_class in class_indices_by_class.values() for idx in by_class[:initial_samples_per_class]
@@ -563,7 +565,7 @@ def load_cinic_cifar_shift_experiment_data(
     num_classes = split_cifar10_dataset.train.get_num_classes()
     evaluation_set_samples_per_class = evaluation_set_size // num_classes
     balanced_evaluation_indices = get_balanced_sample_indices(
-        split_cifar10_dataset.train,
+        targets=split_cifar10_dataset.train.get_targets(),
         num_classes=num_classes,
         samples_per_class=evaluation_set_samples_per_class,
         seed=validation_split_random_state,
@@ -577,7 +579,7 @@ def load_cinic_cifar_shift_experiment_data(
 
     initial_samples_per_class = initial_training_set_size // num_classes
     balanced_initial_indices = get_balanced_sample_indices(
-        train_dataset,
+        targets=train_dataset.get_targets(),
         num_classes=num_classes,
         samples_per_class=initial_samples_per_class,
         seed=validation_split_random_state,
