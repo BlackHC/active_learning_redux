@@ -134,10 +134,14 @@ def get_lml_estimates(log_probs_N_K_C_labels_N):
 
     true_log_probs_N_K = log_probs_N_K_C[list(range(len(labels_N))), :, labels_N]
 
-    marginal_log_predictive = torch.logsumexp(true_log_probs_N_K, dim=1).sum(dim=0) - np.log(
-        true_log_probs_N_K.shape[1]
+    # Compute predictive distribution individually (as average of MC samples) and sum up.
+    marginal_log_predictive = (torch.logsumexp(true_log_probs_N_K, dim=1) - np.log(true_log_probs_N_K.shape[1])).sum(
+        dim=0
     )
+
+    # Compute joint distribution for each consistent parameter sample and then average.
     joint_log_predictive = torch.logsumexp(true_log_probs_N_K.sum(dim=0), dim=0) - np.log(true_log_probs_N_K.shape[1])
+
     return LmlEstimates(marginal_log_predictive, joint_log_predictive)
 
 
@@ -387,16 +391,13 @@ configs = [
         coldness=coldness,
     )
     for seed in range(5)
-    for acquisition_size in [10]
+    for acquisition_size in [5]
     for num_pool_samples in [100]
     for coldness in [1]
     for stochastic_mode in [
         acquisition_functions.StochasticMode.Power,
     ]
-    for acquisition_function in [
-        acquisition_functions.BALD,
-        acquisition_functions.Random
-    ]
+    for acquisition_function in [acquisition_functions.BALD, acquisition_functions.Random]
 ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
