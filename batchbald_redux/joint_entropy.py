@@ -5,6 +5,7 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'JointEntropy', 'Ex
 
 # Cell
 import math
+from typing import Optional
 
 import torch
 from toma import toma
@@ -79,6 +80,17 @@ class JointEntropy:
         """Computes the joint entropy of the added variables together with the batch (one by one)."""
         raise NotImplementedError()
 
+    def lazy_compute_batch(self, log_probs_B_K_C: torch.Tensor, previous_entropies_B: torch.Tensor, top_k:int, output_entropies_B=None) -> torch.Tensor:
+        """
+        Computes the joint entropy of the added variables together with the batch (one by one) using a lazy-greedy approach.
+
+        For this previous_entropies_B has to be sorted descending. We only support a top-k version here.
+
+        The idea is that once the number of updated scores > largest not-updated score is larger than k, the top-k can
+        only come from the updated scores.
+        """
+        raise NotImplementedError()
+
 # Cell
 
 
@@ -119,6 +131,9 @@ class ExactJointEntropy(JointEntropy):
         return self
 
     def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None):
+        return self.lazy_compute_batch(log_probs_B_K_C=log_probs_B_K_C, previous_entropies_B=None, top_k=None, output_entropies_B=output_entropies_B)
+
+    def lazy_compute_batch(self, log_probs_B_K_C: torch.Tensor, previous_entropies_B: Optional[torch.Tensor], top_k:Optional[int], output_entropies_B=None):
         assert self.joint_probs_M_K.shape[1] == log_probs_B_K_C.shape[1]
 
         B, K, C = log_probs_B_K_C.shape
@@ -130,29 +145,45 @@ class ExactJointEntropy(JointEntropy):
         pbar = create_progress_bar(B, tqdm_args=dict(desc="ExactJointEntropy.compute_batch", leave=False))
         pbar.start()
 
+        copy_old_scores = None
+
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+            nonlocal copy_old_scores
+
             if start == 0:
                 pbar.reset()
+                copy_old_scores = False
 
-            chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
-            b = chunked_probs_b_K_C.shape[0]
+            if not copy_old_scores:
+                chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
+                b = chunked_probs_b_K_C.shape[0]
 
-            probs_b_M_C = torch.empty((b, M, C), dtype=self.joint_probs_M_K.dtype, device=self.joint_probs_M_K.device)
-            for i in range(b):
-                torch.matmul(
-                    self.joint_probs_M_K,
-                    chunked_probs_b_K_C[i].to(self.joint_probs_M_K, non_blocking=True),
-                    out=probs_b_M_C[i],
+                probs_b_M_C = torch.empty((b, M, C), dtype=self.joint_probs_M_K.dtype, device=self.joint_probs_M_K.device)
+                for i in range(b):
+                    torch.matmul(
+                        self.joint_probs_M_K,
+                        chunked_probs_b_K_C[i].to(self.joint_probs_M_K, non_blocking=True),
+                        out=probs_b_M_C[i],
+                    )
+                probs_b_M_C /= K
+
+                nats_b_M_C = -torch.log(probs_b_M_C) * probs_b_M_C
+                nats_b_M_C[torch.isnan(nats_b_M_C)] = 0.
+
+                output_entropies_B[start:end].copy_(
+                    torch.sum(nats_b_M_C, dim=(1, 2)), non_blocking=True
                 )
-            probs_b_M_C /= K
 
-            nats_b_M_C = -torch.log(probs_b_M_C) * probs_b_M_C
-            nats_b_M_C[torch.isnan(nats_b_M_C)] = 0.
-
-            output_entropies_B[start:end].copy_(
-                torch.sum(nats_b_M_C, dim=(1, 2)), non_blocking=True
-            )
+                # Early out (if there is anything left to do)?
+                if end < B and previous_entropies_B is not None:
+                    if torch.sum(output_entropies_B[:end] > previous_entropies_B[end]) >= top_k:
+                        copy_old_scores = True
+            else:
+                # Just copy old scores
+                output_entropies_B[start:end].copy_(
+                    previous_entropies_B[start:end], non_blocking=True
+                )
 
             pbar.update(end - start)
 
@@ -264,6 +295,9 @@ class SampledJointEntropy(JointEntropy):
         return self
 
     def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None):
+        return self.lazy_compute_batch(log_probs_B_K_C=log_probs_B_K_C, previous_entropies_B=None, top_k=None, output_entropies_B=output_entropies_B)
+
+    def lazy_compute_batch(self, log_probs_B_K_C: torch.Tensor, previous_entropies_B: Optional[torch.Tensor], top_k:Optional[int], output_entropies_B=None):
         assert self.sampled_joint_probs_M_K.shape[1] == log_probs_B_K_C.shape[1]
 
         B, K, C = log_probs_B_K_C.shape
@@ -275,29 +309,45 @@ class SampledJointEntropy(JointEntropy):
         pbar = create_progress_bar(B, tqdm_args=dict(desc="SampledJointEntropy.compute_batch", leave=False))
         pbar.start()
 
+        copy_old_scores = None
+
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
         def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+            nonlocal copy_old_scores
+
             if start == 0:
                 pbar.reset()
+                copy_old_scores = False
 
-            b = chunked_log_probs_b_K_C.shape[0]
+            if not copy_old_scores:
+                b = chunked_log_probs_b_K_C.shape[0]
 
-            probs_b_M_C = torch.empty(
-                (b, M, C), dtype=self.sampled_joint_probs_M_K.dtype, device=self.sampled_joint_probs_M_K.device
-            )
-            for i in range(b):
-                torch.matmul(
-                    self.sampled_joint_probs_M_K,
-                    chunked_log_probs_b_K_C[i].to(self.sampled_joint_probs_M_K, non_blocking=True).exp(),
-                    out=probs_b_M_C[i],
+                probs_b_M_C = torch.empty(
+                    (b, M, C), dtype=self.sampled_joint_probs_M_K.dtype, device=self.sampled_joint_probs_M_K.device
                 )
-            probs_b_M_C /= K
+                for i in range(b):
+                    torch.matmul(
+                        self.sampled_joint_probs_M_K,
+                        chunked_log_probs_b_K_C[i].to(self.sampled_joint_probs_M_K, non_blocking=True).exp(),
+                        out=probs_b_M_C[i],
+                    )
+                probs_b_M_C /= K
 
-            q_1_M_1 = self.sampled_joint_probs_M_K.mean(dim=1, keepdim=True)[None]
+                q_1_M_1 = self.sampled_joint_probs_M_K.mean(dim=1, keepdim=True)[None]
 
-            output_entropies_B[start:end].copy_(
-                torch.sum(-torch.log(probs_b_M_C) * probs_b_M_C / q_1_M_1, dim=(1, 2)) / M, non_blocking=True
-            )
+                output_entropies_B[start:end].copy_(
+                    torch.sum(-torch.log(probs_b_M_C) * probs_b_M_C / q_1_M_1, dim=(1, 2)) / M, non_blocking=True
+                )
+
+                # Early out (if there is anything left to do)?
+                if end < B and previous_entropies_B is not None:
+                    if torch.sum(output_entropies_B[:end] > previous_entropies_B[end]) >= top_k:
+                        copy_old_scores = True
+            else:
+                # Just copy old scores
+                output_entropies_B[start:end].copy_(
+                    previous_entropies_B[start:end], non_blocking=True
+                )
 
             pbar.update(end - start)
 
@@ -346,3 +396,7 @@ class DynamicJointEntropy(JointEntropy):
     def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None) -> torch.Tensor:
         """Computes the joint entropy of the added variables together with the batch (one by one)."""
         return self.inner.compute_batch(log_probs_B_K_C, output_entropies_B)
+
+    def lazy_compute_batch(self, log_probs_B_K_C: torch.Tensor, previous_entropies_B: Optional[torch.Tensor], top_k:Optional[int], output_entropies_B=None):
+        """Computes the joint entropy of the added variables together with the batch (one by one)."""
+        return self.inner.lazy_compute_batch(log_probs_B_K_C=log_probs_B_K_C, previous_entropies_B=previous_entropies_B, top_k=top_k, output_entropies_B=output_entropies_B)
