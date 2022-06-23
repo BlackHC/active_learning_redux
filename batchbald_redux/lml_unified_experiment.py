@@ -391,8 +391,8 @@ configs = [
         coldness=coldness,
     )
     for seed in range(5)
-    for acquisition_size in [5]
-    for num_pool_samples in [100]
+    for acquisition_size in [1]
+    for num_pool_samples in [20]
     for coldness in [1]
     for stochastic_mode in [
         acquisition_functions.StochasticMode.Power,
