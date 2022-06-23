@@ -6,13 +6,10 @@ __all__ = ['CINIC10']
 
 import os
 from pathlib import Path
-from typing import IO, Any, Callable, Dict, List, Optional, Tuple, Union
-from urllib.error import URLError
+from typing import Callable, Optional
 
-import torch
 from torchvision.datasets import ImageFolder
-from torchvision.datasets.utils import download_and_extract_archive, verify_str_arg
-from torchvision.transforms import Compose, Normalize, ToTensor
+from torchvision.datasets.utils import download_and_extract_archive
 
 # Cell
 

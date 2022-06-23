@@ -14,6 +14,7 @@ import batchbald_redux.acquisition_functions.batchbald
 import batchbald_redux.acquisition_functions.sievebald
 from batchbald_redux import acquisition_functions
 from .unified_experiment import UnifiedExperiment
+from .experiment_data import StandardExperimentDataConfig
 
 from .models import MnistModelTrainer
 
@@ -21,29 +22,81 @@ from .models import MnistModelTrainer
 
 configs = [
     UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=False,
+            ood_dataset_config=None,
+        ),
         seed=seed + 6548,
         acquisition_function=acquisition_function,
         acquisition_size=acquisition_size,
         num_pool_samples=num_pool_samples,
-        initial_training_set_size=20,
-        evaluation_set_size=0,
-        max_training_set=300,
-        id_dataset_name="MNIST",
-        ood_dataset_name=None,
-        ood_exposure=False,
-        id_repetitions=id_repetitions,
-        add_dataset_noise=True,
+        max_training_set=320,
         model_trainer_factory=MnistModelTrainer
     )
     for seed in range(5)
     for acquisition_function in [
         batchbald_redux.acquisition_functions.sievebald.SieveBALD,
+    ]
+    for acquisition_size in [10,20,40]
+    for num_pool_samples in [100]
+    for id_repetitions in [1, 4]
+] +  [UnifiedExperiment(
+        experiment_data_config=StandardExperimentDataConfig(
+            id_dataset_name="MNIST",
+            id_repetitions=id_repetitions,
+            initial_training_set_size=20,
+            validation_set_size=4096,
+            validation_split_random_state=0,
+            evaluation_set_size=0,
+            add_dataset_noise=False,
+            ood_dataset_config=None,
+        ),
+        seed=seed + 6548,
+        acquisition_function=acquisition_function,
+        acquisition_size=acquisition_size,
+        num_pool_samples=num_pool_samples,
+        max_training_set=320,
+        model_trainer_factory=MnistModelTrainer
+    )
+    for seed in range(5)
+    for acquisition_function in [
         batchbald_redux.acquisition_functions.batchbald.BatchBALD,
     ]
-    for acquisition_size in [10]
+    for acquisition_size in [5, 10]
     for num_pool_samples in [100]
     for id_repetitions in [1, 4]
 ]
+# + [
+#     UnifiedExperiment(
+#         seed=seed + 6548,
+#         acquisition_function=acquisition_function,
+#         acquisition_size=acquisition_size,
+#         num_pool_samples=num_pool_samples,
+#         initial_training_set_size=20,
+#         evaluation_set_size=0,
+#         max_training_set=300,
+#         id_dataset_name="MNIST",
+#         ood_dataset_name=None,
+#         ood_exposure=False,
+#         id_repetitions=id_repetitions,
+#         add_dataset_noise=True,
+#         model_trainer_factory=MnistModelTrainer
+#     )
+#     for seed in range(5)
+#     for acquisition_function in [
+#         batchbald_redux.acquisition_functions.sievebald.SieveBALD,
+#         batchbald_redux.acquisition_functions.batchbald.BatchBALD,
+#     ]
+#     for acquisition_size in [10]
+#     for num_pool_samples in [100]
+#     for id_repetitions in [1, 4]
+# ]
 
 if not is_run_from_ipython() and __name__ == "__main__":
     for job_id, store in embedded_experiments(__file__, len(configs)):
