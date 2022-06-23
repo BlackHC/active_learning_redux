@@ -5,6 +5,7 @@ __all__ = ['compute_conditional_entropy', 'compute_entropy', 'JointEntropy', 'Ex
 
 # Cell
 import math
+from typing import Optional
 
 import torch
 from toma import toma
@@ -18,7 +19,9 @@ def compute_conditional_entropy(log_probs_N_K_C: torch.Tensor) -> torch.Tensor:
 
     log_probs_N_K_C = log_probs_N_K_C.to(torch.double)
 
-    pbar = create_progress_bar(N, tqdm_args=dict(desc="Conditional Entropy", leave=False))
+    pbar = create_progress_bar(
+        N, tqdm_args=dict(desc="Conditional Entropy", leave=False)
+    )
     pbar.start()
 
     @toma.execute.chunked(log_probs_N_K_C, 65536)
@@ -75,8 +78,27 @@ class JointEntropy:
         """Expands the joint entropy to include more terms."""
         raise NotImplementedError()
 
-    def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None) -> torch.Tensor:
+    def compute_batch(
+        self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None
+    ) -> torch.Tensor:
         """Computes the joint entropy of the added variables together with the batch (one by one)."""
+        raise NotImplementedError()
+
+    def lazy_compute_batch(
+        self,
+        log_probs_B_K_C: torch.Tensor,
+        previous_entropies_B: torch.Tensor,
+        top_k: int,
+        output_entropies_B=None,
+    ) -> torch.Tensor:
+        """
+        Computes the joint entropy of the added variables together with the batch (one by one) using a lazy-greedy approach.
+
+        For this previous_entropies_B has to be sorted descending. We only support a top-k version here.
+
+        The idea is that once the number of updated scores > largest not-updated score is larger than k, the top-k can
+        only come from the updated scores.
+        """
         raise NotImplementedError()
 
 # Cell
@@ -95,7 +117,7 @@ class ExactJointEntropy(JointEntropy):
     def compute(self) -> torch.Tensor:
         probs_M = torch.mean(self.joint_probs_M_K, dim=1, keepdim=False)
         nats_M = -torch.log(probs_M) * probs_M
-        nats_M[torch.isnan(nats_M)] = 0.
+        nats_M[torch.isnan(nats_M)] = 0.0
         del probs_M
         entropy = torch.sum(nats_M)
         del nats_M
@@ -111,7 +133,9 @@ class ExactJointEntropy(JointEntropy):
 
         # Using lots of memory.
         for i in range(N):
-            probs_i__K_1_C = probs_N_K_C[i][:, None, :].to(joint_probs_K_M_1, non_blocking=True)
+            probs_i__K_1_C = probs_N_K_C[i][:, None, :].to(
+                joint_probs_K_M_1, non_blocking=True
+            )
             joint_probs_K_M_C = joint_probs_K_M_1 * probs_i__K_1_C
             joint_probs_K_M_1 = joint_probs_K_M_C.reshape((K, -1, 1))
 
@@ -119,40 +143,85 @@ class ExactJointEntropy(JointEntropy):
         return self
 
     def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None):
+        return self.lazy_compute_batch(
+            log_probs_B_K_C=log_probs_B_K_C,
+            previous_entropies_B=None,
+            top_k=None,
+            output_entropies_B=output_entropies_B,
+        )
+
+    def lazy_compute_batch(
+        self,
+        log_probs_B_K_C: torch.Tensor,
+        previous_entropies_B: Optional[torch.Tensor],
+        top_k: Optional[int],
+        output_entropies_B=None,
+    ):
         assert self.joint_probs_M_K.shape[1] == log_probs_B_K_C.shape[1]
 
         B, K, C = log_probs_B_K_C.shape
         M = self.joint_probs_M_K.shape[0]
 
         if output_entropies_B is None:
-            output_entropies_B = torch.empty(B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device)
+            output_entropies_B = torch.empty(
+                B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device
+            )
 
-        pbar = create_progress_bar(B, tqdm_args=dict(desc="ExactJointEntropy.compute_batch", leave=False))
+        pbar = create_progress_bar(
+            B, tqdm_args=dict(desc="ExactJointEntropy.compute_batch", leave=False)
+        )
         pbar.start()
 
+        copy_old_scores = None
+
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
-        def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+        def chunked_joint_entropy(
+            chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int
+        ):
+            nonlocal copy_old_scores
+
             if start == 0:
                 pbar.reset()
+                copy_old_scores = False
 
-            chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
-            b = chunked_probs_b_K_C.shape[0]
+            if not copy_old_scores:
+                chunked_probs_b_K_C = chunked_log_probs_b_K_C.exp()
+                b = chunked_probs_b_K_C.shape[0]
 
-            probs_b_M_C = torch.empty((b, M, C), dtype=self.joint_probs_M_K.dtype, device=self.joint_probs_M_K.device)
-            for i in range(b):
-                torch.matmul(
-                    self.joint_probs_M_K,
-                    chunked_probs_b_K_C[i].to(self.joint_probs_M_K, non_blocking=True),
-                    out=probs_b_M_C[i],
+                probs_b_M_C = torch.empty(
+                    (b, M, C),
+                    dtype=self.joint_probs_M_K.dtype,
+                    device=self.joint_probs_M_K.device,
                 )
-            probs_b_M_C /= K
+                for i in range(b):
+                    torch.matmul(
+                        self.joint_probs_M_K,
+                        chunked_probs_b_K_C[i].to(
+                            self.joint_probs_M_K, non_blocking=True
+                        ),
+                        out=probs_b_M_C[i],
+                    )
+                probs_b_M_C /= K
 
-            nats_b_M_C = -torch.log(probs_b_M_C) * probs_b_M_C
-            nats_b_M_C[torch.isnan(nats_b_M_C)] = 0.
+                nats_b_M_C = -torch.log(probs_b_M_C) * probs_b_M_C
+                nats_b_M_C[torch.isnan(nats_b_M_C)] = 0.0
 
-            output_entropies_B[start:end].copy_(
-                torch.sum(nats_b_M_C, dim=(1, 2)), non_blocking=True
-            )
+                output_entropies_B[start:end].copy_(
+                    torch.sum(nats_b_M_C, dim=(1, 2)), non_blocking=True
+                )
+
+                # Early out (if there is anything left to do)?
+                if end < B and previous_entropies_B is not None:
+                    if (
+                        torch.sum(output_entropies_B[:end] > previous_entropies_B[end])
+                        >= top_k
+                    ):
+                        copy_old_scores = True
+            else:
+                # Just copy old scores
+                output_entropies_B[start:end].copy_(
+                    previous_entropies_B[start:end], non_blocking=True
+                )
 
             pbar.update(end - start)
 
@@ -229,7 +298,9 @@ class SampledJointEntropy(JointEntropy):
         expanded_choices_N_1_K_S = choices_N_K_S[:, None, :, :]
         expanded_probs_N_K_1_C = probs_N_K_C[:, :, None, :]
 
-        probs_N_K_K_S = gather_expand(expanded_probs_N_K_1_C, dim=-1, index=expanded_choices_N_1_K_S)
+        probs_N_K_K_S = gather_expand(
+            expanded_probs_N_K_1_C, dim=-1, index=expanded_choices_N_1_K_S
+        )
         assert expanded_probs_N_K_1_C.data_ptr() != probs_N_K_K_S.data_ptr()
 
         # exp sum log seems necessary to avoid 0s?
@@ -241,13 +312,17 @@ class SampledJointEntropy(JointEntropy):
         return SampledJointEntropy(samples_M_K)
 
     def compute(self) -> torch.Tensor:
-        sampled_joint_probs_M = torch.mean(self.sampled_joint_probs_M_K, dim=1, keepdim=False)
+        sampled_joint_probs_M = torch.mean(
+            self.sampled_joint_probs_M_K, dim=1, keepdim=False
+        )
         nats_M = -sampled_joint_probs_M.log_()
-        nats_M[torch.isnan(nats_M)] = 0.
+        nats_M[torch.isnan(nats_M)] = 0.0
         entropy = torch.mean(nats_M)
         return entropy
 
-    def add_variables(self, log_probs_N_K_C: torch.Tensor, M2: int) -> "SampledJointEntropy":
+    def add_variables(
+        self, log_probs_N_K_C: torch.Tensor, M2: int
+    ) -> "SampledJointEntropy":
         assert self.sampled_joint_probs_M_K.shape[1] == log_probs_N_K_C.shape[1]
         K = log_probs_N_K_C.shape[1]
 
@@ -264,40 +339,87 @@ class SampledJointEntropy(JointEntropy):
         return self
 
     def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None):
+        return self.lazy_compute_batch(
+            log_probs_B_K_C=log_probs_B_K_C,
+            previous_entropies_B=None,
+            top_k=None,
+            output_entropies_B=output_entropies_B,
+        )
+
+    def lazy_compute_batch(
+        self,
+        log_probs_B_K_C: torch.Tensor,
+        previous_entropies_B: Optional[torch.Tensor],
+        top_k: Optional[int],
+        output_entropies_B=None,
+    ):
         assert self.sampled_joint_probs_M_K.shape[1] == log_probs_B_K_C.shape[1]
 
         B, K, C = log_probs_B_K_C.shape
         M = self.sampled_joint_probs_M_K.shape[0]
 
         if output_entropies_B is None:
-            output_entropies_B = torch.empty(B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device)
+            output_entropies_B = torch.empty(
+                B, dtype=log_probs_B_K_C.dtype, device=log_probs_B_K_C.device
+            )
 
-        pbar = create_progress_bar(B, tqdm_args=dict(desc="SampledJointEntropy.compute_batch", leave=False))
+        pbar = create_progress_bar(
+            B, tqdm_args=dict(desc="SampledJointEntropy.compute_batch", leave=False)
+        )
         pbar.start()
 
+        copy_old_scores = None
+
         @toma.execute.chunked(log_probs_B_K_C, initial_step=1024, dimension=0)
-        def chunked_joint_entropy(chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int):
+        def chunked_joint_entropy(
+            chunked_log_probs_b_K_C: torch.Tensor, start: int, end: int
+        ):
+            nonlocal copy_old_scores
+
             if start == 0:
                 pbar.reset()
+                copy_old_scores = False
 
-            b = chunked_log_probs_b_K_C.shape[0]
+            if not copy_old_scores:
+                b = chunked_log_probs_b_K_C.shape[0]
 
-            probs_b_M_C = torch.empty(
-                (b, M, C), dtype=self.sampled_joint_probs_M_K.dtype, device=self.sampled_joint_probs_M_K.device
-            )
-            for i in range(b):
-                torch.matmul(
-                    self.sampled_joint_probs_M_K,
-                    chunked_log_probs_b_K_C[i].to(self.sampled_joint_probs_M_K, non_blocking=True).exp(),
-                    out=probs_b_M_C[i],
+                probs_b_M_C = torch.empty(
+                    (b, M, C),
+                    dtype=self.sampled_joint_probs_M_K.dtype,
+                    device=self.sampled_joint_probs_M_K.device,
                 )
-            probs_b_M_C /= K
+                for i in range(b):
+                    torch.matmul(
+                        self.sampled_joint_probs_M_K,
+                        chunked_log_probs_b_K_C[i]
+                        .to(self.sampled_joint_probs_M_K, non_blocking=True)
+                        .exp(),
+                        out=probs_b_M_C[i],
+                    )
+                probs_b_M_C /= K
 
-            q_1_M_1 = self.sampled_joint_probs_M_K.mean(dim=1, keepdim=True)[None]
+                q_1_M_1 = self.sampled_joint_probs_M_K.mean(dim=1, keepdim=True)[None]
 
-            output_entropies_B[start:end].copy_(
-                torch.sum(-torch.log(probs_b_M_C) * probs_b_M_C / q_1_M_1, dim=(1, 2)) / M, non_blocking=True
-            )
+                output_entropies_B[start:end].copy_(
+                    torch.sum(
+                        -torch.log(probs_b_M_C) * probs_b_M_C / q_1_M_1, dim=(1, 2)
+                    )
+                    / M,
+                    non_blocking=True,
+                )
+
+                # Early out (if there is anything left to do)?
+                if end < B and previous_entropies_B is not None:
+                    if (
+                        torch.sum(output_entropies_B[:end] > previous_entropies_B[end])
+                        >= top_k
+                    ):
+                        copy_old_scores = True
+            else:
+                # Just copy old scores
+                output_entropies_B[start:end].copy_(
+                    previous_entropies_B[start:end], non_blocking=True
+                )
 
             pbar.update(end - start)
 
@@ -320,7 +442,9 @@ class DynamicJointEntropy(JointEntropy):
         self.max_N = max_N
 
         self.inner = ExactJointEntropy.empty(K, dtype=dtype, device=device)
-        self.log_probs_max_N_K_C = torch.empty((max_N, K, C), dtype=dtype, device=device)
+        self.log_probs_max_N_K_C = torch.empty(
+            (max_N, K, C), dtype=dtype, device=device
+        )
 
     def add_variables(self, log_probs_N_K_C: torch.Tensor) -> "DynamicJointEntropy":
         C = self.log_probs_max_N_K_C.shape[2]
@@ -334,7 +458,9 @@ class DynamicJointEntropy(JointEntropy):
 
         num_exact_samples = C ** self.N
         if num_exact_samples > self.M:
-            self.inner = SampledJointEntropy.sample(self.log_probs_max_N_K_C[: self.N].exp(), self.M)
+            self.inner = SampledJointEntropy.sample(
+                self.log_probs_max_N_K_C[: self.N].exp(), self.M
+            )
         else:
             self.inner.add_variables(log_probs_N_K_C)
 
@@ -343,6 +469,21 @@ class DynamicJointEntropy(JointEntropy):
     def compute(self) -> torch.Tensor:
         return self.inner.compute()
 
-    def compute_batch(self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None) -> torch.Tensor:
-        """Computes the joint entropy of the added variables together with the batch (one by one)."""
+    def compute_batch(
+        self, log_probs_B_K_C: torch.Tensor, output_entropies_B=None
+    ) -> torch.Tensor:
         return self.inner.compute_batch(log_probs_B_K_C, output_entropies_B)
+
+    def lazy_compute_batch(
+        self,
+        log_probs_B_K_C: torch.Tensor,
+        previous_entropies_B: Optional[torch.Tensor],
+        top_k: Optional[int],
+        output_entropies_B=None,
+    ):
+        return self.inner.lazy_compute_batch(
+            log_probs_B_K_C=log_probs_B_K_C,
+            previous_entropies_B=previous_entropies_B,
+            top_k=top_k,
+            output_entropies_B=output_entropies_B,
+        )

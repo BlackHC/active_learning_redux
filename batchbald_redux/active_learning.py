@@ -98,7 +98,11 @@ class ActiveLearningData:
 
 
 class SampledActiveLearningData:
-    """For datasets that provide a label distribution allows to sample from the label distribution on acquisition."""
+    """
+    For datasets that provide a label distribution, this class allows to sample from the label distribution on acquisition.
+
+    To do this, we keep a list of the drawn labels for each training sample.
+    """
 
     base_dataset: data.Dataset
 
