@@ -35,7 +35,7 @@ from .dataset_operations import (
     get_base_dataset_index,
     get_target,
 )
-from .datasets import get_dataset
+from .datasets.factories import get_dataset
 from .di import DependencyInjection
 from .experiment_data import (
     ExperimentData,
@@ -45,7 +45,7 @@ from .experiment_data import (
 )
 from .experiment_logging import init_wandb, log2wandb
 from .models import MnistModelTrainer
-from .resnet_models import Cifar10ModelTrainer
+from .models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,

@@ -30,10 +30,10 @@ from .dataset_operations import (
     get_base_dataset_index,
     get_target, AdditiveGaussianNoise, AliasDataset, get_balanced_sample_indices_by_class,
 )
-from .datasets import get_dataset
+from .datasets.factories import get_dataset
 from .di import DependencyInjection
-from .resnet_models import Cifar10BayesianResnetFactory
-from .resnet_models import Cifar10ModelTrainer
+from .models import Cifar10BayesianResnetFactory
+from .models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,

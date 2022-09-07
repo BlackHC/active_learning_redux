@@ -34,7 +34,7 @@ from .experiment_data import (
     StandardExperimentDataConfig,
 )
 from .models import MnistModelTrainer
-from .resnet_models import Cifar10ModelTrainer
+from .models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,

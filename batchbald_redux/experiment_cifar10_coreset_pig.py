@@ -16,7 +16,7 @@ from batchbald_redux import acquisition_functions, baseline_acquisition_function
 from .experiment_data import StandardExperimentDataConfig
 from .unified_experiment import UnifiedExperiment
 from .train_eval_model import TrainExplicitEvalModel
-from .resnet_models import Cifar10ModelWorkshopPaperTrainer
+from .models import Cifar10ModelWorkshopPaperTrainer
 
 # Cell
 

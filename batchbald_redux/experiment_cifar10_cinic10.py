@@ -16,7 +16,7 @@ from .experiment_data import (
     OoDDatasetConfig,
     StandardExperimentDataConfig,
 )
-from .resnet_models import Cifar10ModelWorkshopPaperTrainer
+from .models import Cifar10ModelWorkshopPaperTrainer
 from .unified_experiment import UnifiedExperiment
 
 # Cell

@@ -14,7 +14,7 @@ import batchbald_redux.acquisition_functions.bald
 import batchbald_redux.acquisition_functions.batchbald
 from batchbald_redux import acquisition_functions, baseline_acquisition_functions
 from .experiment_data import StandardExperimentDataConfig
-from .emnist_models import EMnistModelTrainer
+from .models import EMnistModelTrainer
 from .unified_experiment import UnifiedExperiment
 
 # Cell

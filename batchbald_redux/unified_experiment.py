@@ -35,7 +35,7 @@ from .experiment_data import (
 )
 from .experiment_logging import init_wandb, log2wandb
 from .models import MnistModelTrainer
-from .resnet_models import Cifar10ModelTrainer
+from .models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
