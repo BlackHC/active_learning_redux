@@ -18,7 +18,7 @@ from torch import nn
 from torch.utils.data import Dataset
 
 from .active_learning import ActiveLearningData
-from .dataset_challenges import (
+from .dataset_operations import (
     AdditiveGaussianNoise,
     AliasDataset,
     NamedDataset,

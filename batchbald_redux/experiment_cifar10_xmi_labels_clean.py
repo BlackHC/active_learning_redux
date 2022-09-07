@@ -26,7 +26,7 @@ from .acquisition_functions import (
 )
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate
-from .dataset_challenges import (
+from .dataset_operations import (
     get_base_dataset_index,
     get_target, AdditiveGaussianNoise, AliasDataset, get_balanced_sample_indices_by_class,
 )

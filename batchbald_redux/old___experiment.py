@@ -24,7 +24,7 @@ from .acquisition_functions import (
 )
 from .active_learning import ActiveLearningData
 from .black_box_model_training import evaluate
-from .dataset_challenges import (
+from .dataset_operations import (
     create_repeated_MNIST_dataset,
     get_base_dataset_index,
     get_target,

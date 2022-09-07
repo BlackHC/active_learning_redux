@@ -6,7 +6,7 @@ import numpy as np
 from tqdm.auto import tqdm
 from toma import toma
 
-from batchbald_redux.dataset_challenges import AliasDataset
+from batchbald_redux.dataset_operations import AliasDataset
 from batchbald_redux.consistent_mc_dropout import BayesianModule
 
 

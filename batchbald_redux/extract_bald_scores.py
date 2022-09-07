@@ -24,7 +24,7 @@ from .acquisition_functions import (
     EvalModelBatchComputer,
 )
 from .black_box_model_training import evaluate
-from .dataset_challenges import get_base_dataset_index, get_target
+from .dataset_operations import get_base_dataset_index, get_target
 from .di import DependencyInjection
 from .experiment_data import (
     ExperimentData,
@@ -43,7 +43,7 @@ from .trained_model import ModelTrainer, BayesianEnsembleModelTrainer
 from .joint_entropy import compute_entropy
 from .acquisition_functions.bald import get_bald_scores
 
-from .dataset_challenges import get_base_dataset_index
+from .dataset_operations import get_base_dataset_index
 
 # Cell
 

@@ -19,7 +19,7 @@ import wandb
 
 from .active_learning import ActiveLearningData, RandomFixedLengthSampler
 from .black_box_model_training import evaluate_old, train
-from .dataset_challenges import NamedDataset
+from .dataset_operations import NamedDataset
 from .di import DependencyInjection
 from .experiment_logging import asclassdict, init_wandb, log2wandb
 from .fast_mnist import FastMNIST
