@@ -17,9 +17,9 @@ from torch import nn
 from torch.utils import data
 from torchvision import datasets, transforms
 
-from .dataset_operations import NamedDataset, get_targets
-from .cinic10 import CINIC10
-from .fast_mnist import FastFashionMNIST, FastMNIST
+from batchbald_redux.dataset_operations import NamedDataset, get_targets
+from cinic10 import CINIC10
+from fast_mnist import FastFashionMNIST, FastMNIST
 
 
 @dataclass
