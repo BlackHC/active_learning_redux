@@ -17,16 +17,30 @@ class DependencyInjection:
     supported_types: list = None
 
     def create_dataclass_type(self, dataclass_type: Type[T], **kwargs) -> T:
+        """
+        Create a dataclass type.
+
+        :param dataclass_type: the type to create.
+        :param kwargs: additional arguments to pass to the dataclass constructor
+        :return: a new instance of the dataclass type.
+        """
         resolved_args = self.resolve_dataclass_args(dataclass_type)
         final_args = {**resolved_args, **kwargs}
 
-        args_str = ",\n".join([f"\t{key}={value}" for key, value in final_args.items()])
         self.check_missing_fields(dataclass_type, final_args)
 
+        args_str = ",\n".join([f"\t{key}={value}" for key, value in final_args.items()])
         print(f"Creating: {dataclass_type.__qualname__}(\n{args_str}\n)")
         return dataclass_type(**final_args)
 
     def check_missing_fields(self, dataclass_type, args):
+        """
+        Check if all fields are present in the args or have defaults.
+
+        :param dataclass_type:
+        :param args:
+        :return: raises an exception if a field is missing.
+        """
         missing_fields = []
 
         fields = dataclasses.fields(dataclass_type)
@@ -43,6 +57,12 @@ class DependencyInjection:
             raise ValueError(f"Unresolved fields for {dataclass_type.__qualname__}: {', '.join(missing_fields)}")
 
     def resolve_dataclass_args(self, dataclass_type):
+        """
+        Resolve the arguments for a dataclass type.
+
+        :param dataclass_type:
+        :return: resolved arguments as a dict.
+        """
         fields = dataclasses.fields(dataclass_type)
 
         resolved_args = {}
@@ -56,7 +76,5 @@ class DependencyInjection:
 
             if self.supported_types and field.type in self.supported_types:
                 resolved_args[field.name] = self.create_dataclass_type(field.type)
-
-        # print(f"Resolved: {dataclass_type.__qualname__} with {resolved_args}")
 
         return resolved_args
