@@ -21,6 +21,7 @@ from batchbald_redux.unified_experiment import UnifiedExperiment
 
 coldness_range = [1/4, 1., 4., 8., 16.]
 
+# num_experiments = 5*3*4=5*12=60
 configs = [
     UnifiedExperiment(
         experiment_data_config=StandardExperimentDataConfig(
@@ -55,36 +56,6 @@ configs = [
         acquisition_functions.StochasticMode.Power,
         acquisition_functions.StochasticMode.Softmax,
         acquisition_functions.StochasticMode.Softrank,
-    ]
-] + [
-    UnifiedExperiment(
-        experiment_data_config=StandardExperimentDataConfig(
-            id_dataset_name="MNIST",
-            id_repetitions=id_repetitions,
-            initial_training_set_size=20,
-            validation_set_size=4096,
-            validation_split_random_state=0,
-            evaluation_set_size=0,
-            add_dataset_noise=True,
-            ood_dataset_config=None,
-        ),
-        seed=seed + 1765,
-        acquisition_function=acquisition_function,
-        acquisition_size=acquisition_size,
-        num_pool_samples=num_pool_samples,
-        max_training_set=300,
-        model_trainer_factory=MnistModelTrainer,
-        stochastic_mode=stochastic_mode,
-    )
-    for acquisition_function in [
-        batchbald_redux.acquisition_functions.bald.BALD,
-        acquisition_functions.Random,
-    ]
-    for seed in range(5)
-    for acquisition_size in [5]
-    for num_pool_samples in [100]
-    for id_repetitions in [1,2,4]
-    for stochastic_mode in [
         acquisition_functions.StochasticMode.TopK,
     ]
 ]
