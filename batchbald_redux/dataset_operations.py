@@ -21,7 +21,7 @@ import torch.utils.data as data
 import torchvision.datasets
 from ddu_dirty_mnist import DistributionalAmbiguousMNIST, AmbiguousMNIST
 
-from .fast_mnist import FastFashionMNIST, FastMNIST
+from batchbald_redux.datasets.fast_mnist import FastFashionMNIST, FastMNIST
 
 # Cell
 
