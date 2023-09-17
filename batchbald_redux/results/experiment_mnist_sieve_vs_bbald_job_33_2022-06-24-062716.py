@@ -1,0 +1,12 @@
+store = {}
+store['timestamp']=1656048436
+store['cmdline']=['/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_mnist_sieve_vs_bbald.py', '--id=33']
+store['commit']='857038f171037232a2bd94828f739ec9c907ae8e'
+store['github_url']='857038f171037232a2bd94828f739ec9c907ae8e'
+store['experiment']='/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_mnist_sieve_vs_bbald.py'
+store['job_id']=33
+store['worker_id']=33
+store['num_workers']=50
+store['config']={'seed': 6581, 'experiment_data_config': {'id_dataset_name': 'MNIST', 'id_repetitions': 4, 'initial_training_set_size': 20, 'validation_set_size': 4096, 'validation_split_random_state': 0, 'evaluation_set_size': 0, 'add_dataset_noise': False, 'ood_dataset_config': None}, 'acquisition_size': 10, 'max_training_set': 320, 'max_training_epochs': 300, 'num_pool_samples': 100, 'num_validation_samples': 20, 'num_training_samples': 1, 'device': 'cuda', 'acquisition_function': 'batchbald_redux.acquisition_functions.batchbald.BatchBALD', 'train_eval_model': 'batchbald_redux.train_eval_model.TrainSelfDistillationEvalModel', 'model_trainer_factory': 'batchbald_redux.models.MnistModelTrainer', 'ensemble_size': 1, 'temperature': 1.0, 'coldness': 1.0, 'stochastic_mode': None, 'epig_bootstrap_type': 'BootstrapType.NO_BOOTSTRAP', 'epig_bootstrap_factor': 1.0, 'epig_dtype': torch.float64, 'disable_training_augmentations': False, 'cache_explicit_eval_model': False, 'resnet18_dropout_head': True}
+store['log']={}
+store['exception']='Traceback (most recent call last):\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_mnist_sieve_vs_bbald.py", line 110, in <module>\n    config.run(store=store)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/unified_experiment.py", line 274, in run\n    data = self.load_experiment_data()\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/unified_experiment.py", line 253, in load_experiment_data\n    return self.experiment_data_config.load(self.device)\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_data.py", line 87, in load\n    return load_standard_experiment_data(\n  File "/auto/users/andsch/github/active_learning_redux/batchbald_redux/experiment_data.py", line 186, in load_standard_experiment_data\n    raise RuntimeError("`add_dataset_noise`==False, even though repeated id or ood data!")\nRuntimeError: `add_dataset_noise`==False, even though repeated id or ood data!\n'
