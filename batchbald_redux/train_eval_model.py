@@ -11,7 +11,7 @@ from torch import nn
 
 from .active_learning import RandomFixedLengthSampler
 from .consistent_mc_dropout import get_log_mean_probs
-from .dataset_challenges import (
+from .dataset_operations import (
     RandomLabelsDataset,
     ReplaceTargetsDataset,
 )

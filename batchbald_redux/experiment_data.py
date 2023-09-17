@@ -18,7 +18,7 @@ from torch import nn
 from torch.utils.data import Dataset
 
 from .active_learning import ActiveLearningData
-from .dataset_challenges import (
+from .dataset_operations import (
     AdditiveGaussianNoise,
     AliasDataset,
     NamedDataset,
@@ -28,7 +28,7 @@ from .dataset_challenges import (
     get_class_indices_by_class,
     get_targets,
 )
-from .datasets import get_dataset
+from .datasets.factories import get_dataset
 
 # Cell
 

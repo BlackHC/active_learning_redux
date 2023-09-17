@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-from batchbald_redux.dataset_challenges import AliasDataset, SubsetAliasDataset, get_targets
+from batchbald_redux.dataset_operations import AliasDataset, SubsetAliasDataset, get_targets
 
 
 class ActiveLearningData:

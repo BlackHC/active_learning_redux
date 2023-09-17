@@ -30,12 +30,12 @@ from .acquisition_functions import (
 )
 from .active_learning import SampledActiveLearningData
 from .black_box_model_training import evaluate
-from .dataset_challenges import (
+from .dataset_operations import (
     NamedDataset,
     get_base_dataset_index,
     get_target,
 )
-from .datasets import get_dataset
+from .datasets.factories import get_dataset
 from .di import DependencyInjection
 from .experiment_data import (
     ExperimentData,
@@ -45,7 +45,7 @@ from .experiment_data import (
 )
 from .experiment_logging import init_wandb, log2wandb
 from .models import MnistModelTrainer
-from .resnet_models import Cifar10ModelTrainer
+from .models import Cifar10ModelTrainer
 from .train_eval_model import (
     TrainEvalModel,
     TrainSelfDistillationEvalModel,
